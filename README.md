@@ -1,45 +1,75 @@
-**Edit a file, create a new file, and clone from Bitbucket in under 2 minutes**
+## Events
 
-When you're done, you can delete the content in this README and update the file with details for others getting started with your repository.
+This addon assumes the following data in an entry:
 
-*We recommend that you open this README in another tab as you perform the tasks below. You can [watch our video](https://youtu.be/0ocf7u76WSo) for a full demo of all the steps in this tutorial. Open the video in a new tab to avoid leaving Bitbucket.*
+```
+start_date: '2019-10-09 11:00'
+duration: '1'
+recurrence_type: weekly
+recurrence_end_date: '2019-11-07'
+```
 
----
+### Fields
 
-## Edit a file
+* `start_date` - **Required** - Start date **and** time of the event.
+* `duration` - **Required** - How long is the event, in hours
+* `recurrence_type` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`
+* `recurrence_end_date` - **Optional** - when is the last event. If `recurrence_type` is set and this is not, the event goes on forever
 
-You’ll start by editing this README file to learn how to edit a file in Bitbucket.
+### Usage
 
-1. Click **Source** on the left side.
-2. Click the README.md link from the list of files.
-3. Click the **Edit** button.
-4. Delete the following text: *Delete this line to make a change to the README from Bitbucket.*
-5. After making your change, click **Commit** and then **Commit** again in the dialog. The commit page will open and you’ll see the change you just made.
-6. Go back to the **Source** page.
+Both of these tags assume they are used in the context of an entry, i.e. you are in a `collection` loop.
 
----
+#### Next Occurrence
 
-## Create a file
+Single tag that returns the next event date, after the current date.
 
-Next, you’ll add a new file to this repository.
+*Example*:
 
-1. Click the **New file** button at the top of the **Source** page.
-2. Give the file a filename of **contributors.txt**.
-3. Enter your name in the empty file space.
-4. Click **Commit** and then **Commit** again in the dialog.
-5. Go back to the **Source** page.
+```
+{{ collection:events }}
+    <p>{{ title }} - next date: {{ generate_events:next_occurrence }}</p>
+{{ /collection:events }}
+```
 
-Before you move on, go ahead and explore the repository. You've already seen the **Source** page, but check out the **Commits**, **Branches**, and **Settings** pages.
+*Output*:
 
----
+```
+Event Title - next date: October 12th, 2019
+```
 
-## Clone a repository
+#### Next Occurrences
 
-Use these steps to clone from SourceTree, our client for using the repository command-line free. Cloning allows you to work on your files locally. If you don't yet have SourceTree, [download and install first](https://www.sourcetreeapp.com/). If you prefer to clone from the command line, see [Clone a repository](https://confluence.atlassian.com/x/4whODQ).
+Tag pair that returns the given number of next dates, from the current date/time.
 
-1. You’ll see the clone button under the **Source** heading. Click that button.
-2. Now click **Check out in SourceTree**. You may need to create a SourceTree account or log in.
-3. When you see the **Clone New** dialog in SourceTree, update the destination path and name if you’d like to and then click **Clone**.
-4. Open the directory you just created to see your repository’s files.
+Parameters:
 
-Now that you're more familiar with your Bitbucket repository, go ahead and add a new file locally. You can [push your change back to Bitbucket with SourceTree](https://confluence.atlassian.com/x/iqyBMg), or you can [add, commit,](https://confluence.atlassian.com/x/8QhODQ) and [push from the command line](https://confluence.atlassian.com/x/NQ0zDQ).
+* `number_of_occurrences` - how many future events?
+
+
+*Example*:
+
+```
+{{ collection:events }}
+    <p>{{ title }}</p>
+    <ul>
+        {{ generate_events:next_occurrences number_of_occurrences="3" }}
+            <li>{{ occurrence }}</li>
+        {{ /generate_events:next_occurrences }}
+    </ul>
+{{ /collection:events }}
+```
+
+*Output*:
+
+```
+Event 2
+
+* October 12th, 2019
+* October 13th, 2019
+* October 14th, 2019
+```
+
+
+
+
