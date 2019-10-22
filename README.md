@@ -5,71 +5,88 @@ This addon assumes the following data in an entry:
 ```
 start_date: '2019-10-09 11:00'
 duration: '1'
-recurrence_type: weekly
-recurrence_end_date: '2019-11-07'
+recurrence: weekly
+end_date: '2019-11-07'
 ```
 
 ### Fields
 
 * `start_date` - **Required** - Start date **and** time of the event.
 * `duration` - **Required** - How long is the event, in hours
-* `recurrence_type` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`
-* `recurrence_end_date` - **Optional** - when is the last event. If `recurrence_type` is set and this is not, the event goes on forever
+* `recurrence` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`
+* `end_date` - **Optional** - when is the last event. If `recurrence` is set and this is not, the event goes on forever
 
 ### Usage
 
-Both of these tags assume they are used in the context of an entry, i.e. you are in a `collection` loop.
+#### Calendar
 
-#### Next Occurrence
-
-Single tag that returns the next event date, after the current date.
+Tag pair that returns an entire month of dates, starting on a Sunday and ending on a Saturday. 2 required params, `collection` & `month`.
 
 *Example*:
 
 ```
-{{ collection:events }}
-    <p>{{ title }} - next date: {{ generate_events:next_occurrence }}</p>
-{{ /collection:events }}
+{{ generate_events:calendar collection="events" month="october" }}
+  {{ date }} {{# date of event #}}
+  {{ if no_results }}
+    {{# whatever you need to when for an empty day #}}
+  {{ else }}
+    {{ events }}
+      ...other entry data...
+      {{ next_date }}
+    {{ /events}}
+  {{ /if }}
+{{ /generate_events }}
 ```
 
-*Output*:
+*Data*:
+
+If there are no events on a given day, data returned is:
 
 ```
-Event Title - next date: October 12th, 2019
+date: October 21, 2019
+no_results: true
 ```
 
-#### Next Occurrences
+If there are events, each event has all the entry data **plus** `next_date` which is the next time this event happens:
 
-Tag pair that returns the given number of next dates, from the current date/time.
+```
+date: October 21, 2019
+events:
+  -
+    ...
+    next_date: Octover 22, 2019
+    ...
+  -
+  ...
+```
 
-Parameters:
+#### Next Events
 
-* `number_of_occurrences` - how many future events?
+Tag pair that returns the next X event dates. 2 required params, `collection` & `limit`.
 
 
 *Example*:
 
 ```
-{{ collection:events }}
-    <p>{{ title }}</p>
-    <ul>
-        {{ generate_events:next_occurrences number_of_occurrences="3" }}
-            <li>{{ occurrence }}</li>
-        {{ /generate_events:next_occurrences }}
-    </ul>
-{{ /collection:events }}
+{{ generate_events:next_events collection="events" limit="2" }}
+  ...other entry data
+  {{ next_date }}
+{{ /generate_events:next_events }}
 ```
 
-*Output*:
+*Data*:
+
+If there are no events on a given day, data returned is:
 
 ```
-Event 2
-
-* October 12th, 2019
-* October 13th, 2019
-* October 14th, 2019
+date: October 21, 2019
+no_results: true
 ```
 
+If there are events, each event has all the entry data **plus** `next_date` which is the next time this event happens:
 
-
-
+```
+date: October 21, 2019
+...
+next_date: Octover 22, 2019
+```
