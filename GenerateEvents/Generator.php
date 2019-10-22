@@ -3,91 +3,120 @@
 namespace Statamic\Addons\GenerateEvents;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 class Generator
 {
-    private $startDate;
-    private $endDate;
-    private $recurrenceType;
-    //private $recurrenceInterval = 1;
+    /** @var Collection */
+    private $events;
 
-    /**
-     * Undocumented function
-     *
-     * @param mixed $startDate
-     * @param string $type
-     * @param string $interval
-     * @param mixed $endDate
-     */
-    public function __construct($startDate, $type, $endDate = null)
+    public function __construct()
     {
-        $this->startDate = clone carbon($startDate);
-        $this->endDate = $endDate ? clone carbon($endDate) : null;
-        $this->recurrenceType = $type;
-        //$this->recurrenceInterval = $interval;
+        $this->events = collect();
     }
 
-    /**
-     * Get the next occurrence AFTER the given date function
-     *
-     * @param string|Carbon $afterDate
-     * @return Carbon
-     */
-    public function nextOccurrence($afterDate = null)
+    public function add($event)
     {
-        $afterDate = clone carbon($afterDate ?? time());
+        $this->events->push($event);
+    }
 
-        if ($afterDate < $this->startDate) {
-            return clone $this->startDate;
+    public function nextDate($event, $afterDate): ?Carbon
+    {
+        $afterDate = carbon($afterDate ?? time())->copy();
+        $startDate = carbon($event['start_date'])->copy();
+        $endDate = isset($event['end_date']) ? carbon($event['end_date'])->copy() : null;
+
+        if ($afterDate < $startDate) {
+            return $startDate;
         }
 
-        if ($this->endDate && $afterDate >= $this->endDate) {
+        if (!isset($event['recurrence']) || ($endDate && $afterDate >= $endDate)) {
             return null;
         }
 
-        $nextOccurrence = clone $this->startDate;
-
-        switch ($this->recurrenceType) {
+        switch ($event['recurrence']) {
             case 'daily':
-                $nextOccurrence = (clone $afterDate)->addDay();
-                break;
+                $nextOccurrence = $startDate
+                    ->day($afterDate->day)
+                    ->addDay();
+            break;
             case 'weekly':
-                $englishDayOfWeek = $this->startDate->englishDayOfWeek;
-
-                $nextOccurrence = $afterDate->modify("next {$englishDayOfWeek}");
-                $nextOccurrence->hour($this->startDate->hour);
-                $nextOccurrence->minute($this->startDate->minute);
+                $nextOccurrence = $afterDate
+                    ->modify("next {$startDate->englishDayOfWeek}")
+                    ->hour($startDate->hour)
+                    ->minute($startDate->minute)
+                    ->second($startDate->second);
                 break;
             case 'monthly':
-                $nextOccurrence = (clone $this->startDate)
+                $nextOccurrence = $startDate
                     ->month($afterDate->month)
                     ->year($afterDate->year);
-                if ($afterDate->day >= $this->startDate->day) {
+                if ($afterDate->day >= $startDate->day) {
                     $nextOccurrence->addMonth();
                 }
                 break;
             case 'every_x_weeks':
                 throw \Exception('not implemented');
-    }
-
-        return clone $nextOccurrence;
-    }
-
-    public function nextOccurrences($occurrences, $after)
-    {
-        if ($this->endDate && ($after > $this->endDate)) {
-            return [];
         }
 
-        $currentDate = $this->nextOccurrence($after);
-        $dates = [];
+        return $nextOccurrence;
+    }
+
+    public function nextXEvents($event, $occurrences)
+    {
+        $currentDate = $this->nextDate($event, Carbon::now());
+
+        $events = [];
         $x = 0;
 
         while ($currentDate && ($x < $occurrences)) {
-            $dates[$x++] = $currentDate;
-            $currentDate = $this->nextOccurrence($currentDate);
+            $events[$x] = $event;
+            $events[$x++]['next_date'] = $currentDate->toString();
+            $currentDate = $this->nextDate($event, $currentDate);
         }
 
-        return $dates;
+        return $events;
+    }
+
+    public function occurrencesUntil(Carbon $afterDate, Carbon $untilDate, array $event)
+    {
+        if ($afterDate > $untilDate) {
+            return null;
+        }
+
+        // @TODO refactor
+        //loop until currentDate > $untilDate
+        $currentDate = $this->nextDate($event, $afterDate);
+        $events = [];
+        $x = 0;
+
+        while ($currentDate && ($currentDate < $untilDate)) {
+            $events[$x] = $event;
+            $events[$x++]['next_date'] = $currentDate->toString();
+            $currentDate = $this->nextDate($event, $currentDate);
+        }
+
+        // end refactor
+
+        return $events;
+    }
+
+    public function nextXOccurrences($occurrences, $afterDate = null)
+    {
+        return $this->events->flatMap(function ($event, $key) use ($occurrences) {
+            return $this->nextXEvents($event, $occurrences);
+        })->sortBy(function ($event, $key) {
+            return carbon($event['next_date']);
+        })->take($occurrences)
+        ->values();
+    }
+
+    public function all($afterDate, $untilDate)
+    {
+        return $this->events->flatMap(function ($event, $key) use ($afterDate, $untilDate) {
+            return $this->occurrencesUntil($afterDate, $untilDate, $event);
+        })->sortBy(function ($event, $key) {
+            return carbon($event['next_date']);
+        })->values();
     }
 }
