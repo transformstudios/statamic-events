@@ -20,7 +20,7 @@ class Generator
         $this->events->push($event);
     }
 
-    public function nextDate($event, $afterDate): ?Carbon
+    public function nextDate($event, $afterDate)
     {
         $afterDate = carbon($afterDate ?? time())->copy();
         $startDate = carbon($event['start_date'])->copy();
@@ -35,6 +35,9 @@ class Generator
         }
 
         switch ($event['recurrence']) {
+            case 'none':
+                $nextOccurrence = null;
+                break;
             case 'daily':
                 $nextOccurrence = $startDate
                     ->day($afterDate->day)
@@ -62,35 +65,45 @@ class Generator
         return $nextOccurrence;
     }
 
-    public function nextXEvents($event, $occurrences)
+    /**
+     * Undocumented function
+     *
+     * @param array $event
+     * @param integer $occurrences
+     * @param integer $offset
+     * @return array
+     */
+    private function nextEvents($event, $limit, $offset = 1)
     {
         $currentDate = $this->nextDate($event, Carbon::now());
 
         $events = [];
         $x = 0;
 
-        while ($currentDate && ($x < $occurrences)) {
+        while ($currentDate && ($x < $limit * $offset)) {
             $events[$x] = $event;
             $events[$x++]['next_date'] = $currentDate->toString();
             $currentDate = $this->nextDate($event, $currentDate);
         }
 
+        array_splice($events, 0, $limit * ($offset - 1));
+
         return $events;
     }
 
-    public function occurrencesUntil(Carbon $afterDate, Carbon $untilDate, array $event)
+    private function eventsBetween(array $event, Carbon $from, Carbon $to)
     {
-        if ($afterDate > $untilDate) {
-            return null;
+        if ($from->startOfDay() > $to->endOfDay()) {
+            return [];
         }
 
-        // @TODO refactor
-        //loop until currentDate > $untilDate
-        $currentDate = $this->nextDate($event, $afterDate);
+        // @TODO refactor - use collection and return collection
+        //loop until currentDate > $to
+        $currentDate = $this->nextDate($event, $from);
         $events = [];
         $x = 0;
 
-        while ($currentDate && ($currentDate < $untilDate)) {
+        while ($currentDate && ($currentDate < $to)) {
             $events[$x] = $event;
             $events[$x++]['next_date'] = $currentDate->toString();
             $currentDate = $this->nextDate($event, $currentDate);
@@ -101,21 +114,28 @@ class Generator
         return $events;
     }
 
-    public function nextXOccurrences($occurrences, $afterDate = null)
+    public function nextXOccurrences($limit = 1, $offset = 1)
     {
-        return $this->events->flatMap(function ($event, $key) use ($occurrences) {
-            return $this->nextXEvents($event, $occurrences);
-        })->sortBy(function ($event, $key) {
+        $events = $this->events->flatMap(function ($event, $ignore) use ($limit, $offset) {
+            return $this->nextEvents($event, $limit, $offset);
+        })->sortBy(function ($event, $ignore) {
             return carbon($event['next_date']);
-        })->take($occurrences)
+        })->take($limit)
         ->values();
+
+        if ($limit === 1) {
+            return $events->first();
+        }
+
+        return $events;
     }
 
-    public function all($afterDate, $untilDate)
+    public function all($from, $to)
     {
-        return $this->events->flatMap(function ($event, $key) use ($afterDate, $untilDate) {
-            return $this->occurrencesUntil($afterDate, $untilDate, $event);
-        })->sortBy(function ($event, $key) {
+        return $this->events->flatMap(function ($event, $ignore) use ($from, $to) {
+            return $this->eventsBetween($event, $from, $to);
+        })->filter()
+        ->sortBy(function ($event, $ignore) {
             return carbon($event['next_date']);
         })->values();
     }
