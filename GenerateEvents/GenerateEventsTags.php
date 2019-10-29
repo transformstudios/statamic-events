@@ -3,108 +3,60 @@
 namespace Statamic\Addons\GenerateEvents;
 
 use Carbon\Carbon;
-use Statamic\API\Arr;
 use Statamic\API\Entry;
 use Statamic\Extend\Tags;
+use Illuminate\Support\Collection;
 
 class GenerateEventsTags extends Tags
 {
-    /** @var Generator */
-    private $generator;
+    /** @var Collection */
+    private $events;
 
     public function __construct()
     {
         parent::__construct();
 
-        $this->generator = new Generator();
+        $this->events = collect();
 
         Carbon::setWeekStartsAt(Carbon::SUNDAY);
         Carbon::setWeekEndsAt(Carbon::SATURDAY);
     }
 
-    /**
-     * The {{ generate_events }} tag
-     *
-     * @return string|array
-     */
-    // public function nextOccurrence()
-    // {
-    //     if ($recurrenceType = Arr::get($this->context, 'recurrence')) {
-    //         $startDate = carbon(Arr::get($this->context, 'start_date'));
-    //         $generator = new Generator(
-    //             $startDate,
-    //             $recurrenceType,
-    //             Arr::get($this->context, 'end_date')
-    //         );
-
-    //         $nextOccurrence = $generator->nextEvent(time());
-
-    //         return $nextOccurrence;
-    //     }
-    // }
-
     public function nextEvents()
     {
-        Entry::whereCollection($this->getParam('collection'))->each(function ($event) {
-            $this->generator->add($event->toArray());
-        });
+        $generator = new Generator();
 
-        return $this->parseLoop(
-            $this->generator->nextXOccurrences($this->getParamInt('limit', 1))->toArray()
+        Entry::whereCollection($this->getParam('collection'))
+            ->each(
+                function ($event) use ($generator) {
+                    $generator->add($event->toArray());
+                }
+            );
+
+        $this->events = $generator->nextXOccurrences(
+            $this->getParamInt('limit', 1),
+            $this->getParam('offset', 1)
         );
+
+        return $this->output();
     }
-
-    // public function all()
-    // {
-    //     Entry::whereCollection($this->getParam('collection'))->each(function ($event) {
-    //         $this->generator->add($event->toArray());
-    //     });
-
-    //     $from = carbon($this->getParam('from', Carbon::now()));
-    //     $to = carbon($this->getParam('to'));
-
-    //     $events = $this->generator
-    //         ->all($from, $to)
-    //         ->groupBy(function ($event, $key) {
-    //             return carbon($event['next_date'])->toDateString();
-    //         })
-    //         ->map(function ($days, $key) {
-    //             return [
-    //                 'date' => $key,
-    //                 'events' => $days->toArray(),
-    //             ];
-    //         })
-    //         ->toArray();
-
-    //     // generate an array of dates from/to
-    //     $days_to_render = $to->diffInDays($from);
-
-    //     $dates = [];
-
-    //     for ($i = 0; $i <= $days_to_render; $i++) {
-    //         $date = $from->toDateString();
-    //         $dates[$date] = [
-    //             'date' => $date,
-    //             'no_results' => true,
-    //         ];
-    //         $from->addDay();
-    //     }
-
-    //     return $this->parseLoop(array_merge($dates, $events));
-    // }
 
     public function calendar()
     {
-        Entry::whereCollection($this->getParam('collection'))->each(function ($event) {
-            $this->generator->add($event->toArray());
-        });
+        $generator = new Generator();
 
-        $month = carbon($this->getParam('month'));
+        Entry::whereCollection($this->getParam('collection'))
+            ->each(function ($event) use ($generator) {
+                $generator->add($event->toArray());
+            });
+
+        $month = carbon($this->getParam('month', Carbon::now()))
+            ->year($this->getParam('year', Carbon::now()->year));
 
         $from = $month->copy()->startOfMonth();
         $to = $month->copy()->endOfMonth();
 
-        $events = $this->generator
+        $this->events = $generator
             ->all($from, $to)
             ->groupBy(function ($event, $key) {
                 return carbon($event['next_date'])->toDateString();
@@ -114,8 +66,7 @@ class GenerateEventsTags extends Tags
                     'date' => $key,
                     'events' => $days->toArray(),
                 ];
-            })
-            ->toArray();
+            });
 
         $currentDay = $from->copy()->startOfWeek();
         $lastDay = $to->copy()->endOfWeek();
@@ -132,6 +83,38 @@ class GenerateEventsTags extends Tags
             $currentDay->addDay();
         }
 
-        return $this->parseLoop(array_merge($dates, $events));
+        return $this->parseLoop(array_merge($dates, $this->events->toArray()));
+    }
+
+    protected function output()
+    {
+        if ($as = $this->get('as')) {
+            $data = array_merge(
+                [$as => $this->events->toArray()],
+                $this->getEventsMetaData()
+            );
+
+            return $this->parse($data);
+        } else {
+            // Add the meta data (total_results, etc) into each iteration.
+            $meta = $this->getEventsMetaData();
+            $data = $this->events->map(function ($event) use ($meta) {
+                return array_merge($event, $meta);
+            })->all();
+
+            return $this->parseLoop($data);
+        }
+    }
+
+    /**
+     * Get any meta data that should be available in templates
+     *
+     * @return array
+     */
+    protected function getEventsMetaData()
+    {
+        return [
+            'total_results' => $this->events->count(),
+        ];
     }
 }
