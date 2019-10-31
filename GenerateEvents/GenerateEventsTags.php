@@ -9,14 +9,26 @@ use Illuminate\Support\Collection;
 
 class GenerateEventsTags extends Tags
 {
+    /** @var Generator */
+    private $generator;
+
     /** @var Collection */
     private $events;
+
+    private $offset;
+
+    private $limit;
+
+    private $paginated;
+
+    private $paginationData;
 
     public function __construct()
     {
         parent::__construct();
 
         $this->events = collect();
+        $this->generator = new Generator();
 
         Carbon::setWeekStartsAt(Carbon::SUNDAY);
         Carbon::setWeekEndsAt(Carbon::SATURDAY);
@@ -24,30 +36,30 @@ class GenerateEventsTags extends Tags
 
     public function nextEvents()
     {
-        $generator = new Generator();
+        $this->limit = $this->getInt('limit', 1);
+        $this->offset = $this->getInt('offset', 0);
 
-        Entry::whereCollection($this->getParam('collection'))
+        Entry::whereCollection($this->get('collection'))
             ->each(
-                function ($event) use ($generator) {
-                    $generator->add($event->toArray());
+                function ($event) {
+                    $this->generator->add($event->toArray());
                 }
             );
 
-        $this->events = $generator->nextXOccurrences(
-            $this->getParamInt('limit', 1),
-            $this->getParam('offset', 1)
-        );
+        if ($this->getBool('paginate')) {
+            $this->paginate();
+        } else {
+            $this->events = $this->generator->nextXOccurrences($this->limit, $this->offset);
+        }
 
         return $this->output();
     }
 
     public function calendar()
     {
-        $generator = new Generator();
-
         Entry::whereCollection($this->getParam('collection'))
-            ->each(function ($event) use ($generator) {
-                $generator->add($event->toArray());
+            ->each(function ($event) {
+                $this->generator->add($event->toArray());
             });
 
         $month = carbon($this->getParam('month', Carbon::now()))
@@ -56,7 +68,7 @@ class GenerateEventsTags extends Tags
         $from = $month->copy()->startOfMonth();
         $to = $month->copy()->endOfMonth();
 
-        $this->events = $generator
+        $this->events = $this->generator
             ->all($from, $to)
             ->groupBy(function ($event, $key) {
                 return carbon($event['next_date'])->toDateString();
@@ -86,24 +98,45 @@ class GenerateEventsTags extends Tags
         return $this->parseLoop(array_merge($dates, $this->events->toArray()));
     }
 
-    protected function output()
+    private function paginate()
     {
-        if ($as = $this->get('as')) {
-            $data = array_merge(
-                [$as => $this->events->toArray()],
-                $this->getEventsMetaData()
-            );
+        $this->paginated = true;
 
-            return $this->parse($data);
-        } else {
-            // Add the meta data (total_results, etc) into each iteration.
-            $meta = $this->getEventsMetaData();
-            $data = $this->events->map(function ($event) use ($meta) {
-                return array_merge($event, $meta);
-            })->all();
+        $page = (int) Request::get('page', 1);
 
-            return $this->parseLoop($data);
+        $this->offset = (($page - 1) * $this->limit) + $this->offset;
+
+        $events = $this->generator->nextXOccurrences($this->limit + 1, $this->offset);
+
+        $paginator = new Paginator(
+            $events,
+            $this->limit,
+            $page
+        );
+
+        $paginator->setPath(URL::makeAbsolute(URL::getCurrent()));
+        $paginator->appends(Request::all());
+
+        $this->paginationData = [
+                'prev_page' => $paginator->previousPageUrl(),
+                'next_page' => $paginator->nextPageUrl(),
+            ];
+
+        $this->events = $events->slice(0, $this->limit);
+    }
+
+    private function output()
+    {
+        $data = array_merge(
+            $this->getEventsMetaData(),
+            ['events' => $this->events->toArray()]
+        );
+
+        if ($this->paginated) {
+            $data = array_merge($data, ['paginate' => $this->paginationData]);
         }
+
+        return $this->parse($data);
     }
 
     /**
