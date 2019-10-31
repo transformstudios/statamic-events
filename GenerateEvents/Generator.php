@@ -66,29 +66,30 @@ class Generator
     }
 
     /**
-     * Undocumented function
+     * Get next `$limit` events, starting at `$offset`
+     *
+     * @todo This loop/if feels goopy. There's likely a nicer solution
      *
      * @param array $event
      * @param integer $occurrences
      * @param integer $offset
      * @return array
      */
-    private function nextEvents($event, $limit, $offset = 1)
+    private function nextEvents($event, $limit, $offset = 0)
     {
         $currentDate = $this->nextDate($event, Carbon::now());
 
         $events = [];
         $x = 0;
+        $total = $offset ? $limit * $offset : $limit;
 
-        while ($currentDate && ($x < $limit * $offset)) {
+        while ($currentDate && ($x < $total)) {
             $events[$x] = $event;
             $events[$x++]['next_date'] = $currentDate->toString();
             $currentDate = $this->nextDate($event, $currentDate);
         }
 
-        array_splice($events, 0, $limit * ($offset - 1));
-
-        return $events;
+        return array_splice($events, $offset, $limit);
     }
 
     private function eventsBetween(array $event, Carbon $from, Carbon $to)
@@ -114,7 +115,7 @@ class Generator
         return $events;
     }
 
-    public function nextXOccurrences($limit = 1, $offset = 1)
+    public function nextXOccurrences($limit = 1, $offset)
     {
         $events = $this->events->flatMap(function ($event, $ignore) use ($limit, $offset) {
             return $this->nextEvents($event, $limit, $offset);
