@@ -69,8 +69,10 @@ Tag pair that returns the next X event dates. 2 required params, `collection` & 
 
 ```
 {{ generate_events:next_events collection="events" limit="2" }}
-  ...other entry data
-  {{ next_date }}
+  {{ events }}
+    ...other entry data
+    {{ next_date }}
+  {{ /events }}
 {{ /generate_events:next_events }}
 ```
 
@@ -89,4 +91,32 @@ If there are events, each event has all the entry data **plus** `next_date` whic
 date: October 21, 2019
 ...
 next_date: Octover 22, 2019
+```
+
+If there are no more dates, `next_date` won't be there or will be null
+
+**Pagination**
+
+If you want to paginate the results, add `paginate="true"` to the tag. Then the tag will look for a `page` query parameter and paginate appropriately.
+
+*Example*
+```
+{{ generate_events:next_events collection="events" limit="2" paginate="true" }}
+  {{ events }}
+    ...other entry data
+    {{ next_date }}
+  {{ /events }}
+  {{ pagination }}
+    {{ if prev_page }}<a href="{{ prev_page }}"{{ /if }}
+    {{ if next_page }}<a href="{{ next_page }}"{{ /if }}
+  {{ /pagination }}
+{{ /generate_events:next_events }}
+```
+*Data*
+
+* All the usual data (above), plus:
+```
+paginate:
+  next_page: /events?page=3
+  prev_page: /events?page=1
 ```
