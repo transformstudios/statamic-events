@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Addons\GenerateEvents;
+namespace Statamic\Addons\Events;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
-class Generator
+class Events
 {
     /** @var Collection */
     private $events;
@@ -20,7 +20,7 @@ class Generator
         $this->events->push($event);
     }
 
-    public function nextDate($event, $afterDate)
+    public static function nextDate($event, $afterDate)
     {
         $afterDate = carbon($afterDate ?? time())->copy();
         $startDate = carbon($event['start_date'])->copy();
@@ -36,37 +36,40 @@ class Generator
 
         switch ($event['recurrence']) {
             case 'none':
-                $nextOccurrence = null;
+                $date = null;
                 break;
             case 'daily':
-                $nextOccurrence = $startDate
+                $date = $afterDate
                     ->day($afterDate->day)
+                    ->hour($startDate->hour)
+                    ->minute($startDate->minute)
+                    ->second($startDate->second)
                     ->addDay();
             break;
             case 'weekly':
-                $nextOccurrence = $afterDate
+                $date = $afterDate
                     ->modify("next {$startDate->englishDayOfWeek}")
                     ->hour($startDate->hour)
                     ->minute($startDate->minute)
                     ->second($startDate->second);
                 break;
             case 'monthly':
-                $nextOccurrence = $startDate
+                $date = $startDate
                     ->month($afterDate->month)
                     ->year($afterDate->year);
                 if ($afterDate->day >= $startDate->day) {
-                    $nextOccurrence->addMonth();
+                    $date->addMonth();
                 }
                 break;
             case 'every_x_weeks':
                 throw \Exception('not implemented');
         }
 
-        return $nextOccurrence;
+        return $date;
     }
 
     /**
-     * Get next `$limit` events, starting at `$offset`
+     * Get next `$limit` dates, starting at `$offset`
      *
      * @todo This loop/if feels goopy. There's likely a nicer solution
      *
@@ -75,21 +78,21 @@ class Generator
      * @param integer $offset
      * @return array
      */
-    private function nextEvents($event, $limit, $offset = 0)
+    private static function nextDates($event, $limit, $offset = 0)
     {
-        $currentDate = $this->nextDate($event, Carbon::now());
+        $currentDate = self::nextDate($event, Carbon::now());
 
-        $events = [];
+        $dates = [];
         $x = 0;
         $total = $offset ? $limit * $offset : $limit;
 
         while ($currentDate && ($x < $total)) {
-            $events[$x] = $event;
-            $events[$x++]['next_date'] = $currentDate->toString();
-            $currentDate = $this->nextDate($event, $currentDate);
+            $dates[$x] = $event;
+            $dates[$x++]['date'] = $currentDate->toString();
+            $currentDate = self::nextDate($event, $currentDate);
         }
 
-        return array_splice($events, $offset, $limit);
+        return array_splice($dates, $offset, $limit);
     }
 
     private function eventsBetween(array $event, Carbon $from, Carbon $to)
@@ -100,14 +103,14 @@ class Generator
 
         // @TODO refactor - use collection and return collection
         //loop until currentDate > $to
-        $currentDate = $this->nextDate($event, $from);
+        $currentDate = self::nextDate($event, $from);
         $events = [];
         $x = 0;
 
         while ($currentDate && ($currentDate < $to)) {
             $events[$x] = $event;
-            $events[$x++]['next_date'] = $currentDate->toString();
-            $currentDate = $this->nextDate($event, $currentDate);
+            $events[$x++]['date'] = $currentDate->toString();
+            $currentDate = self::nextDate($event, $currentDate);
         }
 
         // end refactor
@@ -115,12 +118,12 @@ class Generator
         return $events;
     }
 
-    public function nextXOccurrences($limit = 1, $offset)
+    public function next($limit = 1, $offset = 0)
     {
         $events = $this->events->flatMap(function ($event, $ignore) use ($limit, $offset) {
-            return $this->nextEvents($event, $limit, $offset);
+            return self::nextDates($event, $limit, $offset);
         })->sortBy(function ($event, $ignore) {
-            return carbon($event['next_date']);
+            return carbon($event['date']);
         })->take($limit)
         ->values();
 
@@ -137,7 +140,7 @@ class Generator
             return $this->eventsBetween($event, $from, $to);
         })->filter()
         ->sortBy(function ($event, $ignore) {
-            return carbon($event['next_date']);
+            return carbon($event['date']);
         })->values();
     }
 }

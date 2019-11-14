@@ -1,19 +1,22 @@
 <?php
 
-namespace Statamic\Addons\GenerateEvents;
+namespace Statamic\Addons\Events;
 
 use Carbon\Carbon;
+use Statamic\API\URL;
 use Statamic\API\Entry;
+use Statamic\API\Request;
 use Statamic\Extend\Tags;
 use Illuminate\Support\Collection;
+use Illuminate\Pagination\Paginator;
 
-class GenerateEventsTags extends Tags
+class EventsTags extends Tags
 {
-    /** @var Generator */
-    private $generator;
+    /** @var Events */
+    private $events;
 
     /** @var Collection */
-    private $events;
+    private $dates;
 
     private $offset;
 
@@ -27,29 +30,27 @@ class GenerateEventsTags extends Tags
     {
         parent::__construct();
 
-        $this->events = collect();
-        $this->generator = new Generator();
+        $this->dates = collect();
+        $this->events = new Events();
 
         Carbon::setWeekStartsAt(Carbon::SUNDAY);
         Carbon::setWeekEndsAt(Carbon::SATURDAY);
     }
 
-    public function nextEvents()
+    public function next()
     {
         $this->limit = $this->getInt('limit', 1);
         $this->offset = $this->getInt('offset', 0);
 
         Entry::whereCollection($this->get('collection'))
-            ->each(
-                function ($event) {
-                    $this->generator->add($event->toArray());
-                }
-            );
+            ->each(function ($event) {
+                $this->events->add($event->toArray());
+            });
 
         if ($this->getBool('paginate')) {
             $this->paginate();
         } else {
-            $this->events = $this->generator->nextXOccurrences($this->limit, $this->offset);
+            $this->dates = $this->events->next($this->limit, $this->offset);
         }
 
         return $this->output();
@@ -59,7 +60,7 @@ class GenerateEventsTags extends Tags
     {
         Entry::whereCollection($this->getParam('collection'))
             ->each(function ($event) {
-                $this->generator->add($event->toArray());
+                $this->events->add($event->toArray());
             });
 
         $month = carbon($this->getParam('month', Carbon::now()))
@@ -68,15 +69,15 @@ class GenerateEventsTags extends Tags
         $from = $month->copy()->startOfMonth();
         $to = $month->copy()->endOfMonth();
 
-        $this->events = $this->generator
+        $this->dates = $this->events
             ->all($from, $to)
             ->groupBy(function ($event, $key) {
-                return carbon($event['next_date'])->toDateString();
+                return carbon($event['date'])->toDateString();
             })
             ->map(function ($days, $key) {
                 return [
                     'date' => $key,
-                    'events' => $days->toArray(),
+                    'dates' => $days->toArray(),
                 ];
             });
 
@@ -95,7 +96,7 @@ class GenerateEventsTags extends Tags
             $currentDay->addDay();
         }
 
-        return $this->parseLoop(array_merge($dates, $this->events->toArray()));
+        return $this->parseLoop(array_merge($dates, $this->dates->toArray()));
     }
 
     private function paginate()
@@ -106,7 +107,7 @@ class GenerateEventsTags extends Tags
 
         $this->offset = (($page - 1) * $this->limit) + $this->offset;
 
-        $events = $this->generator->nextXOccurrences($this->limit + 1, $this->offset);
+        $events = $this->events->next($this->limit + 1, $this->offset);
 
         $paginator = new Paginator(
             $events,
@@ -122,14 +123,14 @@ class GenerateEventsTags extends Tags
                 'next_page' => $paginator->nextPageUrl(),
             ];
 
-        $this->events = $events->slice(0, $this->limit);
+        $this->dates = $events->slice(0, $this->limit);
     }
 
     private function output()
     {
         $data = array_merge(
             $this->getEventsMetaData(),
-            ['events' => $this->events->toArray()]
+            ['dates' => $this->dates->toArray()]
         );
 
         if ($this->paginated) {
@@ -147,7 +148,7 @@ class GenerateEventsTags extends Tags
     protected function getEventsMetaData()
     {
         return [
-            'total_results' => $this->events->count(),
+            'total_results' => $this->dates->count(),
         ];
     }
 }

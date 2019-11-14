@@ -1,12 +1,12 @@
 <?php
 
-namespace Statamic\Addons\GenerateEvents;
+namespace Statamic\Addons\Events;
 
 use Statamic\API\Entry;
 use Illuminate\Http\Request;
 use Statamic\Extend\Controller;
 
-class GenerateEventsController extends Controller
+class EventsController extends Controller
 {
     /**
      * Get the next function
@@ -21,16 +21,16 @@ class GenerateEventsController extends Controller
             'offset' => 'sometimes|required|integer',
         ]);
 
-        $generator = new Generator();
+        $events = new Events();
 
-        Entry::whereCollection($request->input('collection'))->each(function ($event) use ($generator) {
-            $generator->add($event->toArray());
+        Entry::whereCollection($request->input('collection'))->each(function ($event) use ($events) {
+            $events->add($event->toArray());
         });
 
-        return $generator
-                ->nextXOccurrences(
+        return $events
+                ->next(
                     $request->input('limit', 1),
-                    $request->input('offset', 1)
+                    $request->input('offset', 0)
                 )
                 ->toArray();
     }

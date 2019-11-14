@@ -25,17 +25,17 @@ Tag pair that returns an entire month of dates, starting on a Sunday and ending 
 *Example*:
 
 ```
-{{ generate_events:calendar collection="events" month="october" }}
+{{ events:calendar collection="events" month="october" }}
   {{ date }} {{# date of event #}}
   {{ if no_results }}
     {{# whatever you need to when for an empty day #}}
   {{ else }}
-    {{ events }}
+    {{ dates }}
       ...other entry data...
-      {{ next_date }}
-    {{ /events}}
+      {{ date }}
+    {{ /dates }}
   {{ /if }}
-{{ /generate_events }}
+{{ /events }}
 ```
 
 *Data*:
@@ -47,14 +47,14 @@ date: October 21, 2019
 no_results: true
 ```
 
-If there are events, each event has all the entry data **plus** `next_date` which is the next time this event happens:
+If there are events, each event has all the entry data **plus** `date` which is the next time this event happens:
 
 ```
 date: October 21, 2019
-events:
+dates:
   -
     ...
-    next_date: October 22, 2019
+    date: Octover 22, 2019
     ...
   -
   ...
@@ -68,12 +68,12 @@ Tag pair that returns the next X event dates. 2 required params, `collection` & 
 *Example*:
 
 ```
-{{ generate_events:next_events collection="events" limit="2" }}
-  {{ events }}
+{{ events:next collection="events" limit="2" }}
+  {{ dates }}
     ...other entry data
-    {{ next_date }}
-  {{ /events }}
-{{ /generate_events:next_events }}
+    {{ date }}
+  {{ /dates }}
+{{ /events:next }}
 ```
 
 *Data*:
@@ -85,15 +85,15 @@ date: October 21, 2019
 no_results: true
 ```
 
-If there are events, each event has all the entry data **plus** `next_date` which is the next time this event happens:
+If there are events, each event has all the entry data **plus** `date` which is the next time this event happens:
 
 ```
-date: October 21, 2019
+start_date: October 21, 2019
 ...
-next_date: Octover 22, 2019
+date: Octover 22, 2019
 ```
 
-If there are no more dates, `next_date` won't be there or will be null
+If there are no more dates, `date` won't be there or will be null
 
 **Pagination**
 
@@ -101,16 +101,16 @@ If you want to paginate the results, add `paginate="true"` to the tag. Then the 
 
 *Example*
 ```
-{{ generate_events:next_events collection="events" limit="2" paginate="true" }}
-  {{ events }}
+{{ events:next collection="events" limit="2" paginate="true" }}
+  {{ dates }}
     ...other entry data
-    {{ next_date }}
-  {{ /events }}
+    {{ date }}
+  {{ /dates }}
   {{ pagination }}
     {{ if prev_page }}<a href="{{ prev_page }}"{{ /if }}
     {{ if next_page }}<a href="{{ next_page }}"{{ /if }}
   {{ /pagination }}
-{{ /generate_events:next_events }}
+{{ /events:next }}
 ```
 *Data*
 

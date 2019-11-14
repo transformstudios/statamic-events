@@ -1,25 +1,20 @@
 <?php
 
 use Carbon\Carbon;
-use Statamic\API\URL;
-use Statamic\API\Cache;
-use Statamic\API\Entry;
-use Statamic\API\Config;
-use Statamic\API\Stache;
 use Statamic\API\Collection;
 use Statamic\Testing\TestCase;
-use Statamic\Addons\GenerateEvents\Generator;
+use Statamic\Addons\Events\Events;
 
-class GeneratorTest extends TestCase
+class EventsTest extends TestCase
 {
-    /** @var Generator */
+    /** @var Events */
     private $generator;
 
     public function setUp()
     {
         parent::setUp();
 
-        $this->generator = new Generator();
+        $this->generator = new Events();
 
         if ($collection = Collection::whereHandle('test-events')) {
             $collection->delete();
@@ -43,9 +38,9 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'daily',
-        ];
+                'start_date' => $startDate,
+                'recurrence' => 'daily',
+            ];
 
         $nextDate = $this->generator->nextDate($event, Carbon::now()->subDays(5));
 
@@ -61,9 +56,9 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'daily',
-        ];
+                'start_date' => $startDate,
+                'recurrence' => 'daily',
+            ];
 
         Carbon::setTestNow($startDate->copy()->addMinutes(1));
         $nextDate = $this->generator->nextDate($event, Carbon::now()->addHour());
@@ -76,9 +71,9 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'none',
-        ];
+                'start_date' => $startDate,
+                'recurrence' => 'none',
+            ];
 
         Carbon::setTestNow($startDate->copy()->addMinutes(1));
         $nextDate = $this->generator->nextDate($event, Carbon::now()->addHour());
@@ -97,9 +92,9 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'weekly',
-        ];
+                'start_date' => $startDate,
+                'recurrence' => 'weekly',
+            ];
 
         $nextDate = $this->generator->nextDate($event, Carbon::now()->subDays(3));
         $this->assertEquals($startDate, $nextDate);
@@ -113,9 +108,9 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'weekly',
-        ];
+                'start_date' => $startDate,
+                'recurrence' => 'weekly',
+            ];
 
         $nextDate = $this->generator->nextDate($event, Carbon::now()->addDays(3));
 
@@ -127,9 +122,9 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'weekly',
-        ];
+                'start_date' => $startDate,
+                'recurrence' => 'weekly',
+            ];
 
         $nextDate = $this->generator->nextDate($event, Carbon::now()->addWeek());
 
@@ -141,9 +136,9 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'monthly',
-        ];
+                'start_date' => $startDate,
+                'recurrence' => 'monthly',
+            ];
 
         $nextDate = $this->generator->nextDate($event, $startDate->copy()->subDays(5));
         $this->assertEquals($startDate, $nextDate);
@@ -157,9 +152,9 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'monthly',
-        ];
+                'start_date' => $startDate,
+                'recurrence' => 'monthly',
+            ];
 
         $nextDate = $this->generator->nextDate($event, $startDate->copy()->addDays(5));
         $this->assertEquals(
@@ -187,20 +182,20 @@ class GeneratorTest extends TestCase
     {
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'daily',
-        ];
+                    'start_date' => $startDate,
+                    'recurrence' => 'daily',
+                ];
 
         for ($x = 0;$x < 2;$x++) {
             $events[$x] = $event;
-            $events[$x]['next_date'] = $startDate->copy()->addDays($x)->toString();
+            $events[$x]['date'] = $startDate->copy()->addDays($x)->toString();
         }
 
         $this->generator->add($event);
 
         Carbon::setTestNow($startDate->copy()->subMinutes(1));
 
-        $nextDates = $this->generator->nextXOccurrences(2);
+        $nextDates = $this->generator->next(2);
 
         $this->assertEquals($events, $nextDates->toArray());
     }
@@ -209,20 +204,20 @@ class GeneratorTest extends TestCase
     {
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
         $event = [
-            'start_date' => $startDate,
-            'recurrence' => 'daily',
-        ];
+                       'start_date' => $startDate,
+                       'recurrence' => 'daily',
+                   ];
 
         for ($x = 0;$x < 3;$x++) {
             $events[$x] = $event;
-            $events[$x]['next_date'] = $startDate->copy()->addDays($x + 1)->toString();
+            $events[$x]['date'] = $startDate->copy()->addDays($x + 1)->toString();
         }
 
         $this->generator->add($event);
 
         Carbon::setTestNow($startDate->copy()->addMinutes(1));
 
-        $nextDates = $this->generator->nextXOccurrences(3);
+        $nextDates = $this->generator->next(3);
 
         $this->assertEquals($events, $nextDates->toArray());
     }
@@ -232,20 +227,20 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate->copy()->addDay()->toString(),
-            'end_date' => $startDate->copy()->addDays(3),
-            'recurrence' => 'daily',
-        ];
+                       'start_date' => $startDate->copy()->addDay()->toString(),
+                       'end_date' => $startDate->copy()->addDays(3),
+                       'recurrence' => 'daily',
+                   ];
 
         for ($x = 2;$x < 4;$x++) {
             $events[$x - 2] = $event;
-            $events[$x - 2]['next_date'] = $startDate->copy()->addDays($x)->toString();
+            $events[$x - 2]['date'] = $startDate->copy()->addDays($x)->toString();
         }
 
         $this->generator->add($event);
 
         Carbon::setTestNow($startDate->copy()->addDays(1));
-        $nextEvents = $this->generator->nextXOccurrences(3);
+        $nextEvents = $this->generator->next(3);
 
         $this->assertCount(2, $nextEvents);
 
@@ -257,19 +252,19 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->subDay()->setTimeFromTimeString('11:00:00');
 
         $event = [
-            'start_date' => $startDate->toString(),
-            'end_date' => $startDate->copy()->addWeeks(3)->toString(),
-            'recurrence' => 'weekly',
-        ];
+                       'start_date' => $startDate->toString(),
+                       'end_date' => $startDate->copy()->addWeeks(3)->toString(),
+                       'recurrence' => 'weekly',
+                   ];
 
         for ($x = 1;$x <= 3;$x++) {
             $events[$x - 1] = $event;
-            $events[$x - 1]['next_date'] = $startDate->copy()->addWeeks($x)->toString();
+            $events[$x - 1]['date'] = $startDate->copy()->addWeeks($x)->toString();
         }
 
         $this->generator->add($event);
 
-        $nextEvents = $this->generator->nextXOccurrences(4);
+        $nextEvents = $this->generator->next(4);
 
         $this->assertCount(3, $nextEvents);
 
@@ -279,27 +274,27 @@ class GeneratorTest extends TestCase
     public function test_generates_next_occurrence_when_multiple_events()
     {
         $this->generator->add([
-            'start_date' => Carbon::now()->subDays(8)->setTimeFromTimeString('11:00:00'),
-            'duration' => 1,
-            'recurrence' => 'weekly',
-            'end_date' => Carbon::now()->addWeeks(3)->setTimeFromTimeString('11:00:00'),
-        ]);
+                   'start_date' => Carbon::now()->subDays(8)->setTimeFromTimeString('11:00:00'),
+                   'duration' => 1,
+                   'recurrence' => 'weekly',
+                   'end_date' => Carbon::now()->addWeeks(3)->setTimeFromTimeString('11:00:00'),
+               ]);
 
         $this->generator->add([
-            'start_date' => Carbon::now()->subDays(2)->setTimeFromTimeString('13:00:00'),
-            'duration' => '2',
-            'recurrence' => 'daily',
-            'end_date' => Carbon::now()->addDays(5)->setTimeFromTimeString('13:00:00'),
-        ]);
+                   'start_date' => Carbon::now()->subDays(2)->setTimeFromTimeString('13:00:00'),
+                   'duration' => '2',
+                   'recurrence' => 'daily',
+                   'end_date' => Carbon::now()->addDays(5)->setTimeFromTimeString('13:00:00'),
+               ]);
 
-        $nextEvent = $this->generator->nextXOccurrences(1);
+        $nextEvent = $this->generator->next(1);
 
         Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('14:00:00'));
 
-        $this->assertArrayHasKey('next_date', $nextEvent);
+        $this->assertArrayHasKey('date', $nextEvent);
         $this->assertEquals(
             Carbon::now()->addDays(1)->setTimeFromTimeString('13:00:00'),
-            carbon($nextEvent['next_date'])
+            carbon($nextEvent['date'])
         );
     }
 
@@ -308,12 +303,12 @@ class GeneratorTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $this->generator->add([
-            'id' => 'weekly-event',
-            'start_date' => $startDate->copy()->subDays(8)->toString(),
-            'duration' => 1,
-            'recurrence' => 'weekly',
-            'end_date' => $startDate->copy()->addWeeks(3)->toString(),
-        ]);
+                   'id' => 'weekly-event',
+                   'start_date' => $startDate->copy()->subDays(8)->toString(),
+                   'duration' => 1,
+                   'recurrence' => 'weekly',
+                   'end_date' => $startDate->copy()->addWeeks(3)->toString(),
+               ]);
 
         $from = Carbon::now()->subDays(3);
         $to = $from->copy()->addDays(15);
@@ -324,38 +319,38 @@ class GeneratorTest extends TestCase
 
         $this->assertArraySubset(
             [
-                'id' => 'weekly-event',
-            ],
+                       'id' => 'weekly-event',
+                   ],
             $events[0]
         );
 
         $this->assertEquals(
             Carbon::now()->subDays(1)->setTimeFromTimeString('11:00:00'),
-            carbon($events[0]['next_date'])
+            carbon($events[0]['date'])
         );
         $this->assertEquals(
             Carbon::now()->addDays(6)->setTimeFromTimeString('11:00:00'),
-            carbon($events[1]['next_date'])
+            carbon($events[1]['date'])
         );
     }
 
     public function test_generates_all_occurrences_multiple_events_from_to()
     {
         $this->generator->add([
-            'id' => 'weekly-event',
-            'start_date' => Carbon::now()->subDays(8)->setTimeFromTimeString('11:00:00')->toString(),
-            'duration' => 1,
-            'recurrence' => 'weekly',
-            'end_date' => Carbon::now()->addWeeks(3)->setTimeFromTimeString('11:00:00')->toString(),
-        ]);
+                       'id' => 'weekly-event',
+                       'start_date' => Carbon::now()->subDays(8)->setTimeFromTimeString('11:00:00')->toString(),
+                       'duration' => 1,
+                       'recurrence' => 'weekly',
+                       'end_date' => Carbon::now()->addWeeks(3)->setTimeFromTimeString('11:00:00')->toString(),
+                   ]);
 
         $this->generator->add([
-            'id' => 'daily-event',
-            'start_date' => Carbon::now()->subDays(2)->setTimeFromTimeString('13:00:00')->toString(),
-            'duration' => '2',
-            'recurrence' => 'daily',
-            'end_date' => Carbon::now()->addDays(5)->setTimeFromTimeString('13:00:00')->toString(),
-        ]);
+                       'id' => 'daily-event',
+                       'start_date' => Carbon::now()->subDays(2)->setTimeFromTimeString('13:00:00')->toString(),
+                       'duration' => '2',
+                       'recurrence' => 'daily',
+                       'end_date' => Carbon::now()->addDays(5)->setTimeFromTimeString('13:00:00')->toString(),
+                   ]);
 
         $from = Carbon::now()->subDays(3);
         $to = $from->copy()->addDays(15);
@@ -368,73 +363,75 @@ class GeneratorTest extends TestCase
 
         $this->assertArraySubset(
             [
-                'id' => 'daily-event',
-            ],
+                           'id' => 'daily-event',
+                       ],
             $events[0]
         );
 
         $this->assertEquals(
             Carbon::now()->subDays(2)->setTimeFromTimeString('13:00:00'),
-            carbon($events[0]['next_date'])
+            carbon($events[0]['date'])
         );
     }
 
-    public function test_generates_paginated_events_from_controller()
-    {
-        $this->withoutMiddleware();
-        $this->withoutEvents();
+    /*
+        public function test_generates_paginated_events_from_controller()
+        {
+            $this->withoutMiddleware();
+            $this->withoutEvents();
 
-        $collection = Collection::create('test-events');
+            $collection = Collection::create('test-events');
 
-        $collection->save();
+            $collection->save();
 
-        $startDate = Carbon::now()->setTimeFromTimeString('13:00:00');
+            $startDate = Carbon::now()->setTimeFromTimeString('13:00:00');
 
-        $entry = Entry::create('event-one')
-            ->collection('test-events')
-            ->with([
-                'start_date' => $startDate->copy()->subDays(2)->toString(),
-                'recurrence' => 'daily',
-                'end_date' => $startDate->copy()->addDays(5)->toString(),
-            ])
-            ->get();
+            $entry = Entry::create('event-one')
+                       ->collection('test-events')
+                       ->with([
+                           'start_date' => $startDate->copy()->subDays(2)->toString(),
+                           'recurrence' => 'daily',
+                           'end_date' => $startDate->copy()->addDays(5)->toString(),
+                       ])
+                       ->get();
 
-        $entry->save();
+            $entry->save();
 
-        $collection->addEntry($entry->id(), $entry);
+            $collection->addEntry($entry->id(), $entry);
 
-        // $repo = app('stache')->repo('collections');
-        // $repo->setItem('test-events', $collection);
+            // $repo = app('stache')->repo('collections');
+            // $repo->setItem('test-events', $collection);
 
-        // $repo = app('stache')->repo('entries');
-        // $repo->setItem('entries::' . $entry->id(), $entry);
+            // $repo = app('stache')->repo('entries');
+            // $repo->setItem('entries::' . $entry->id(), $entry);
 
-//        dd(Entry::whereCollection('test-events'));
+            //        dd(Entry::whereCollection('test-events'));
 
-        // // workaround Statamic bug: https://github.com/statamic/v2-hub/issues/2363
-        // $repo = app('stache')->repo('users');
-        // $repo->setItem($this->user->id(), $this->user);
-        // // end workaround
+            // // workaround Statamic bug: https://github.com/statamic/v2-hub/issues/2363
+            // $repo = app('stache')->repo('users');
+            // $repo->setItem($this->user->id(), $this->user);
+            // // end workaround
 
-        // Cache::clear();
+            // Cache::clear();
 
-        $response = $this->get(
-            URL::assemble(
-                Config::getSiteUrl(),
-                '!/GenerateEvents/next/?' . http_build_query(
-                    [
-                        'collection' => 'test-events',
-                        'limit' => 2,
-                        'offset' => 2,
-                    ]
-                )
-            )
-        );
+            $response = $this->get(
+                URL::assemble(
+                           Config::getSiteUrl(),
+                           '!/GenerateEvents/next/?' . http_build_query(
+                               [
+                                   'collection' => 'test-events',
+                                   'limit' => 2,
+                                   'offset' => 2,
+                               ]
+                           )
+                       )
+            );
 
-        $response->assertResponseStatus(201);
+            $response->assertResponseStatus(201);
 
-        // $subscriptions = $this->paymentGateway->subscriptions();
+            // $subscriptions = $this->paymentGateway->subscriptions();
 
-        // $this->assertCount(1, $subscriptions);
-    }
+                   // $this->assertCount(1, $subscriptions);
+        }
+        */
 }
