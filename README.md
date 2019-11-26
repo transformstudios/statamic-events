@@ -3,18 +3,44 @@
 This addon assumes the following data in an entry:
 
 ```
-start_date: '2019-10-09 11:00'
-duration: '1'
+start_date: '2019-10-09'
+start_time: '11:00'
+end_time: '12:00'
 recurrence: weekly
 end_date: '2019-11-07'
+
 ```
 
 ### Fields
 
-* `start_date` - **Required** - Start date **and** time of the event.
-* `duration` - **Required** - How long is the event, in hours
+#### Single Day Events
+
+* `start_date` - **Required** - Start date of the event.
+* `start_time` - **Optional (see `all_day`)** - Start time of the event.
+* `end_time` - **Optional (see `all_day`)** - Start date of the event.
+* `all_day` - **Optional** - boolean. If this is `true`, then neither `start_time` nor `end_time` are required
 * `recurrence` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`
 * `end_date` - **Optional** - when is the last event. If `recurrence` is set and this is not, the event goes on forever
+
+#### Multi-Day Events:
+* `multi_day` - boolean. When true, `start_date`, `start_time`, `end_time`, `recurrence`, `end_date` are not used
+* `days` - **Required** - array of days:
+```
+multi_day: true
+days:
+  -
+    date: '2019-11-23'
+    start_time: '19:00'
+    end_time: '21:00'
+  -
+    date: '2019-11-24'
+    start_time: '11:00'
+    end_time: '15:00'
+  -
+    date: '2019-11-25'
+    start_time: '11:00'
+    end_time: '15:00'
+```
 
 ### Usage
 
