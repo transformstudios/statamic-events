@@ -13,6 +13,9 @@ class SingleDayEventsTest extends TestCase
     /** @var SingleDayEvent */
     private $nonAllDayEvent;
 
+    /** @var SingleDayEvent */
+    private $recurrenceNoneEvent;
+
     public function setUp()
     {
         parent::setUp();
@@ -26,6 +29,13 @@ class SingleDayEventsTest extends TestCase
             'start_date' => '2019-11-27',
             'start_time' => '11:00',
             'end_time' => '12:00',
+        ]);
+
+        $this->recurrenceNoneEvent = EventFactory::createFromArray([
+            'start_date' => '2019-11-27',
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 0,
         ]);
     }
 
@@ -45,6 +55,7 @@ class SingleDayEventsTest extends TestCase
     {
         $this->assertTrue($this->allDayEvent instanceof SingleDayEvent);
         $this->assertTrue($this->nonAllDayEvent instanceof SingleDayEvent);
+        $this->assertTrue($this->recurrenceNoneEvent instanceof SingleDayEvent);
     }
 
     public function test_can_get_start()
