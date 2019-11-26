@@ -9,6 +9,7 @@ use Statamic\API\Request;
 use Statamic\Extend\Tags;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
+use Statamic\Addons\Events\Types\EventFactory;
 
 class EventsTags extends Tags
 {
@@ -37,20 +38,20 @@ class EventsTags extends Tags
         Carbon::setWeekEndsAt(Carbon::SATURDAY);
     }
 
-    public function next()
+    public function upcoming()
     {
         $this->limit = $this->getInt('limit', 1);
         $this->offset = $this->getInt('offset', 0);
 
         Entry::whereCollection($this->get('collection'))
             ->each(function ($event) {
-                $this->events->add($event->toArray());
+                $this->events->add(EventFactory::createFromArray($event->toArray()));
             });
 
         if ($this->getBool('paginate')) {
             $this->paginate();
         } else {
-            $this->dates = $this->events->next($this->limit, $this->offset);
+            $this->dates = $this->events->upcoming($this->limit, $this->offset);
         }
 
         return $this->output();
@@ -60,7 +61,7 @@ class EventsTags extends Tags
     {
         Entry::whereCollection($this->getParam('collection'))
             ->each(function ($event) {
-                $this->events->add($event->toArray());
+                $this->events->add(EventFactory::createFromArray($event->toArray()));
             });
 
         $month = carbon($this->getParam('month', Carbon::now()))
@@ -72,7 +73,7 @@ class EventsTags extends Tags
         $this->dates = $this->events
             ->all($from, $to)
             ->groupBy(function ($event, $key) {
-                return carbon($event['date'])->toDateString();
+                return $event->start_date;
             })
             ->map(function ($days, $key) {
                 return [
@@ -107,7 +108,7 @@ class EventsTags extends Tags
 
         $this->offset = (($page - 1) * $this->limit) + $this->offset;
 
-        $events = $this->events->next($this->limit + 1, $this->offset);
+        $events = $this->events->upcoming($this->limit + 1, $this->offset);
 
         $paginator = new Paginator(
             $events,

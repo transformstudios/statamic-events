@@ -28,7 +28,7 @@ class EventsController extends Controller
         });
 
         return $events
-                ->next(
+                ->upcoming(
                     $request->input('limit', 1),
                     $request->input('offset', 0)
                 )
