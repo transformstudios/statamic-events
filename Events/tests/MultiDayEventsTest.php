@@ -36,6 +36,21 @@ class MultiDayEventsTest extends TestCase
                 ],
             ]
         );
+
+        $this->allDayEvent = EventFactory::createFromArray(
+            [
+                'multi_day' => true,
+                'all_day' => true,
+                'days' => [
+                    [
+                        'date' => '2019-11-20',
+                    ],
+                    [
+                        'date' => '2019-11-21',
+                    ],
+                ],
+            ]
+        );
     }
 
     /**
@@ -53,16 +68,19 @@ class MultiDayEventsTest extends TestCase
     public function test_can_create_multi_day_event()
     {
         $this->assertTrue($this->event instanceof MultiDayEvent);
+        $this->assertTrue($this->allDayEvent instanceof MultiDayEvent);
     }
 
     public function test_can_get_start()
     {
         $this->assertEquals(carbon('2019-11-23 19:00'), $this->event->start());
+        $this->assertEquals(carbon('2019-11-20 0:00'), $this->allDayEvent->start());
     }
 
     public function test_can_get_end()
     {
         $this->assertEquals(carbon('2019-11-25 15:00'), $this->event->end());
+        $this->assertEquals(carbon('2019-11-21 23:59:59'), $this->allDayEvent->end());
     }
 
     public function test_get_null_next_date_if_after_end_date()
