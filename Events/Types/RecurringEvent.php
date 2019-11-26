@@ -42,9 +42,11 @@ class RecurringEvent extends Event
 
         if ($after < $start) {
             return new Schedule(
-                $start->toDateString(),
-                $this->startTime(),
-                $this->endTime()
+                [
+                    'date' => $start->toDateString(),
+                    'start_time' => $this->startTime(),
+                    'end_time' => $this->endTime(),
+                ]
             );
         }
 
@@ -55,9 +57,11 @@ class RecurringEvent extends Event
         }
 
         return new Schedule(
-            $this->{$this->recurrence}($after)->toDateString(),
-            $this->startTime(),
-            $this->endTime()
+            [
+                'date' => $this->{$this->recurrence}($after)->toDateString(),
+                'start_time' => $this->startTime(),
+                'end_time' => $this->endTime(),
+            ]
         );
     }
 

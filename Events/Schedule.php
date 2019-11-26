@@ -12,13 +12,18 @@ class Schedule
 
     private $end;
 
-    public function __construct(string $date, string $startTime, string $endTime)
+    public function __construct($data, bool $isAllDay = false)
     {
-        $this->date = $date;
+        $this->date = $data['date'];
 
-        $this->start = $startTime;
-
-        $this->end = $endTime;
+        if ($isAllDay) {
+            $date = carbon($this->date);
+            $this->start = $date->startOfDay()->toTimeString();
+            $this->end = $date->endOfDay()->toTimeString();
+        } else {
+            $this->start = $data['start_time'];
+            $this->end = $data['end_time'];
+        }
     }
 
     public function start(): Carbon
@@ -36,12 +41,14 @@ class Schedule
         return Schedule::fromCarbon(Carbon::now());
     }
 
-    public static function fromCarbon($date): Schedule
+    public static function fromCarbon(Carbon $date): Schedule
     {
         return new Schedule(
-            $date->toDateString(),
-            $date->toTimeString(),
-            $date->endOfDay()->toTimeString()
+            [
+            'date' => $date->toDateString(),
+            'start_time' => $date->toTimeString(),
+            'end_time' => $date->endOfDay()->toTimeString(),
+            ]
         );
     }
 }

@@ -16,9 +16,11 @@ class MultiDayEvent extends Event
     {
         parent::__construct($data);
 
+        $isAllDay = $this->isAllDay();
+
         $this->days = collect(Arr::get($data, 'days', []))
-            ->map(function ($day, $ignore) {
-                return new Schedule($day['date'], $day['start_time'], $day['end_time']);
+            ->map(function ($day, $ignore) use ($isAllDay) {
+                return new Schedule($day, $isAllDay);
             });
     }
 
