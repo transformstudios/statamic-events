@@ -44,6 +44,7 @@ class EventsTags extends Tags
         $this->offset = $this->getInt('offset', 0);
 
         Entry::whereCollection($this->get('collection'))
+            ->removeUnpublished()
             ->each(function ($event) {
                 $this->events->add(EventFactory::createFromArray($event->toArray()));
             });
@@ -60,6 +61,7 @@ class EventsTags extends Tags
     public function calendar()
     {
         Entry::whereCollection($this->getParam('collection'))
+            ->removeUnpublished()
             ->each(function ($event) {
                 $this->events->add(EventFactory::createFromArray($event->toArray()));
             });
