@@ -10,6 +10,9 @@ class MultiDayEventsTest extends TestCase
     /** @var MultiDayEvent */
     private $event;
 
+    /** @var MultiDayEvent */
+    private $allDayEvent;
+
     public function setUp()
     {
         parent::setUp();
@@ -176,5 +179,21 @@ class MultiDayEventsTest extends TestCase
         $this->assertEmpty(
             $this->event->datesBetween(carbon('2019-11-26'), carbon('2019-11-28'))
         );
+    }
+
+    public function test_can_generate_only_start_date_when_collapsed()
+    {
+        Carbon::setTestNow(carbon('2019-11-19'));
+
+        $this->allDayEvent->asSingleDay = true;
+        $nextDates = $this->allDayEvent->upcomingDates();
+
+        $dates = collect([
+            carbon('2019-11-20'),
+        ]);
+
+        $this->assertCount(1, $nextDates);
+
+        $this->assertEquals($dates[0], $nextDates[0]->start());
     }
 }

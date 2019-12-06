@@ -42,11 +42,21 @@ class EventsTags extends Tags
     {
         $this->limit = $this->getInt('limit', 1);
         $this->offset = $this->getInt('offset', 0);
+        $collapseMultiDays = $this->getBool('collapse_multi_days', false);
 
         Entry::whereCollection($this->get('collection'))
             ->removeUnpublished()
-            ->each(function ($event) {
-                $this->events->add(EventFactory::createFromArray($event->toArray()));
+            ->each(function ($event) use ($collapseMultiDays) {
+                $event = EventFactory::createFromArray(
+                    array_merge(
+                        $event->toArray(),
+                        [
+                            'asSingleDay' => $collapseMultiDays,
+                        ]
+                    )
+                );
+
+                $this->events->add($event);
             });
 
         if ($this->getBool('paginate')) {

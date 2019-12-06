@@ -59,8 +59,11 @@ class MultiDayEvent extends Event
             return $first;
         }
 
-        $last = $this->lastDay();
-        $end = $last->start();
+        if ($this->asSingleDay && $after >= $first->start()) {
+            return null;
+        }
+
+        $end = $this->lastDay()->start();
 
         if ($end && $after >= $end) {
             return null;
