@@ -191,7 +191,7 @@ class RecurringEventsTest extends TestCase
             ]
         );
 
-        $nextDate = $event->upcomingDate(Carbon::now()->addWeek());
+        $nextDate = $event->upcomingDate($startDate->copy()->addWeek());
 
         $this->assertEquals($startDate->addWeeks(1), $nextDate->start());
     }
