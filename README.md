@@ -114,6 +114,7 @@ no_results: true
 ```
 
 If there are events, each event has all the entry data **plus**:
+
 * `date` - which is the next time this event happens
 * `multi_day` - `true` when this is a multi-day event (like Thanksgiving or a conference)
   * when it is a multi-day event, there is also an array of `days` that contains:
