@@ -47,6 +47,7 @@ class RecurringEventsTest extends TestCase
         $event = [
             'start_date' => Carbon::now()->toDateString(),
             'start_time' => '11:00',
+            'end_time' => '12:00',
             'end_date' => Carbon::now()->addDays(2)->toDateString(),
             'recurrence' => 'daily',
         ];
@@ -75,6 +76,22 @@ class RecurringEventsTest extends TestCase
 
         $nextDate = EventFactory::createFromArray($event)
             ->upcomingDate(Carbon::now()->setTimeFromTimeString('10:59:00'));
+
+        $this->assertEquals($startDate, $nextDate->start());
+    }
+
+    public function test_can_generate_next_day_if_during()
+    {
+        $startDate = Carbon::now()->setTimeFromTimeString('11:00');
+        $event = [
+                'start_date' => $startDate->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+            ];
+
+        $nextDate = EventFactory::createFromArray($event)
+            ->upcomingDate($startDate->copy()->addMinute(10));
 
         $this->assertEquals($startDate, $nextDate->start());
     }
@@ -119,6 +136,30 @@ class RecurringEventsTest extends TestCase
         $this->assertEquals($startDate, $nextDate->start());
     }
 
+    public function test_can_generate_next_weekly_date_if_during()
+    {
+        $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
+
+        $event = EventFactory::createFromArray(
+            [
+                'start_date' => $startDate->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'weekly',
+            ]
+        );
+
+        $nextDate = $event
+            ->upcomingDate($startDate->copy()->addMinute(10));
+
+        $this->assertEquals($startDate, $nextDate->start());
+
+        $nextDate = $event
+            ->upcomingDate($startDate->copy()->addWeek()->addMinute(10));
+
+        $this->assertEquals($startDate->addWeek(), $nextDate->start());
+    }
+
     public function test_can_generate_next_weekly_date_when_after()
     {
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
@@ -152,7 +193,7 @@ class RecurringEventsTest extends TestCase
 
         $nextDate = $event->upcomingDate(Carbon::now()->addWeek());
 
-        $this->assertEquals($startDate->addWeeks(2), $nextDate->start());
+        $this->assertEquals($startDate->addWeeks(1), $nextDate->start());
     }
 
     public function test_can_generate_next_monthly_date_if_before()
@@ -246,7 +287,7 @@ class RecurringEventsTest extends TestCase
         ]);
 
         for ($x = 0;$x < 3;$x++) {
-            $events[] = $startDate->copy()->addDays($x + 1);
+            $events[] = $startDate->copy()->addDays($x);
         }
 
         $this->events->add($event);
@@ -338,17 +379,17 @@ class RecurringEventsTest extends TestCase
                    'end_time' => '15:00',
                ]));
 
-        $nextEvent = $this->events->upcoming(1);
-
         Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('14:00:00'));
 
+        $nextEvent = $this->events->upcoming(1);
+
         $this->assertEquals(
-            Carbon::now()->addDays(1)->setTimeFromTimeString('13:00:00'),
+            Carbon::now()->setTimeFromTimeString('13:00:00'),
             $nextEvent->start()
         );
     }
 
-    public function test_generates_all_occurrences_single_event_from_to()
+    public function test_generates_all_weekly_occurrences_single_event_from_to()
     {
         $startDate = Carbon::now();
 
@@ -376,6 +417,48 @@ class RecurringEventsTest extends TestCase
             Carbon::now()->addDays(6)->setTimeFromTimeString('11:00:00'),
             $events[1]->start()
         );
+    }
+
+    public function test_can_get_last_day_when_before()
+    {
+        Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('10:30'));
+
+        $this->events->add(EventFactory::createFromArray([
+                       'id' => 'daily-event',
+                       'start_date' => Carbon::now()->toDateString(),
+                       'start_time' => '13:00',
+                       'end_time' => '15:00',
+                       'recurrence' => 'daily',
+                       'end_date' => Carbon::now()->addDays(7)->toDateString(),
+                   ]));
+
+        $from = Carbon::now()->addDays(7);
+        $to = Carbon::now()->endOfDay()->addDays(10);
+
+        $events = $this->events->all($from, $to);
+
+        $this->assertCount(1, $events);
+    }
+
+    public function test_generates_all_daily_occurrences_single_event_from_to()
+    {
+        Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('10:30'));
+
+        $this->events->add(EventFactory::createFromArray([
+                       'id' => 'daily-event',
+                       'start_date' => Carbon::now()->toDateString(),
+                       'start_time' => '13:00',
+                       'end_time' => '15:00',
+                       'recurrence' => 'daily',
+                       'end_date' => Carbon::now()->addDays(7)->toDateString(),
+                   ]));
+
+        $from = Carbon::now()->subDays(1);
+        $to = Carbon::now()->endOfDay()->addDays(10);
+
+        $events = $this->events->all($from, $to);
+
+        $this->assertCount(8, $events);
     }
 
     public function test_generates_all_occurrences_multiple_events_from_to()

@@ -95,13 +95,15 @@ class SingleDayEventsTest extends TestCase
         );
     }
 
-    public function test_get_null_next_datetime_if_during()
+    public function test_returns_start_if_during()
     {
-        $this->assertNull(
-            $this->allDayEvent->upcomingDate(carbon('2019-11-27 10:00'))
+        $this->assertEquals(
+            carbon('2019-11-27')->setTimeFromTimeString('11:00:00'),
+            $this->nonAllDayEvent->upcomingDate(carbon('2019-11-27 11:30'))->start()
         );
-        $this->assertNull(
-            $this->allDayEvent->upcomingDate(carbon('2019-11-27 11:30'))
+        $this->assertEquals(
+            carbon('2019-11-27')->setTimeFromTimeString('00:00:00'),
+            $this->allDayEvent->upcomingDate(carbon('2019-11-27 11:30'))->start()
         );
     }
 
