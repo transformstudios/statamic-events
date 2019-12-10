@@ -54,18 +54,13 @@ class MultiDayEvent extends Event
         }
 
         $first = $this->firstDay();
+        $end = $this->lastDay()->end();
 
-        if ($after < $first->start()) {
+        if ($after < $first->start() || ($this->asSingleDay && $after <= $end)) {
             return $first;
         }
 
-        if ($this->asSingleDay && $after >= $first->start()) {
-            return null;
-        }
-
-        $end = $this->lastDay()->start();
-
-        if ($end && $after >= $end) {
+        if ($after > $end) {
             return null;
         }
 
@@ -83,6 +78,10 @@ class MultiDayEvent extends Event
         $dates = collect();
 
         $day = Schedule::now();
+
+        if ($this->asSingleDay) {
+            return collect([$this->upcomingDate(Carbon::now())]);
+        }
 
         while (($day = $this->upcomingDate($day->start())) && $dates->count() <= $total) {
             $dates->push($day);

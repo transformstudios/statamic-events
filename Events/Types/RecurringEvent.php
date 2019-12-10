@@ -18,7 +18,7 @@ class RecurringEvent extends Event
         return null;
     }
 
-    public function end(): Carbon
+    public function end(): ?Carbon
     {
         $end = $this->endDate();
 
@@ -26,7 +26,7 @@ class RecurringEvent extends Event
             return $end->endOfDay();
         }
 
-        return $end->setTimeFromTimeString($this->endTime());
+        return $end ? $end->setTimeFromTimeString($this->endTime()) : null;
     }
 
     /**
@@ -40,7 +40,7 @@ class RecurringEvent extends Event
 
         $start = $this->start();
 
-        if ($after < $start) {
+        if ($after < $start->copy()->setTimeFromTimeString($this->endTime())) {
             return new Schedule(
                 [
                     'date' => $start->toDateString(),
@@ -50,9 +50,9 @@ class RecurringEvent extends Event
             );
         }
 
-        $endDate = $this->endDate();
+        $end = $this->end();
 
-        if ($endDate && $after >= $endDate) {
+        if ($end && $after >= $end) {
             return null;
         }
 
@@ -70,10 +70,13 @@ class RecurringEvent extends Event
         $total = $offset ? $limit * $offset : $limit;
 
         $dates = collect();
-        $day = Schedule::now();
+        $after = Carbon::now();
 
-        while (($day = $this->upcomingDate($day->start())) && $dates->count() <= $total) {
+        while (($day = $this->upcomingDate($after)) && $dates->count() <= $total) {
             $dates->push($day);
+
+            // think I want `$after->modify('next day/week/month');
+            $after = $day->start()->modify("next {$this->recurrenceUnit()}");
         }
 
         return $dates->slice($offset, $limit);
@@ -97,36 +100,54 @@ class RecurringEvent extends Event
 
         while ($day && $day->start() < $to) {
             $days->push($day);
-            $day = $this->upcomingDate($day->start());
+            $day = $this->upcomingDate($day->start()->modify("next {$this->recurrenceUnit()}"));
         }
 
         return $days;
     }
 
-    private function daily($after)
+    private function daily(Carbon $after)
     {
         $start = $this->start();
 
-        return $after->copy()
+        $next = $after->copy()
             ->day($after->day)
             ->hour($start->hour)
             ->minute($start->minute)
-            ->second($start->second)
-            ->addDay();
+            ->second($start->second);
+
+        if ($after >= $next->copy()->setTimeFromTimeString($this->endTime())) {
+            $next->addDay();
+        }
+
+        return $next;
     }
 
-    private function weekly($after)
+    private function weekly(Carbon $after)
     {
         $start = $this->start();
 
-        return $after->copy()
-            ->modify("next {$start->englishDayOfWeek}")
+        $next = $after->copy()
             ->hour($start->hour)
             ->minute($start->minute)
             ->second($start->second);
+
+        // during is if on same day and time is >=start && < end
+        $during = $after->isBetween(
+            $after->copy()->setTimeFromTimeString($this->startTime()),
+            $after->copy()->setTimeFromTimeString($this->endTime()),
+        );
+
+        // if $after is on the same day of the week as $start
+        // AND it is DURING the time, DO NOT go to the next week
+        if (!($after->dayOfWeek == $start->dayOfWeek && $during)) {
+            $next->modify("next {$start->englishDayOfWeek}");
+        }
+
+        return $next;
     }
 
-    private function monthly($after)
+    private function monthly(Carbon $after)
     {
         $start = $this->start();
 
@@ -139,5 +160,19 @@ class RecurringEvent extends Event
         }
 
         return $date;
+    }
+
+    private function recurrenceUnit()
+    {
+        switch ($this->recurrence) {
+            case 'daily':
+                return 'day';
+            case 'weekly':
+                return 'week';
+            case 'monthly':
+                return 'month';
+            case 'yearly':
+                return 'year';
+        }
     }
 }

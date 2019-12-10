@@ -17,13 +17,11 @@ class SingleDayEvent extends Event
             $after = Carbon::now();
         }
 
-        $dateTime = $this->start();
-
-        if (carbon($after) >= $dateTime) {
+        if (carbon($after) >= $this->end()) {
             return null;
         }
 
-        return Schedule::fromCarbon($dateTime);
+        return Schedule::fromCarbon($this->start());
     }
 
     public function upcomingDates($limit = 2, $offset = 0): Collection
