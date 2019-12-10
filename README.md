@@ -86,15 +86,17 @@ dates:
   ...
 ```
 
-#### Next Events
+#### Upcoming Events
 
 Tag pair that returns the next X event dates. 2 required params, `collection` & `limit`.
+
+One optional param, only relevant on multi-day, all-day events, `collapse_multi_days`. When `true`, multi-day events will only show up once in the event list.
 
 
 *Example*:
 
 ```
-{{ events:next collection="events" limit="2" }}
+{{ events:upcoming collection="events" limit="2" }}
   {{ dates }}
     ...other entry data
     {{ date }}
@@ -111,13 +113,24 @@ date: October 21, 2019
 no_results: true
 ```
 
-If there are events, each event has all the entry data **plus** `date` which is the next time this event happens:
+If there are events, each event has all the entry data **plus**:
+* `date` - which is the next time this event happens
+* `multi_day` - `true` when this is a multi-day event (like Thanksgiving or a conference)
+  * when it is a multi-day event, there is also an array of `days` that contains:
+    * `start_time`
+    * `end_time`
+    * `date`
+* `all_day` - `true` when an all day event (like a holiday)
+
 
 ```
 start_date: October 21, 2019
+multi_day: true
+all_day: true
 ...
 date: Octover 22, 2019
 ```
+
 
 If there are no more dates, `date` won't be there or will be null
 
@@ -127,7 +140,7 @@ If you want to paginate the results, add `paginate="true"` to the tag. Then the 
 
 *Example*
 ```
-{{ events:next collection="events" limit="2" paginate="true" }}
+{{ events:upcoming collection="events" limit="2" paginate="true" }}
   {{ dates }}
     ...other entry data
     {{ date }}
