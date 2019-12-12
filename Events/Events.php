@@ -20,12 +20,17 @@ class Events
         $this->events->push($event);
     }
 
-    public function upcoming($limit = 1, $offset = 0)
+    /**
+     * @return Collection|Event
+     */
+    public function upcoming(int $limit = 1, int $offset = 0)
     {
         $events = $this->events->flatMap(function ($event, $ignore) use ($limit, $offset) {
-            $days = $event->upcomingDates($limit, $offset);
+            return $event->upcomingDates($limit, $offset)->map(function ($day, $ignore) use ($event) {
+                if (is_null($day)) {
+                    return;
+                }
 
-            return $days->map(function ($day, $ignore) use ($event) {
                 $event = clone $event;
                 $event->start_date = $day->start()->toDateString();
                 $event->start_time = $day->start()->toTimeString();
@@ -39,11 +44,7 @@ class Events
         })->values()
         ->take($limit);
 
-        if ($limit === 1) {
-            return $events->first();
-        }
-
-        return $events;
+        return $limit === 1 ? $events->first() : $events;
     }
 
     public function all($from, $to)
