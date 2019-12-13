@@ -73,6 +73,31 @@ class SingleDayEventsTest extends TestCase
         $this->assertEquals(carbon('2019-11-27 12:00'), $this->nonAllDayEvent->end());
     }
 
+    public function test_can_get_end_when_none_set()
+    {
+        $event = EventFactory::createFromArray([
+            'start_date' => '2019-11-27',
+            'start_time' => '11:00',
+        ]);
+
+        $endOfDayTime = Carbon::now()->endOfDay()->toTimeString();
+
+        $endOfDay = carbon('2019-11-27')->setTimeFromTimeString($endOfDayTime);
+        $this->assertEquals($endOfDay, $event->end());
+    }
+
+    public function test_can_get_start_when_none_set()
+    {
+        $event = EventFactory::createFromArray([
+            'start_date' => '2019-11-27',
+        ]);
+
+        $startOfDayTime = Carbon::now()->startOfDay()->toTimeString();
+
+        $startOfDay = carbon('2019-11-27')->setTimeFromTimeString($startOfDayTime);
+        $this->assertEquals($startOfDay, $event->start());
+    }
+
     public function test_get_null_next_date_if_after_end_date()
     {
         $this->assertNull(

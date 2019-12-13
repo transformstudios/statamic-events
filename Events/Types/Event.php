@@ -46,20 +46,22 @@ abstract class Event implements Arrayable
 
     public function startTime(): string
     {
+        $time = Carbon::now()->startOfDay()->toTimeString();
         if ($this->isAllDay()) {
-            return Carbon::now()->startOfDay()->toTimeString();
+            return $time;
         }
 
-        return Arr::get($this->data, 'start_time');
+        return Arr::get($this->data, 'start_time', $time);
     }
 
     public function endTime(): string
     {
+        $time = Carbon::now()->endOfDay()->toTimeString();
         if ($this->isAllDay()) {
-            return Carbon::now()->endOfDay()->toTimeString();
+            return $time;
         }
 
-        return Arr::get($this->data, 'end_time');
+        return Arr::get($this->data, 'end_time', $time);
     }
 
     public function start(): Carbon
