@@ -1,5 +1,3 @@
-## Events
-
 This addon assumes the following data in an entry:
 
 ```
@@ -13,14 +11,14 @@ end_date: '2019-11-07'
 
 ```
 
-### Sample Fieldset
+## Sample Fieldset
 
 See [here](/event.yaml).
 
 
-### Fields
+## Fields
 
-#### Single Day Events
+### Single Day Events
 
 * `start_date` - **Required** - Start date of the event.
 * `start_time` - **Optional (see `all_day`)** - Start time of the event.
@@ -29,7 +27,7 @@ See [here](/event.yaml).
 * `recurrence` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`
 * `end_date` - **Optional** - when is the last event. If `recurrence` is set and this is not, the event goes on forever
 
-#### Multi-Day Events:
+### Multi-Day Events:
 * `multi_day` - boolean. When true, `start_date`, `start_time`, `end_time`, `recurrence`, `end_date` are not used
 * `days` - **Required** - array of days:
 ```
@@ -49,9 +47,9 @@ days:
     end_time: '15:00'
 ```
 
-### Usage
+## Usage
 
-#### Calendar
+### Calendar
 
 Tag pair that returns an entire month of dates, starting on a Sunday and ending on a Saturday. 2 required params, `collection` & `month`.
 
@@ -93,7 +91,7 @@ dates:
   ...
 ```
 
-#### Upcoming Events
+### Upcoming Events
 
 Tag pair that returns the next X event dates. 2 required params, `collection` & `limit`.
 
