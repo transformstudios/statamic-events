@@ -1,0 +1,141 @@
+title: Event
+sections:
+  main:
+    display: Main
+    fields:
+      basics:
+        type: section
+        display: Basics
+      title:
+        display: Title
+        type: text
+        width: 33
+        localizable: true
+      slug:
+        type: text
+        display: Slug
+        width: 33
+      highlights:
+        options:
+          dark: Dark
+          primary: Primary
+        type: suggest
+        width: 33
+        display: Highlight
+        create: false
+      details:
+        type: section
+        display: Details
+      location:
+        type: text
+        width: 25
+        display: Location
+      cost:
+        type: text
+        width: 25
+        display: Cost
+      all_day:
+        type: toggle
+        width: 25
+        display: "All Day?"
+      multi_day:
+        type: toggle
+        width: 25
+        display: "Multi-Day?"
+      start_date:
+        allow_blank: false
+        allow_time: false
+        require_time: false
+        earliest_date: "January 1, 1900"
+        input_format: M/D/YYY
+        type: date
+        width: 33
+        display: "Start Date"
+        show_when:
+          multi_day: false
+      start_time:
+        type: time
+        width: 33
+        display: "Start Time"
+        show_when:
+          all_day: false
+          multi_day: false
+      end_time:
+        type: time
+        width: 33
+        display: "End Time"
+        show_when:
+          all_day: false
+          multi_day: false
+      days:
+        mode: table
+        fields:
+          date:
+            allow_blank: false
+            allow_time: false
+            require_time: false
+            input_format: M/D/YYY
+            earliest_date: "January 1, 1900"
+            type: date
+            width: 33
+            display: Date
+          start_time:
+            type: time
+            width: 33
+            display: "Start Time"
+          end_time:
+            type: time
+            width: 33
+            display: "End Time"
+        type: grid
+        display: Days
+        min_rows: 2
+        add_row: "Add Day"
+        show_when:
+          multi_day: true
+      recurrence_section:
+        type: section
+        display: Recurrence
+      recurrence:
+        options:
+          false: None
+          daily: Daily
+          weekly: Weekly
+          monthly: Monthly
+        type: select
+        width: 33
+        display: "Recurrence Type"
+        default: false
+      recurrence_frequency:
+        type: integer
+        width: 33
+        display: "Recurrence Frequency"
+        show_when:
+          recurrence: every_x_weeks
+      end_date:
+        allow_blank: true
+        allow_time: false
+        require_time: false
+        earliest_date: "January 1, 1900"
+        input_format: M/D/YYY
+        type: date
+        display: "End Date"
+        width: 33
+        show_when:
+          recurrence:
+            - daily
+            - weekly
+            - monthly
+      bard_content:
+        fieldset: content
+        type: partial
+        display: Content
+  sidebar:
+    display: Sidebar
+    fields:
+      partial_seo:
+        fieldset: partial_seo_data
+        type: partial
+        display: partial_seo
+taxonomies: false
+create_title: "Create Event"
