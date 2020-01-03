@@ -24,7 +24,9 @@ See [here](/event.yaml).
 * `start_time` - **Optional (see `all_day`)** - Start time of the event.
 * `end_time` - **Optional (see `all_day`)** - Start date of the event.
 * `all_day` - **Optional** - boolean. If this is `true`, then neither `start_time` nor `end_time` are required
-* `recurrence` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`
+* `recurrence` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`, `every`
+* `interval` - **Optional** - required if `recurrence` is `every` and indicates the frequency of the event
+* `period` - **Optional** - required if `recurrence` is `every` and indicates the period of recurrence. One of `days`, `weeks`, `months`, `years`
 * `end_date` - **Optional** - when is the last event. If `recurrence` is set and this is not, the event goes on forever
 
 ### Multi-Day Events:
@@ -155,7 +157,7 @@ If you want to paginate the results, add `paginate="true"` to the tag. Then the 
     {{ if prev_page }}<a href="{{ prev_page }}"{{ /if }}
     {{ if next_page }}<a href="{{ next_page }}"{{ /if }}
   {{ /pagination }}
-{{ /events:next }}
+{{ /events:upcoming }}
 ```
 *Data*
 

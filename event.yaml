@@ -98,20 +98,31 @@ sections:
         display: Recurrence
       recurrence:
         options:
-          false: None
+          0: None
           daily: Daily
           weekly: Weekly
           monthly: Monthly
+          every: Every
         type: select
-        width: 33
+        width: 25
         display: "Recurrence Type"
         default: false
-      recurrence_frequency:
+      interval:
         type: integer
-        width: 33
-        display: "Recurrence Frequency"
+        width: 25
+        display: Interval
         show_when:
-          recurrence: every_x_weeks
+          recurrence: every
+      period:
+        options:
+          days: Days
+          weeks: Weeks
+          years: Years
+        type: select
+        display: Period
+        width: 25
+        show_when:
+          recurrence: every
       end_date:
         allow_blank: true
         allow_time: false
@@ -120,12 +131,13 @@ sections:
         input_format: M/D/YYYY
         type: date
         display: "End Date"
-        width: 33
+        width: 25
         show_when:
           recurrence:
             - daily
             - weekly
             - monthly
+            - every
       bard_content:
         fieldset: content
         type: partial
