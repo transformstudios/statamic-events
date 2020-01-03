@@ -66,7 +66,7 @@ class SingleDayEventsTest extends TestCase
 
     public function test_can_get_end()
     {
-        $endOfDayTime = Carbon::now()->endOfDay()->toTimeString();
+        $endOfDayTime = Carbon::now()->endOfDay()->format('G:i');
 
         $endOfDay = carbon('2019-11-27')->setTimeFromTimeString($endOfDayTime);
         $this->assertEquals($endOfDay, $this->allDayEvent->end());
@@ -80,7 +80,7 @@ class SingleDayEventsTest extends TestCase
             'start_time' => '11:00',
         ]);
 
-        $endOfDayTime = Carbon::now()->endOfDay()->toTimeString();
+        $endOfDayTime = Carbon::now()->endOfDay()->format('G:i');
 
         $endOfDay = carbon('2019-11-27')->setTimeFromTimeString($endOfDayTime);
         $this->assertEquals($endOfDay, $event->end());

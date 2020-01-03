@@ -83,7 +83,7 @@ class MultiDayEventsTest extends TestCase
     public function test_can_get_end()
     {
         $this->assertEquals(carbon('2019-11-25 15:00'), $this->event->end());
-        $this->assertEquals(carbon('2019-11-21 23:59:59'), $this->allDayEvent->end());
+        $this->assertEquals(carbon('2019-11-21 23:59'), $this->allDayEvent->end());
     }
 
     public function test_get_null_next_date_if_after_end_date()

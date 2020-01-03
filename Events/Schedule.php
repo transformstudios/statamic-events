@@ -18,8 +18,8 @@ class Schedule
 
         if ($isAllDay) {
             $date = carbon($this->date);
-            $this->start = $date->startOfDay()->format('g:i');
-            $this->end = $date->endOfDay()->format('g:i');
+            $this->start = $date->startOfDay()->format('G:i');
+            $this->end = $date->endOfDay()->format('G:i');
         } else {
             $this->start = $data['start_time'];
             $this->end = $data['end_time'];

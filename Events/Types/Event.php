@@ -46,7 +46,7 @@ abstract class Event implements Arrayable
 
     public function startTime(): string
     {
-        $time = Carbon::now()->startOfDay()->format('g:i');
+        $time = Carbon::now()->startOfDay()->format('G:i');
         if ($this->isAllDay()) {
             return $time;
         }
@@ -56,7 +56,7 @@ abstract class Event implements Arrayable
 
     public function endTime(): string
     {
-        $time = Carbon::now()->endOfDay()->format('g:i');
+        $time = Carbon::now()->endOfDay()->format('G:i');
         if ($this->isAllDay()) {
             return $time;
         }
