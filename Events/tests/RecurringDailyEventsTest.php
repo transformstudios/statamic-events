@@ -241,4 +241,24 @@ class RecurringDailyEventsTest extends TestCase
 
         $this->assertCount(8, $events);
     }
+
+    public function test_generates_all_daily_occurrences_single_event_from_to_without_end_date()
+    {
+        Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('10:30'));
+
+        $this->events->add(EventFactory::createFromArray([
+                       'id' => 'daily-event',
+                       'start_date' => Carbon::now()->toDateString(),
+                       'start_time' => '13:00',
+                       'end_time' => '15:00',
+                       'recurrence' => 'daily',
+                   ]));
+
+        $from = Carbon::now()->subDays(1);
+        $to = Carbon::now()->endOfDay()->addDays(10);
+
+        $events = $this->events->all($from, $to);
+
+        $this->assertCount(11, $events);
+    }
 }

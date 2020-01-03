@@ -89,7 +89,7 @@ class RecurringEvent extends Event
 
         if (($from->startOfDay() > $to->endOfDay()) ||
             ($this->start()->isAfter($to)) ||
-            ($this->end()->isBefore($from))
+            ($this->end() && $this->end()->isBefore($from))
         ) {
             return collect();
         }
