@@ -3,6 +3,7 @@
 namespace Statamic\Addons\Events\Types;
 
 use Statamic\API\Arr;
+use Statamic\Addons\Events\Types\Recurring\EveryX;
 
 class EventFactory
 {
@@ -12,8 +13,8 @@ class EventFactory
             return new MultiDayEvent($data);
         }
 
-        if (Arr::get($data, 'recurrence', false)) {
-            return new RecurringEvent($data);
+        if ($type = Arr::get($data, 'recurrence', false)) {
+            return $type === 'every' ? new EveryX($data) : new RecurringEvent($data);
         }
 
         return new SingleDayEvent($data);
