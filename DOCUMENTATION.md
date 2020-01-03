@@ -11,9 +11,9 @@ end_date: '2019-11-07'
 
 ```
 
-## Sample Fieldset
+## Event Fieldset
 
-See [here](/event.yaml).
+See [here](/event.yaml). You can add this to your collection fieldsets via the `partial` fieldtype.
 
 
 ## Fields
