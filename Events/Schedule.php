@@ -6,11 +6,11 @@ use Carbon\Carbon;
 
 class Schedule
 {
-    private $date;
+    private string $date;
 
-    private $start;
+    private string $start;
 
-    private $end;
+    private string $end;
 
     public function __construct($data, bool $isAllDay = false)
     {
@@ -18,8 +18,8 @@ class Schedule
 
         if ($isAllDay) {
             $date = carbon($this->date);
-            $this->start = $date->startOfDay()->toTimeString();
-            $this->end = $date->endOfDay()->toTimeString();
+            $this->start = $date->startOfDay()->format('g:i');
+            $this->end = $date->endOfDay()->format('g:i');
         } else {
             $this->start = $data['start_time'];
             $this->end = $data['end_time'];
@@ -31,9 +31,19 @@ class Schedule
         return carbon($this->date)->setTimeFromTimeString($this->start);
     }
 
+    public function startTime(): string
+    {
+        return $this->start;
+    }
+
     public function end(): Carbon
     {
         return carbon($this->date)->setTimeFromTimeString($this->end);
+    }
+
+    public function endTime(): string
+    {
+        return $this->end;
     }
 
     public static function now(): Schedule

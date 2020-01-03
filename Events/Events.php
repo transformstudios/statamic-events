@@ -55,8 +55,8 @@ class Events
             return $days->map(function ($day, $ignore) use ($event) {
                 $event = clone $event;
                 $event->start_date = $day->start()->toDateString();
-                $event->start_time = $day->start()->toTimeString();
-                $event->end_time = $day->end()->toTimeString();
+                $event->start_time = $day->startTime();
+                $event->end_time = $day->endTime();
 
                 return $event;
             });
