@@ -106,7 +106,7 @@ One optional param, only relevant on multi-day, all-day events, `collapse_multi_
     ...other entry data
     {{ date }}
   {{ /dates }}
-{{ /events:next }}
+{{ /events:upcoming }}
 ```
 
 *Data*:
