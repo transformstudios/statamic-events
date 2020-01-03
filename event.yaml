@@ -47,7 +47,7 @@ sections:
         allow_time: false
         require_time: false
         earliest_date: "January 1, 1900"
-        input_format: M/D/YYY
+        input_format: M/D/YYYY
         type: date
         width: 33
         display: "Start Date"
@@ -74,7 +74,7 @@ sections:
             allow_blank: false
             allow_time: false
             require_time: false
-            input_format: M/D/YYY
+            input_format: M/D/YYYY
             earliest_date: "January 1, 1900"
             type: date
             width: 33
@@ -117,7 +117,7 @@ sections:
         allow_time: false
         require_time: false
         earliest_date: "January 1, 1900"
-        input_format: M/D/YYY
+        input_format: M/D/YYYY
         type: date
         display: "End Date"
         width: 33
