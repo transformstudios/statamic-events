@@ -26,15 +26,15 @@ class Events
     public function upcoming(int $limit = 1, int $offset = 0)
     {
         $events = $this->events->flatMap(function ($event, $ignore) use ($limit, $offset) {
-            return $event->upcomingDates($limit, $offset)->map(function ($day, $ignore) use ($event) {
+            return $event->upcomingDates($limit * ($offset + 1))->map(function ($day, $ignore) use ($event) {
                 if (is_null($day)) {
                     return;
                 }
 
                 $event = clone $event;
                 $event->start_date = $day->start()->toDateString();
-                $event->start_time = $day->start()->toTimeString();
-                $event->end_time = $day->end()->toTimeString();
+                $event->start_time = $day->startTime();
+                $event->end_time = $day->endTime();
 
                 return $event;
             });
@@ -42,7 +42,7 @@ class Events
         ->sortBy(function ($event, $ignore) {
             return carbon($event->start_date)->setTimeFromTimeString($event->startTime());
         })->values()
-        ->take($limit);
+        ->splice($offset, $limit);
 
         return $limit === 1 ? $events->first() : $events;
     }

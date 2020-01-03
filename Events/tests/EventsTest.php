@@ -102,4 +102,27 @@ class EventsTest extends TestCase
 
         $this->assertCount(0, $nextDates);
     }
+
+    public function test_event_pagination()
+    {
+        $events = new Events();
+
+        $events->add($this->event);
+        $events->add($this->allDayEvent);
+
+        Carbon::setTestNow(carbon('2019-11-19'));
+
+        $nextDates = $this->event->upcomingDates(2, 1);
+        $this->assertCount(2, $nextDates);
+
+        $this->assertEquals(Carbon::parse('2019-11-24 11:00'), $nextDates[0]->start());
+        $this->assertEquals(Carbon::parse('2019-11-25 11:00'), $nextDates[1]->start());
+
+        $nextDates = $events->upcoming(2, 2);
+
+        $this->assertCount(2, $nextDates);
+
+        $this->assertEquals(Carbon::parse('2019-11-23 19:00'), carbon($nextDates[0]->start_date . ' ' . $nextDates[0]->start_time));
+        $this->assertEquals(Carbon::parse('2019-11-24 11:00'), carbon($nextDates[1]->start_date . ' ' . $nextDates[1]->start_time));
+    }
 }
