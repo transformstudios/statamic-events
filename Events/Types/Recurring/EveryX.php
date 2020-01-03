@@ -91,7 +91,7 @@ class EveryX extends RecurringEvent
 
         if (($from->startOfDay() > $to->endOfDay()) ||
             ($this->start()->isAfter($to)) ||
-            ($this->end()->isBefore($from))
+            ($this->end() && $this->end()->isBefore($from))
         ) {
             return collect();
         }
