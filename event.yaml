@@ -96,6 +96,8 @@ sections:
       recurrence_section:
         type: section
         display: Recurrence
+        show_when:
+          multi_day: false
       recurrence:
         options:
           0: None
@@ -107,6 +109,8 @@ sections:
         width: 25
         display: "Recurrence Type"
         default: false
+        show_when:
+          multi_day: false
       interval:
         type: integer
         width: 25
