@@ -2,6 +2,7 @@
 
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
+use Statamic\Addons\Events\Events;
 use Statamic\Addons\Events\Types\EventFactory;
 use Statamic\Addons\Events\Types\MultiDayEvent;
 
@@ -186,10 +187,21 @@ class MultiDayEventsTest extends TestCase
         Carbon::setTestNow(carbon('2019-11-19'));
 
         $this->allDayEvent->asSingleDay = true;
+        $this->event->asSingleDay = true;
         $nextDates = $this->allDayEvent->upcomingDates();
 
         $dates = collect([
             carbon('2019-11-20'),
+        ]);
+
+        $this->assertCount(1, $nextDates);
+
+        $this->assertEquals($dates[0], $nextDates[0]->start());
+
+        $nextDates = $this->event->upcomingDates();
+
+        $dates = collect([
+            carbon('2019-11-23 7PM'),
         ]);
 
         $this->assertCount(1, $nextDates);
@@ -211,5 +223,23 @@ class MultiDayEventsTest extends TestCase
         $this->assertCount(1, $nextDates);
 
         $this->assertEquals($dates[0], $nextDates[0]->start());
+    }
+
+    public function test_exposes_end_date_when_collapsed()
+    {
+        Carbon::setTestNow(carbon('2019-11-21 12:00'));
+
+        $this->event->asSingleDay = true;
+
+        $events = new Events();
+
+        $events->add($this->event);
+
+        $nextDates = $this->event->upcomingDates();
+
+        $this->assertCount(1, $nextDates);
+        $this->assertEquals('2019-11-25', $nextDates[0]->endDate());
+
+        $next = $events->upcoming(1);
     }
 }
