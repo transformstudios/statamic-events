@@ -3,47 +3,71 @@
 namespace Statamic\Addons\Events;
 
 use Carbon\Carbon;
+use Statamic\API\Arr;
 
 class Schedule
 {
     private string $date;
 
-    private string $start;
+    private string $startTime;
 
-    private string $end;
+    private string $endTime;
+
+    private string $endDate;
 
     public function __construct($data, bool $isAllDay = false)
     {
         $this->date = $data['date'];
+        $this->endDate = Arr::get($data, 'end_date', $this->date);
 
         if ($isAllDay) {
             $date = carbon($this->date);
-            $this->start = $date->startOfDay()->format('G:i');
-            $this->end = $date->endOfDay()->format('G:i');
+            $this->startTime = $date->startOfDay()->format('G:i');
+            $this->endTime = $date->endOfDay()->format('G:i');
         } else {
-            $this->start = $data['start_time'];
-            $this->end = $data['end_time'];
+            $this->startTime = $data['start_time'];
+            $this->endTime = $data['end_time'];
         }
     }
 
     public function start(): Carbon
     {
-        return carbon($this->date)->setTimeFromTimeString($this->start);
+        return carbon($this->date)->setTimeFromTimeString($this->startTime);
+    }
+
+    public function startDate(): string
+    {
+        return $this->date;
     }
 
     public function startTime(): string
     {
-        return $this->start;
+        return $this->startTime;
     }
 
     public function end(): Carbon
     {
-        return carbon($this->date)->setTimeFromTimeString($this->end);
+        return carbon($this->endDate)->setTimeFromTimeString($this->endTime);
+    }
+
+    public function endDate($date = null)
+    {
+        if (is_null($date)) {
+            return $this->endDate;
+        }
+
+        if ($date instanceof Carbon) {
+            $date = $date->toDateString();
+        }
+
+        $this->endDate = $date;
+
+        return $this;
     }
 
     public function endTime(): string
     {
-        return $this->end;
+        return $this->endTime;
     }
 
     public static function now(): Schedule

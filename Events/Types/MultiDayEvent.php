@@ -56,6 +56,10 @@ class MultiDayEvent extends Event
         $first = $this->firstDay();
         $end = $this->lastDay()->end();
 
+        if ($this->asSingleDay) {
+            $first->endDate($end);
+        }
+
         if ($after < $first->start() || ($this->asSingleDay && $after <= $end)) {
             return $first;
         }
