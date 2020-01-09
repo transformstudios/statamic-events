@@ -35,11 +35,13 @@ class RecurringDailyEventsTest extends TestCase
             'start_date' => Carbon::now()->toDateString(),
             'start_time' => '11:00',
             'recurrence' => 'daily',
+            'all_day' => true,
         ];
 
         $event = EventFactory::createFromArray($event);
 
         $this->assertNull($event->endDate());
+        $this->assertNull($event->end());
     }
 
     public function test_get_null_next_date_if_after_end_date()
