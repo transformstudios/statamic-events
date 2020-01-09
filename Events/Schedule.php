@@ -7,13 +7,13 @@ use Statamic\API\Arr;
 
 class Schedule
 {
-    private string $date;
+    private $date;
 
-    private string $startTime;
+    private $startTime;
 
-    private string $endTime;
+    private $endTime;
 
-    private string $endDate;
+    private $endDate;
 
     public function __construct($data, bool $isAllDay = false)
     {

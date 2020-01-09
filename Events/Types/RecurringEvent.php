@@ -20,13 +20,15 @@ class RecurringEvent extends Event
 
     public function end(): ?Carbon
     {
-        $end = $this->endDate();
+        if (!$end = $this->endDate()) {
+            return null;
+        }
 
         if ($this->isAllDay()) {
             return $end->endOfDay();
         }
 
-        return $end ? $end->setTimeFromTimeString($this->endTime()) : null;
+        return $end->setTimeFromTimeString($this->endTime());
     }
 
     /**
@@ -135,7 +137,7 @@ class RecurringEvent extends Event
         // during is if on same day and time is >=start && < end
         $during = $after->isBetween(
             $after->copy()->setTimeFromTimeString($this->startTime()),
-            $after->copy()->setTimeFromTimeString($this->endTime()),
+            $after->copy()->setTimeFromTimeString($this->endTime())
         );
 
         // if $after is on the same day of the week as $start
