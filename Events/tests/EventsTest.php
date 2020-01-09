@@ -140,8 +140,6 @@ class EventsTest extends TestCase
 
         $nextDates = $events->upcoming(4);
 
-        dd($nextDates);
-
         $this->assertCount(2, $nextDates);
 
         $this->assertEquals($dates[0], carbon($nextDates[0]->start_date)->setTimeFromTimeString($nextDates[0]->start_time));
