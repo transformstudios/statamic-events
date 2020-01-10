@@ -54,6 +54,8 @@ days:
 ### Calendar
 
 Tag pair that returns an entire month of dates, starting on a Sunday and ending on a Saturday. 2 required params, `collection` & `month`.
+Optional param:
+* `year` - which year? Default to the current year
 
 *Example*:
 
@@ -68,7 +70,51 @@ Tag pair that returns an entire month of dates, starting on a Sunday and ending 
       {{ date }}
     {{ /dates }}
   {{ /if }}
-{{ /events }}
+{{ /events:calendar }}
+```
+
+*Data*:
+
+If there are no events on a given day, data returned is:
+
+```
+date: October 21, 2019
+no_results: true
+```
+
+If there are events, each event has all the entry data **plus** `date` which is the next time this event happens:
+
+```
+date: October 21, 2019
+dates:
+  -
+    ...
+    date: Octover 22, 2019
+    ...
+  -
+  ...
+```
+
+### In
+
+Tag pair that returns a range of dates 2 required params, `collection` & `next`
+* `collection` - which collection has the events
+* `next` - a period that is [parsable](https://www.php.net/manual/en/datetime.formats.relative.php) by DateTime. Examples include `'2 weeks'`, `'90 days'`
+
+*Example*:
+
+```
+{{ events:in collection="events" next="90 days" }}
+  {{ date }} {{# date of event #}}
+  {{ if no_results }}
+    {{# whatever you need to when for an empty day #}}
+  {{ else }}
+    {{ dates }}
+      ...other entry data...
+      {{ date }}
+    {{ /dates }}
+  {{ /if }}
+{{ /events:in }}
 ```
 
 *Data*:
