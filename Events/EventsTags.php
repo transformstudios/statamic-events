@@ -70,11 +70,7 @@ class EventsTags extends Tags
 
     public function calendar()
     {
-        Entry::whereCollection($this->getParam('collection'))
-            ->removeUnpublished()
-            ->each(function ($event) {
-                $this->events->add(EventFactory::createFromArray($event->toArray()));
-            });
+        $this->loadEvents();
 
         $month = carbon($this->getParam('month', Carbon::now()))
             ->year($this->getParam('year', Carbon::now()->year));
@@ -82,34 +78,31 @@ class EventsTags extends Tags
         $from = $month->copy()->startOfMonth();
         $to = $month->copy()->endOfMonth();
 
-        $this->dates = $this->events
-            ->all($from, $to)
-            ->groupBy(function ($event, $key) {
-                return $event->start_date;
-            })
-            ->map(function ($days, $key) {
-                return [
-                    'date' => $key,
-                    'dates' => $days->toArray(),
-                ];
-            });
+        $this->loadDates($from, $to);
 
-        $currentDay = $from->copy()->startOfWeek();
-        $lastDay = $to->copy()->endOfWeek();
-        $daysToRender = $lastDay->diffInDays($currentDay);
+        return $this->parseLoop(
+            array_merge(
+                $this->makeEmptyDates($from->startOfWeek(), $to->endOfWeek()),
+                $this->dates->toArray()
+            )
+        );
+    }
 
-        $dates = [];
+    public function in()
+    {
+        $this->loadEvents();
 
-        for ($i = 0; $i <= $daysToRender; $i++) {
-            $date = $currentDay->copy()->toDateString();
-            $dates[$date] = [
-                'date' => $date,
-                'no_results' => true,
-            ];
-            $currentDay->addDay();
-        }
+        $from = Carbon::now()->startOfDay();
+        $to = Carbon::now()->modify($this->getParam('next'))->endOfDay();
 
-        return $this->parseLoop(array_merge($dates, $this->dates->toArray()));
+        $this->loadDates($from, $to);
+
+        return $this->parseLoop(
+            array_merge(
+                $this->makeEmptyDates($from, $to),
+                $this->dates->toArray()
+            )
+        );
     }
 
     private function paginate()
@@ -151,6 +144,49 @@ class EventsTags extends Tags
         }
 
         return $this->parse($data);
+    }
+
+    private function loadDates($from, $to)
+    {
+        $this->dates = $this->events
+            ->all($from, $to)
+            ->groupBy(function ($event, $key) {
+                return $event->start_date;
+            })
+            ->map(function ($days, $key) {
+                return [
+                    'date' => $key,
+                    'dates' => $days->toArray(),
+                ];
+            });
+    }
+
+    private function loadEvents()
+    {
+        Entry::whereCollection($this->getParam('collection'))
+            ->removeUnpublished()
+            ->each(
+                function ($event) {
+                    $this->events->add(EventFactory::createFromArray($event->toArray()));
+                }
+            );
+    }
+
+    private function makeEmptyDates($from, $to): array
+    {
+        $dates = [];
+        $currentDay = $from;
+
+        foreach (range(0, $to->diffInDays($from)) as $ignore) {
+            $date = $currentDay->toDateString();
+            $dates[$date] = [
+                'date' => $date,
+                'no_results' => true,
+            ];
+            $currentDay->addDay();
+        }
+
+        return $dates;
     }
 
     /**
