@@ -146,12 +146,5 @@ sections:
         fieldset: content
         type: partial
         display: Content
-  sidebar:
-    display: Sidebar
-    fields:
-      partial_seo:
-        fieldset: partial_seo_data
-        type: partial
-        display: partial_seo
 taxonomies: false
 create_title: "Create Event"
