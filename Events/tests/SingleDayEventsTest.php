@@ -53,9 +53,19 @@ class SingleDayEventsTest extends TestCase
 
     public function test_can_create_single_day_event()
     {
+        $event = EventFactory::createFromArray(
+            [
+                'start_date' => '2019-11-27',
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'false',
+            ]
+        );
+
         $this->assertTrue($this->allDayEvent instanceof SingleDayEvent);
         $this->assertTrue($this->nonAllDayEvent instanceof SingleDayEvent);
         $this->assertTrue($this->recurrenceNoneEvent instanceof SingleDayEvent);
+        $this->assertTrue($event instanceof SingleDayEvent);
     }
 
     public function test_can_get_start()
