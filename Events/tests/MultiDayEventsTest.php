@@ -242,4 +242,48 @@ class MultiDayEventsTest extends TestCase
 
         $next = $events->upcoming(1);
     }
+
+    public function test_can_get_all_events_when_during()
+    {
+        Carbon::setTestNow(carbon('2019-11-24'));
+        $event = EventFactory::createFromArray(
+            [
+                'multi_day' => true,
+                'days' => [
+                    [
+                        'date' => '2019-11-23',
+                        'start_time' => '19:00',
+                        'end_time' => '21:00',
+                    ],
+                    [
+                        'date' => '2019-11-25',
+                        'start_time' => '11:00',
+                        'end_time' => '15:00',
+                    ],
+                    [
+                        'date' => '2019-11-26',
+                        'start_time' => '11:00',
+                        'end_time' => '15:00',
+                    ],
+                ],
+            ]
+        );
+
+        $events = new Events();
+
+        $events->add($event);
+
+        $nextDates = $events->all(Carbon::now(), Carbon::now()->addDays(8))
+        ->groupBy(function ($event, $key) {
+            return $event->start_date;
+        })
+        ->map(function ($days, $key) {
+            return [
+                'date' => $key,
+                'dates' => $days->toArray(),
+            ];
+        });
+
+        $this->assertCount(2, $nextDates);
+    }
 }
