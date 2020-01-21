@@ -1,6 +1,7 @@
 Events is a Statamic v2 addon/tag that allows you to create a calendar of events or list the next few upcoming events.
 
 It supports:
+
 * multi-day events
 * recurring events - daily, weekly, monthly, annually, every "x"
 
