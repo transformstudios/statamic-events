@@ -72,20 +72,19 @@ class EventsTags extends Tags
     {
         $this->loadEvents();
 
-        $month = carbon($this->getParam('month', Carbon::now()))
-            ->year($this->getParam('year', Carbon::now()->year));
+        $month = carbon($this->getParam('month', Carbon::now()->englishMonth) . ' ' . $this->getParam('year', Carbon::now()->year));
 
-        $from = $month->copy()->startOfMonth();
-        $to = $month->copy()->endOfMonth();
+        $from = $month->copy()->startOfMonth()->startOfWeek();
+        $to = $month->copy()->endOfMonth()->endOfWeek();
 
         $this->loadDates($from, $to);
 
-        return $this->parseLoop(
-            array_merge(
-                $this->makeEmptyDates($from->startOfWeek(), $to->endOfWeek()),
-                $this->dates->toArray()
-            )
+        $dates = array_merge(
+            $this->makeEmptyDates($from, $to),
+            $this->dates->toArray()
         );
+
+        return $this->parseLoop($dates);
     }
 
     public function in()
