@@ -2,12 +2,30 @@
 
 namespace Statamic\Addons\Events;
 
+use Carbon\Carbon;
 use Statamic\API\Entry;
 use Illuminate\Http\Request;
 use Statamic\Extend\Controller;
 
 class EventsController extends Controller
 {
+    public function __construct()
+    {
+        parent::__construct();
+
+        Carbon::setWeekStartsAt(Carbon::SUNDAY);
+        Carbon::setWeekEndsAt(Carbon::SATURDAY);
+    }
+
+    public function getCalendar(Request $request)
+    {
+        $calendar = new Calendar($this->getConfig('events_collection'));
+
+        $dates = $calendar->month('january', '2020');
+
+        dd($dates);
+    }
+
     /**
      * Get the next function
      *
