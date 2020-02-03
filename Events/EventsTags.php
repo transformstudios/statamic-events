@@ -70,11 +70,9 @@ class EventsTags extends Tags
 
     public function calendar()
     {
-        $calendar = new Calendar($this->getConfig('events_collection'));
+        $calendar = new Calendar($this->getParam('collection', $this->getConfig('events_collection')));
 
-        $dates = $calendar->month($this->getParam('month'), $this->getParam('year'));
-
-        return $this->parseLoop($dates);
+        return $this->parseLoop($calendar->month($this->getParam('month'), $this->getParam('year')));
     }
 
     public function in()
