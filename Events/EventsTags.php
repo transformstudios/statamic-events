@@ -70,19 +70,9 @@ class EventsTags extends Tags
 
     public function calendar()
     {
-        $this->loadEvents();
+        $calendar = new Calendar($this->getConfig('events_collection'));
 
-        $month = carbon($this->getParam('month', Carbon::now()->englishMonth) . ' ' . $this->getParam('year', Carbon::now()->year));
-
-        $from = $month->copy()->startOfMonth()->startOfWeek();
-        $to = $month->copy()->endOfMonth()->endOfWeek();
-
-        $this->loadDates($from, $to);
-
-        $dates = array_merge(
-            $this->makeEmptyDates($from, $to),
-            $this->dates->toArray()
-        );
+        $dates = $calendar->month($this->getParam('month'), $this->getParam('year'));
 
         return $this->parseLoop($dates);
     }
