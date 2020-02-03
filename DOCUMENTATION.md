@@ -15,6 +15,15 @@ end_date: '2019-11-07'
 
 See [here](/event.yaml). You can add this to your collection fieldsets via the `partial` fieldtype.
 
+## Settings
+
+In the addon settings, pick the collection that has your Events.
+
+Should look like:
+```yaml
+events_collection: events
+```
+
 
 ## Fields
 
@@ -53,14 +62,18 @@ days:
 
 ### Calendar
 
-Tag pair that returns an entire month of dates, starting on a Sunday and ending on a Saturday. 2 required params, `collection` & `month`.
-Optional param:
-* `year` - which year? Default to the current year
+#### Tag
+
+Tag pair that returns an entire month of dates, starting on a Sunday and ending on a Saturday.
+
+Parameters:
+* `month` - defaults to current month
+* `year` - defaults to the current year
 
 *Example*:
 
 ```
-{{ events:calendar collection="events" month="october" }}
+{{ events:calendar month="october" }}
   {{ date }} {{# date of event #}}
   {{ if no_results }}
     {{# whatever you need to when for an empty day #}}
@@ -73,7 +86,11 @@ Optional param:
 {{ /events:calendar }}
 ```
 
-*Data*:
+#### API
+
+You can also retrieve this data via the endpoint `!/Charge/calendar` and pass the `month` (defaults to current month) & `year` (defaults to current year)
+
+#### Data
 
 If there are no events on a given day, data returned is:
 
