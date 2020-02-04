@@ -230,3 +230,30 @@ paginate:
   next_page: /events?page=3
   prev_page: /events?page=1
 ```
+
+### Download Links
+
+Single Tag returns a url to download the event data and add it to your calendar
+
+Parameters:
+* `start_date` - defaults to current month
+* `start_time` - defaults to the current year
+* `end_date` - optional, defaults to the start date
+* `end_time` - defaults to the current year
+* `title` - defaults to the current year
+* `location` - defaults to the current year
+* `type` - what kind of link do you want? Options are `google`, `yahoo`, `webOutlook`, `ics` (for iCloud folks)
+
+*Example*:
+
+```
+<a href="{{ events:download_link
+    start_date="{{ get:date }}" {{# getting the date from the `date` query param #}}
+    start_time="{{ start_time }}"
+    end_date="{{ get:date }}"
+    end_time="{{ end_time }}"
+    title="{{ title }}"
+    location="{{ location }}"
+    type="google"
+}}">Google</a>
+```
