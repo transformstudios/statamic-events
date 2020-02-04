@@ -98,7 +98,7 @@ class EventsTags extends Tags
         $start_date = $this->getParam('start_date');
         $start_time = $this->getParam('start_time');
         $end_date = $this->getParam('end_date', $start_date);
-        $end_time = $this->getParam('ent_time');
+        $end_time = $this->getParam('end_time');
 
         $from = Carbon::parse($start_date)->setTimeFromTimeString($start_time);
         $to = Carbon::parse($end_date)->setTimeFromTimeString($end_time);
