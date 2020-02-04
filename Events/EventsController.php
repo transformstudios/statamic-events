@@ -21,9 +21,7 @@ class EventsController extends Controller
     {
         $calendar = new Calendar($this->getConfig('events_collection'));
 
-        $dates = $calendar->month('january', '2020');
-
-        dd($dates);
+        return $calendar->month($request->month, $request->year);
     }
 
     /**
