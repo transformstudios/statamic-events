@@ -7,6 +7,7 @@ use Statamic\API\URL;
 use Statamic\API\Entry;
 use Statamic\API\Request;
 use Statamic\Extend\Tags;
+use Spatie\CalendarLinks\Link;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Statamic\Addons\Events\Types\EventFactory;
@@ -90,6 +91,28 @@ class EventsTags extends Tags
                 $this->dates->toArray()
             )
         );
+    }
+
+    public function downloadLink()
+    {
+        $start_date = $this->getParam('start_date');
+        $start_time = $this->getParam('start_time');
+        $end_date = $this->getParam('end_date', $start_date);
+        $end_time = $this->getParam('ent_time');
+
+        $from = Carbon::parse($start_date)->setTimeFromTimeString($start_time);
+        $to = Carbon::parse($end_date)->setTimeFromTimeString($end_time);
+
+        $title = $this->getParam('title');
+
+        $allDay = $this->getParamBool('allDay', false);
+        $location = $this->getParam('location');
+
+        $type = $this->getParam('type');
+
+        $link = Link::create($title, $from, $to, $allDay)->address($location);
+
+        return $link->$type();
     }
 
     private function paginate()

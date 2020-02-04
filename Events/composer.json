@@ -1,0 +1,6 @@
+{
+    "name": "transformstudios/events",
+    "require": {
+        "spatie/calendar-links": "1.*"
+    }
+}
