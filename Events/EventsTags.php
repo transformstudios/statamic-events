@@ -115,6 +115,19 @@ class EventsTags extends Tags
         return $link->$type();
     }
 
+    public function nowOrParam()
+    {
+        $monthYear = request('month', Carbon::now()->englishMonth) . ' ' . request('year', Carbon::now()->year);
+
+        $month = carbon($monthYear);
+
+        if ($modify = $this->getParam('modify')) {
+            $month->modify($modify);
+        }
+
+        return $month->format($this->getParam('format'));
+    }
+
     private function paginate()
     {
         $this->paginated = true;
