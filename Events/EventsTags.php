@@ -3,6 +3,7 @@
 namespace Statamic\Addons\Events;
 
 use Carbon\Carbon;
+use Statamic\API\Arr;
 use Statamic\API\URL;
 use Statamic\API\Entry;
 use Statamic\API\Request;
@@ -95,18 +96,19 @@ class EventsTags extends Tags
 
     public function downloadLink()
     {
-        $start_date = $this->getParam('start_date');
-        $start_time = $this->getParam('start_time');
-        $end_date = $this->getParam('end_date', $start_date);
-        $end_time = $this->getParam('end_time');
+        $event = EventFactory::createFromArray($this->context);
 
-        $from = Carbon::parse($start_date)->setTimeFromTimeString($start_time);
-        $to = Carbon::parse($end_date)->setTimeFromTimeString($end_time);
+        $from = $event->start();
+        $to = $event->end();
 
-        $title = $this->getParam('title');
+        if ($event->isRecurring()) {
+            $from->setDateFrom(carbon($this->getParam('date')));
+            $to = $from->copy()->setTimeFromTimeString($event->endTime());
+        }
 
-        $allDay = $this->getParamBool('allDay', false);
-        $location = $this->getParam('location');
+        $title = Arr::get($this->context, 'title');
+        $allDay = Arr::get($this->context, 'all_day', false);
+        $location = Arr::get($this->context, 'location', '');
 
         $type = $this->getParam('type');
 
