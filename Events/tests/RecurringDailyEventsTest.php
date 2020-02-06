@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;
 use Statamic\Addons\Events\Types\EventFactory;
+use Statamic\Addons\Events\Types\RecurringEvent;
 
 class RecurringDailyEventsTest extends TestCase
 {
@@ -27,6 +28,22 @@ class RecurringDailyEventsTest extends TestCase
         parent::tearDown();
 
         Carbon::setTestNow();
+    }
+
+    public function test_can_create_recurring_event()
+    {
+        $event = [
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'recurrence' => 'daily',
+            'all_day' => true,
+        ];
+
+        $event = EventFactory::createFromArray($event);
+
+        $this->assertTrue($event instanceof RecurringEvent);
+        $this->assertTrue($event->isRecurring());
+        $this->assertFalse($event->isMultiDay());
     }
 
     public function test_get_end_date_null_if_no_end_date()

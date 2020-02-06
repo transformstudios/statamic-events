@@ -66,6 +66,8 @@ class SingleDayEventsTest extends TestCase
         $this->assertTrue($this->nonAllDayEvent instanceof SingleDayEvent);
         $this->assertTrue($this->recurrenceNoneEvent instanceof SingleDayEvent);
         $this->assertTrue($event instanceof SingleDayEvent);
+        $this->assertFalse($event->isRecurring());
+        $this->assertFalse($event->isMultiDay());
     }
 
     public function test_can_get_start()
