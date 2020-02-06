@@ -11,6 +11,11 @@ use Statamic\Addons\Events\Types\RecurringEvent;
 
 class EveryX extends RecurringEvent
 {
+    public function isRecurring(): bool
+    {
+        return true;
+    }
+
     public function endDate(): ?Carbon
     {
         if ($date = Arr::get($this->data, 'end_date')) {

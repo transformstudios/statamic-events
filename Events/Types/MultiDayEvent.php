@@ -24,6 +24,11 @@ class MultiDayEvent extends Event
             });
     }
 
+    public function isMultiDay(): bool
+    {
+        return true;
+    }
+
     public function start(): Carbon
     {
         return $this->firstDay()->start();

@@ -44,6 +44,11 @@ abstract class Event implements Arrayable
         return false;
     }
 
+    public function isRecurring(): bool
+    {
+        return false;
+    }
+
     public function startTime(): string
     {
         $time = Carbon::now()->startOfDay()->format('G:i');

@@ -9,6 +9,11 @@ use Statamic\Addons\Events\Schedule;
 
 class RecurringEvent extends Event
 {
+    public function isRecurring(): bool
+    {
+        return true;
+    }
+
     public function endDate(): ?Carbon
     {
         if ($date = Arr::get($this->data, 'end_date')) {
