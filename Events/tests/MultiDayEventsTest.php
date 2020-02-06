@@ -73,6 +73,8 @@ class MultiDayEventsTest extends TestCase
     {
         $this->assertTrue($this->event instanceof MultiDayEvent);
         $this->assertTrue($this->allDayEvent instanceof MultiDayEvent);
+        $this->assertTrue($this->event->isMultiDay());
+        $this->assertTrue($this->allDayEvent->isMultiDay());
     }
 
     public function test_can_get_start()
