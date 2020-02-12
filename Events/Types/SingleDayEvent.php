@@ -21,7 +21,11 @@ class SingleDayEvent extends Event
             return null;
         }
 
-        return Schedule::fromCarbon($this->start());
+        return new Schedule([
+            'date' => $this->start_date,
+            'start_time' => $this->startTime(),
+            'end_time' => $this->endTime(),
+        ]);
     }
 
     public function upcomingDates($limit = 2, $offset = 0): Collection

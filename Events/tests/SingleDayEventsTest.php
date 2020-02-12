@@ -130,6 +130,10 @@ class SingleDayEventsTest extends TestCase
             carbon('2019-11-27')->setTimeFromTimeString('11:00:00'),
             $this->nonAllDayEvent->upcomingDate(carbon('2019-11-22'))->start()
         );
+        $this->assertEquals(
+            carbon('2019-11-27')->setTimeFromTimeString('12:00:00'),
+            $this->nonAllDayEvent->upcomingDate(carbon('2019-11-22'))->end()
+        );
     }
 
     public function test_returns_start_if_during()
