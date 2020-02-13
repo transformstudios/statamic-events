@@ -17,7 +17,7 @@ class Schedule
 
     public function __construct($data, bool $isAllDay = false)
     {
-        $this->date = $data['date'];
+        $this->date = Arr::get($data, 'date', Carbon::now()->toDateString());
         $this->endDate = Arr::get($data, 'end_date', $this->date);
 
         if ($isAllDay) {
@@ -25,8 +25,8 @@ class Schedule
             $this->startTime = $date->startOfDay()->format('G:i');
             $this->endTime = $date->endOfDay()->format('G:i');
         } else {
-            $this->startTime = $data['start_time'];
-            $this->endTime = $data['end_time'];
+            $this->startTime = Arr::get($data, 'start_time', carbon($this->date)->startOfDay()->toTimeString());
+            $this->endTime = Arr::get($data, 'end_time', carbon($this->date)->endOfDay()->toTimeString());
         }
     }
 

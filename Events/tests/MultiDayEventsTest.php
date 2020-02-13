@@ -41,6 +41,22 @@ class MultiDayEventsTest extends TestCase
             ]
         );
 
+        $this->brokenEvent = EventFactory::createFromArray(
+            [
+                'multi_day' => true,
+                'days' => [
+                    [
+                        'date' => '2019-11-23',
+                        'start_time' => '19:00',
+                    ],
+                    [
+                        'date' => '2019-11-24',
+                        'end_time' => '15:00',
+                    ],
+                ],
+            ]
+        );
+
         $this->allDayEvent = EventFactory::createFromArray(
             [
                 'multi_day' => true,
@@ -73,8 +89,10 @@ class MultiDayEventsTest extends TestCase
     {
         $this->assertTrue($this->event instanceof MultiDayEvent);
         $this->assertTrue($this->allDayEvent instanceof MultiDayEvent);
+        $this->assertTrue($this->brokenEvent instanceof MultiDayEvent);
         $this->assertTrue($this->event->isMultiDay());
         $this->assertTrue($this->allDayEvent->isMultiDay());
+        $this->assertTrue($this->brokenEvent->isMultiDay());
     }
 
     public function test_can_get_start()
