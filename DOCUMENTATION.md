@@ -1,17 +1,13 @@
-This addon assumes the following data in an entry:
+Table Of Contents:
 
-```
-start_date: '2019-10-09'
-start_time: '11:00'
-end_time: '12:00'
-recurrence: weekly
-all-day: false
-multi-day: false
-end_date: '2019-11-07'
+* [Fieldset](#fieldset)
+* [Settings](#settings)
+* [Entry Data](#entry-data) [Entry Data](#entry-data)
+* [Entry Data](#entry-data)
+* [Entry Data](#entry-data)
 
-```
 
-## Event Fieldset
+## Fieldset
 
 See [here](/event.yaml). You can add this to your collection fieldsets via the `partial` fieldtype.
 
@@ -85,6 +81,8 @@ Parameters:
   {{ /if }}
 {{ /events:calendar }}
 ```
+
+Full example [here](calendar.html).
 
 #### API
 
@@ -233,27 +231,17 @@ paginate:
 
 ### Download Links
 
-Single Tag returns a url to download the event data and add it to your calendar
+Single Tag returns a url to download the event data and add it to your calendar. Tag presumes you are in an events context, i.e. your events entry
 
 Parameters:
-* `start_date` - defaults to current month
-* `start_time` - defaults to the current year
-* `end_date` - optional, defaults to the start date
-* `end_time` - defaults to the current year
-* `title` - defaults to the current year
-* `location` - defaults to the current year
-* `type` - what kind of link do you want? Options are `google`, `yahoo`, `webOutlook`, `ics` (for iCloud folks)
+* `date` - required if a recurring event
+* `type` - required, supported opions are: `google`, `yahoo`, `webOutlook`, `ics` (for iCloud folks)
 
 *Example*:
 
 ```
 <a href="{{ events:download_link
     start_date="{{ get:date }}" {{# getting the date from the `date` query param #}}
-    start_time="{{ start_time }}"
-    end_date="{{ get:date }}"
-    end_time="{{ end_time }}"
-    title="{{ title }}"
-    location="{{ location }}"
     type="google"
 }}">Google</a>
 ```
