@@ -86,7 +86,7 @@ Full example [here](calendar.html).
 
 #### API
 
-You can also retrieve this data via the endpoint `!/Charge/calendar` and pass the `month` (defaults to current month) & `year` (defaults to current year)
+You can also retrieve this data via the endpoint `!/Events/calendar` and pass the `month` (defaults to current month) & `year` (defaults to current year)
 
 #### Data
 
