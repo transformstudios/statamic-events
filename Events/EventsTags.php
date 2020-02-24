@@ -5,27 +5,20 @@ namespace Statamic\Addons\Events;
 use Carbon\Carbon;
 use Statamic\API\Arr;
 use Statamic\API\URL;
-use Statamic\API\Entry;
 use Statamic\API\Request;
-use Statamic\Extend\Tags;
 use Spatie\CalendarLinks\Link;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
+use Statamic\Addons\Collection\CollectionTags;
 use Statamic\Addons\Events\Types\EventFactory;
 
-class EventsTags extends Tags
+class EventsTags extends CollectionTags
 {
     /** @var Events */
     private $events;
 
     /** @var Collection */
     private $dates;
-
-    private $offset;
-
-    private $limit;
-
-    private $paginated;
 
     private $paginationData;
 
@@ -44,22 +37,8 @@ class EventsTags extends Tags
     {
         $this->limit = $this->getInt('limit', 1);
         $this->offset = $this->getInt('offset', 0);
-        $collapseMultiDays = $this->getBool('collapse_multi_days', false);
 
-        Entry::whereCollection($this->get('collection'))
-            ->removeUnpublished()
-            ->each(function ($event) use ($collapseMultiDays) {
-                $event = EventFactory::createFromArray(
-                    array_merge(
-                        $event->toArray(),
-                        [
-                            'asSingleDay' => $collapseMultiDays,
-                        ]
-                    )
-                );
-
-                $this->events->add($event);
-            });
+        $this->loadEvents($this->getBool('collapse_multi_days', false));
 
         if ($this->getBool('paginate')) {
             $this->paginate();
@@ -79,7 +58,7 @@ class EventsTags extends Tags
 
     public function in()
     {
-        $this->loadEvents();
+        $this->loadEvents($this->getBool('collapse_multi_days', false));
 
         $from = Carbon::now()->startOfDay();
         $to = Carbon::now()->modify($this->getParam('next'))->endOfDay();
@@ -130,7 +109,7 @@ class EventsTags extends Tags
         return $month->format($this->getParam('format'));
     }
 
-    private function paginate()
+    protected function paginate()
     {
         $this->paginated = true;
 
@@ -150,14 +129,14 @@ class EventsTags extends Tags
         $paginator->appends(Request::all());
 
         $this->paginationData = [
-                'prev_page' => $paginator->previousPageUrl(),
-                'next_page' => $paginator->nextPageUrl(),
-            ];
+            'prev_page' => $paginator->previousPageUrl(),
+            'next_page' => $paginator->nextPageUrl(),
+        ];
 
         $this->dates = $events->slice(0, $this->limit);
     }
 
-    private function output()
+    protected function output()
     {
         $data = array_merge(
             $this->getEventsMetaData(),
@@ -186,15 +165,26 @@ class EventsTags extends Tags
             });
     }
 
-    private function loadEvents()
+    private function loadEvents(bool $collapseMultiDays = false)
     {
-        Entry::whereCollection($this->getParam('collection'))
-            ->removeUnpublished()
-            ->each(
-                function ($event) {
-                    $this->events->add(EventFactory::createFromArray($event->toArray()));
-                }
-            );
+        $this->parameters['show_future'] = true;
+
+        $this->collect($this->get('collection'));
+
+        $this->collection->each(
+            function ($event) use ($collapseMultiDays) {
+                $this->events->add(
+                    EventFactory::createFromArray(
+                        array_merge(
+                            $event->toArray(),
+                            [
+                                'asSingleDay' => $collapseMultiDays,
+                            ]
+                        )
+                    )
+                );
+            }
+        );
     }
 
     private function makeEmptyDates($from, $to): array
