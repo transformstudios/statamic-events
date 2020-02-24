@@ -24,6 +24,11 @@ abstract class Event implements Arrayable
         $this->data = $data;
     }
 
+    public function get($name, $default = null)
+    {
+        return Arr::get($this->data, $name, $default);
+    }
+
     public function __get($name)
     {
         return Arr::get($this->data, $name);

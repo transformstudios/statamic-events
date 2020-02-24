@@ -5,6 +5,7 @@ namespace Statamic\Addons\Events\Types;
 use Carbon\Carbon;
 use Statamic\API\Arr;
 use Statamic\API\Str;
+use Statamic\API\Helper;
 use Illuminate\Support\Collection;
 use Statamic\Addons\Events\Schedule;
 
@@ -80,9 +81,16 @@ class RecurringEvent extends Event
             return null;
         }
 
+        $nextDate = $this->next($after);
+
+        if ($this->excludedDate($nextDate)) {
+            // add the period*interval to get to the next one
+            return $this->upcomingDate($this->addInterval($nextDate));
+        }
+
         return new Schedule(
             [
-                'date' => $this->next($after)->toDateString(),
+                'date' => $nextDate->toDateString(),
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
             ]
@@ -129,26 +137,39 @@ class RecurringEvent extends Event
         return $days;
     }
 
+    private function excludedDate(Carbon $date)
+    {
+        return collect($this->get('except'))
+            ->map(function ($item, $key) {
+                return $item['date'];
+            })
+            ->contains($date->toDateString());
+    }
+
     // this is guaranteed to be AFTER the start
-    private function next(Carbon $after)
+    private function next(Carbon $after): Carbon
     {
         $start = $this->start()->startOfDay();
         $diff = $after->{$this->periodMethod('diffIn')}($start);
 
         $periods = intdiv($diff, $this->interval);
 
-        // if the interval is one
-        // if weekly and afterDay > startDay, add a period
-        // if monthly and afterDate > startDate, add a period
         if ($diff % $this->interval) {
             $periods++;
         }
 
+        // if the interval is one the above `mod` doesn't work right and we need
+        // to check a few things
+        // @todo dis be some ugly code, refactor
         if ($this->interval == 1) {
+            // we're in a subsuquent week but after (day-wise) the start, so go to
+            // the next period
             if ($this->period == 'weeks' && $after->dayOfWeek > $start->dayOfWeek) {
                 $periods++;
             }
 
+            // we're in a subsequent month but we're after (date-wise) the start so
+            // go to the next period
             if ($this->period == 'months' && $after->year == $start->year && $after->day > $start->day) {
                 $periods++;
             }
@@ -157,6 +178,11 @@ class RecurringEvent extends Event
         $increment = ($periods ?: 1) * $this->interval;
 
         return $start->{$this->periodMethod('add')}($increment);
+    }
+
+    private function addInterval(Carbon $date)
+    {
+        return $date->{$this->periodMethod('add')}($this->get('interval'));
     }
 
     private function periodMethod(string $prefix): string
