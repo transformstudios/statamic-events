@@ -3,7 +3,7 @@
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\Types\EventFactory;
+use Statamic\Addons\Events\EventFactory;
 
 class RecurringMonthlyEventsTest extends TestCase
 {
@@ -51,6 +51,8 @@ class RecurringMonthlyEventsTest extends TestCase
 
     public function test_can_generate_next_monthly_date_if_after()
     {
+        Carbon::setTestNow(carbon('2019-11-24 10:50'));
+
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = EventFactory::createFromArray(
@@ -76,7 +78,7 @@ class RecurringMonthlyEventsTest extends TestCase
 
         $nextDate = $event->upcomingDate($startDate->copy()->addYears(1)->addMonths(1)->addDays(5));
         $this->assertEquals(
-            $startDate->copy()->addYears(1)->addMonths(2),
+            $startDate->copy()->addYears(1)->addMonths(1),
             $nextDate->start()
         );
     }

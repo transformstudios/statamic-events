@@ -3,7 +3,7 @@
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\Types\EventFactory;
+use Statamic\Addons\Events\EventFactory;
 use Statamic\Addons\Events\Types\MultiDayEvent;
 
 class EventsTest extends TestCase

@@ -3,7 +3,7 @@
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\Types\EventFactory;
+use Statamic\Addons\Events\EventFactory;
 
 class RecurringMixedEventsTest extends TestCase
 {
@@ -32,20 +32,20 @@ class RecurringMixedEventsTest extends TestCase
     public function test_generates_next_occurrence_when_multiple_events()
     {
         $this->events->add(EventFactory::createFromArray([
-                   'start_date' => Carbon::now()->subDays(8)->toDateString(),
-                   'start_time' => '11:00',
-                   'recurrence' => 'weekly',
-                   'end_date' => Carbon::now()->addWeeks(3)->toDateString(),
-                   'end_time' => '12:00',
-               ]));
+            'start_date' => Carbon::now()->subDays(8)->toDateString(),
+            'start_time' => '11:00',
+            'recurrence' => 'weekly',
+            'end_date' => Carbon::now()->addWeeks(3)->toDateString(),
+            'end_time' => '12:00',
+        ]));
 
         $this->events->add(EventFactory::createFromArray([
-                   'start_date' => Carbon::now()->subDays(2)->toDateTimeString(),
-                   'start_time' => '13:00',
-                   'recurrence' => 'daily',
-                   'end_date' => Carbon::now()->addDays(5)->toDateString(),
-                   'end_time' => '15:00',
-               ]));
+            'start_date' => Carbon::now()->subDays(2)->toDateTimeString(),
+            'start_time' => '13:00',
+            'recurrence' => 'daily',
+            'end_date' => Carbon::now()->addDays(5)->toDateString(),
+            'end_time' => '15:00',
+        ]));
 
         Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('14:00:00'));
 
@@ -62,22 +62,22 @@ class RecurringMixedEventsTest extends TestCase
         Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('10:30'));
 
         $this->events->add(EventFactory::createFromArray([
-                       'id' => 'weekly-event',
-                       'start_date' => Carbon::now()->toDateString(),
-                       'start_time' => '11:00',
-                       'end_time' => '12:00',
-                       'recurrence' => 'weekly',
-                       'end_date' => Carbon::now()->addWeeks(11)->toDateString(),
-                   ]));
+            'id' => 'weekly-event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'weekly',
+            'end_date' => Carbon::now()->addWeeks(11)->toDateString(),
+        ]));
 
         $this->events->add(EventFactory::createFromArray([
-                       'id' => 'daily-event',
-                       'start_date' => Carbon::now()->toDateString(),
-                       'start_time' => '13:00',
-                       'end_time' => '15:00',
-                       'recurrence' => 'daily',
-                       'end_date' => Carbon::now()->addDays(7)->toDateString(),
-                   ]));
+            'id' => 'daily-event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '13:00',
+            'end_time' => '15:00',
+            'recurrence' => 'daily',
+            'end_date' => Carbon::now()->addDays(7)->toDateString(),
+        ]));
 
         $from = Carbon::now()->subDays(1);
         $to = Carbon::now()->addDays(10);

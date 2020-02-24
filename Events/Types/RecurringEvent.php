@@ -4,11 +4,28 @@ namespace Statamic\Addons\Events\Types;
 
 use Carbon\Carbon;
 use Statamic\API\Arr;
+use Statamic\API\Str;
 use Illuminate\Support\Collection;
 use Statamic\Addons\Events\Schedule;
 
 class RecurringEvent extends Event
 {
+    public function __construct($data)
+    {
+        $periodMap = [
+            'daily' => 'days',
+            'weekly' => 'weeks',
+            'monthly' => 'months'
+        ];
+
+        // if type is daily/weekly/monthly, set the period and interval appropriately
+        if (array_key_exists($data['recurrence'], $periodMap)) {
+            $data['period'] = $periodMap[$data['recurrence']];
+            $data['interval'] = 1;
+        }
+
+        parent::__construct($data);
+    }
     public function isRecurring(): bool
     {
         return true;
@@ -37,8 +54,8 @@ class RecurringEvent extends Event
     }
 
     /**
-    * @param null|Carbon $after
-    */
+     * @param null|Carbon $after
+     */
     public function upcomingDate($after = null): ?Schedule
     {
         if (is_null($after)) {
@@ -65,7 +82,7 @@ class RecurringEvent extends Event
 
         return new Schedule(
             [
-                'date' => $this->{$this->recurrence}($after)->toDateString(),
+                'date' => $this->next($after)->toDateString(),
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
             ]
@@ -82,8 +99,7 @@ class RecurringEvent extends Event
         while (($day = $this->upcomingDate($after)) && $dates->count() <= $total) {
             $dates->push($day);
 
-            // think I want `$after->modify('next day/week/month');
-            $after = $day->start()->modify("next {$this->recurrenceUnit()}");
+            $after = $day->start()->{$this->periodMethod('add')}($this->interval);
         }
 
         return $dates->slice($offset, $limit);
@@ -107,79 +123,44 @@ class RecurringEvent extends Event
 
         while ($day && $day->start() < $to) {
             $days->push($day);
-            $day = $this->upcomingDate($day->start()->modify("next {$this->recurrenceUnit()}"));
+            $day = $this->upcomingDate($day->start()->{$this->periodMethod('add')}($this->interval));
         }
 
         return $days;
     }
 
-    private function daily(Carbon $after)
+    // this is guaranteed to be AFTER the start
+    private function next(Carbon $after)
     {
-        $start = $this->start();
+        $start = $this->start()->startOfDay();
+        $diff = $after->{$this->periodMethod('diffIn')}($start);
 
-        $next = $after->copy()
-            ->day($after->day)
-            ->hour($start->hour)
-            ->minute($start->minute)
-            ->second($start->second);
+        $periods = intdiv($diff, $this->interval);
 
-        if ($after >= $next->copy()->setTimeFromTimeString($this->endTime())) {
-            $next->addDay();
+        // if the interval is one
+        // if weekly and afterDay > startDay, add a period
+        // if monthly and afterDate > startDate, add a period
+        if ($diff % $this->interval) {
+            $periods++;
         }
 
-        return $next;
+        if ($this->interval == 1) {
+            if ($this->period == 'weeks' && $after->dayOfWeek > $start->dayOfWeek) {
+                $periods++;
+            }
+
+            if ($this->period == 'months' && $after->year == $start->year && $after->day > $start->day) {
+                $periods++;
+            }
+        }
+
+        $increment = ($periods ?: 1) * $this->interval;
+
+        return $start->{$this->periodMethod('add')}($increment);
     }
 
-    private function weekly(Carbon $after)
+    private function periodMethod(string $prefix): string
     {
-        $start = $this->start();
-
-        $next = $after->copy()
-            ->hour($start->hour)
-            ->minute($start->minute)
-            ->second($start->second);
-
-        // during is if on same day and time is >=start && < end
-        $during = $after->isBetween(
-            $after->copy()->setTimeFromTimeString($this->startTime()),
-            $after->copy()->setTimeFromTimeString($this->endTime())
-        );
-
-        // if $after is on the same day of the week as $start
-        // AND it is DURING the time, DO NOT go to the next week
-        if (!($after->dayOfWeek == $start->dayOfWeek && $during)) {
-            $next->modify("next {$start->englishDayOfWeek}");
-        }
-
-        return $next;
-    }
-
-    private function monthly(Carbon $after)
-    {
-        $start = $this->start();
-
-        $date = $start
-            ->month($after->month)
-            ->year($after->year);
-
-        if ($after->day >= $start->day) {
-            $date->addMonth();
-        }
-
-        return $date;
-    }
-
-    private function recurrenceUnit()
-    {
-        switch ($this->recurrence) {
-            case 'daily':
-                return 'day';
-            case 'weekly':
-                return 'week';
-            case 'monthly':
-                return 'month';
-            case 'yearly':
-                return 'year';
-        }
+        return $prefix . Str::toTitleCase($this->period);
     }
 }

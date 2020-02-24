@@ -1,9 +1,11 @@
 <?php
 
-namespace Statamic\Addons\Events\Types;
+namespace Statamic\Addons\Events;
 
 use Statamic\API\Arr;
-use Statamic\Addons\Events\Types\Recurring\EveryX;
+use Statamic\Addons\Events\Types\MultiDayEvent;
+use Statamic\Addons\Events\Types\RecurringEvent;
+use Statamic\Addons\Events\Types\SingleDayEvent;
 
 class EventFactory
 {
@@ -13,11 +15,9 @@ class EventFactory
             return new MultiDayEvent($data);
         }
 
-        $type = Arr::get($data, 'recurrence', false);
-
         // Statamic can save the recurrence "none" as "false" so we need to check for that
-        if (bool($type)) {
-            return $type === 'every' ? new EveryX($data) : new RecurringEvent($data);
+        if (bool(Arr::get($data, 'recurrence', false))) {
+            return new RecurringEvent($data);
         }
 
         return new SingleDayEvent($data);

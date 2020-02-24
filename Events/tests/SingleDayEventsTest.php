@@ -2,7 +2,7 @@
 
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
-use Statamic\Addons\Events\Types\EventFactory;
+use Statamic\Addons\Events\EventFactory;
 use Statamic\Addons\Events\Types\SingleDayEvent;
 
 class SingleDayEventsTest extends TestCase

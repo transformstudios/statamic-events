@@ -3,7 +3,7 @@
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\Types\EventFactory;
+use Statamic\Addons\Events\EventFactory;
 use Statamic\Addons\Events\Types\RecurringEvent;
 
 class RecurringDailyEventsTest extends TestCase
@@ -82,11 +82,11 @@ class RecurringDailyEventsTest extends TestCase
     {
         $startDate = Carbon::now()->setTimeFromTimeString('11:00');
         $event = [
-                'start_date' => $startDate->toDateString(),
-                'start_time' => '11:00',
-                'end_time' => '12:00',
-                'recurrence' => 'daily',
-            ];
+            'start_date' => $startDate->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'daily',
+        ];
 
         $nextDate = EventFactory::createFromArray($event)
             ->upcomingDate($startDate->copy()->subDays(1));
@@ -103,11 +103,11 @@ class RecurringDailyEventsTest extends TestCase
     {
         $startDate = Carbon::now()->setTimeFromTimeString('11:00');
         $event = [
-                'start_date' => $startDate->toDateString(),
-                'start_time' => '11:00',
-                'end_time' => '12:00',
-                'recurrence' => 'daily',
-            ];
+            'start_date' => $startDate->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'daily',
+        ];
 
         $nextDate = EventFactory::createFromArray($event)
             ->upcomingDate($startDate->copy()->addMinute(10));
@@ -120,11 +120,11 @@ class RecurringDailyEventsTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
         $event = [
-                'start_date' => $startDate->toDateString(),
-                'start_time' => '11:00',
-                'end_time' => '12:00',
-                'recurrence' => 'daily',
-            ];
+            'start_date' => $startDate->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'daily',
+        ];
 
         Carbon::setTestNow($startDate->copy()->addMinutes(1));
 
@@ -147,7 +147,7 @@ class RecurringDailyEventsTest extends TestCase
             ]
         );
 
-        for ($x = 0;$x < 2;$x++) {
+        for ($x = 0; $x < 2; $x++) {
             $events[] = $startDate->copy()->addDays($x);
         }
 
@@ -173,7 +173,7 @@ class RecurringDailyEventsTest extends TestCase
             'recurrence' => 'daily',
         ]);
 
-        for ($x = 0;$x < 3;$x++) {
+        for ($x = 0; $x < 3; $x++) {
             $events[] = $startDate->copy()->addDays($x);
         }
 
@@ -224,13 +224,13 @@ class RecurringDailyEventsTest extends TestCase
         Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('10:30'));
 
         $this->events->add(EventFactory::createFromArray([
-                       'id' => 'daily-event',
-                       'start_date' => Carbon::now()->toDateString(),
-                       'start_time' => '13:00',
-                       'end_time' => '15:00',
-                       'recurrence' => 'daily',
-                       'end_date' => Carbon::now()->addDays(7)->toDateString(),
-                   ]));
+            'id' => 'daily-event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '13:00',
+            'end_time' => '15:00',
+            'recurrence' => 'daily',
+            'end_date' => Carbon::now()->addDays(7)->toDateString(),
+        ]));
 
         $from = Carbon::now()->addDays(7);
         $to = Carbon::now()->endOfDay()->addDays(10);
@@ -245,13 +245,13 @@ class RecurringDailyEventsTest extends TestCase
         Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('10:30'));
 
         $this->events->add(EventFactory::createFromArray([
-                       'id' => 'daily-event',
-                       'start_date' => Carbon::now()->toDateString(),
-                       'start_time' => '13:00',
-                       'end_time' => '15:00',
-                       'recurrence' => 'daily',
-                       'end_date' => Carbon::now()->addDays(7)->toDateString(),
-                   ]));
+            'id' => 'daily-event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '13:00',
+            'end_time' => '15:00',
+            'recurrence' => 'daily',
+            'end_date' => Carbon::now()->addDays(7)->toDateString(),
+        ]));
 
         $from = Carbon::now()->subDays(1);
         $to = Carbon::now()->endOfDay()->addDays(10);
@@ -266,12 +266,12 @@ class RecurringDailyEventsTest extends TestCase
         Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('10:30'));
 
         $this->events->add(EventFactory::createFromArray([
-                       'id' => 'daily-event',
-                       'start_date' => Carbon::now()->toDateString(),
-                       'start_time' => '13:00',
-                       'end_time' => '15:00',
-                       'recurrence' => 'daily',
-                   ]));
+            'id' => 'daily-event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '13:00',
+            'end_time' => '15:00',
+            'recurrence' => 'daily',
+        ]));
 
         $from = Carbon::now()->subDays(1);
         $to = Carbon::now()->endOfDay()->addDays(10);

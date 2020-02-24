@@ -3,7 +3,7 @@
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\Types\EventFactory;
+use Statamic\Addons\Events\EventFactory;
 use Statamic\Addons\Events\Types\MultiDayEvent;
 
 class MultiDayEventsTest extends TestCase
@@ -294,15 +294,15 @@ class MultiDayEventsTest extends TestCase
         $events->add($event);
 
         $nextDates = $events->all(Carbon::now(), Carbon::now()->addDays(8))
-        ->groupBy(function ($event, $key) {
-            return $event->start_date;
-        })
-        ->map(function ($days, $key) {
-            return [
-                'date' => $key,
-                'dates' => $days->toArray(),
-            ];
-        });
+            ->groupBy(function ($event, $key) {
+                return $event->start_date;
+            })
+            ->map(function ($days, $key) {
+                return [
+                    'date' => $key,
+                    'dates' => $days->toArray(),
+                ];
+            });
 
         $this->assertCount(2, $nextDates);
     }

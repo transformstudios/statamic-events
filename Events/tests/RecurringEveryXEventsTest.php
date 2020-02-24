@@ -3,8 +3,8 @@
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\Types\EventFactory;
-use Statamic\Addons\Events\Types\Recurring\EveryX;
+use Statamic\Addons\Events\EventFactory;
+use Statamic\Addons\Events\Types\RecurringEvent;
 
 class RecurringEveryXEventsTest extends TestCase
 {
@@ -43,16 +43,16 @@ class RecurringEveryXEventsTest extends TestCase
 
         $event = EventFactory::createFromArray($event);
 
-        $this->assertInstanceOf(EveryX::class, $event);
+        $this->assertInstanceOf(RecurringEvent::class, $event);
     }
 
     public function test_get_end_date_null_if_no_end_date()
     {
         $event = [
-                'start_date' => Carbon::now()->toDateString(),
-                'start_time' => '11:00',
-                'recurrence' => 'every',
-            ];
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'recurrence' => 'every',
+        ];
 
         $event = EventFactory::createFromArray($event);
 
@@ -208,10 +208,10 @@ class RecurringEveryXEventsTest extends TestCase
                 'recurrence' => 'every',
                 'interval' => 2,
                 'period' => 'days',
-                ]
+            ]
         );
 
-        for ($x = 0;$x < 2;$x++) {
+        for ($x = 0; $x < 2; $x++) {
             $events[] = $startDate->copy()->addDays($x * 2);
         }
 
@@ -232,16 +232,16 @@ class RecurringEveryXEventsTest extends TestCase
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
         $event = EventFactory::createFromArray(
             [
-            'start_date' => $startDate->toDateString(),
-            'start_time' => '11:00',
-            'end_time' => '12:00',
-            'recurrence' => 'every',
-            'interval' => 2,
-            'period' => 'days',
-        ]
+                'start_date' => $startDate->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'every',
+                'interval' => 2,
+                'period' => 'days',
+            ]
         );
 
-        for ($x = 0;$x < 3;$x++) {
+        for ($x = 0; $x < 3; $x++) {
             $events[] = $startDate->copy()->addDays($x * 2);
         }
 
@@ -271,7 +271,7 @@ class RecurringEveryXEventsTest extends TestCase
                 'recurrence' => 'every',
                 'interval' => 2,
                 'period' => 'days',
-                ]
+            ]
         );
 
         for ($x = 1; $x <= 2; $x++) {
@@ -356,7 +356,7 @@ class RecurringEveryXEventsTest extends TestCase
                 'recurrence' => 'every',
                 'interval' => 2,
                 'period' => 'days',
-                ]
+            ]
         ));
 
         $from = Carbon::now()->subDays(1);

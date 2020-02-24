@@ -3,7 +3,7 @@
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\Types\EventFactory;
+use Statamic\Addons\Events\EventFactory;
 
 class RecurringWeeklyEventsTest extends TestCase
 {
@@ -123,7 +123,7 @@ class RecurringWeeklyEventsTest extends TestCase
             ]
         );
 
-        for ($x = 1;$x <= 3;$x++) {
+        for ($x = 1; $x <= 3; $x++) {
             $events[] = $startDate->copy()->addWeeks($x);
         }
 
@@ -143,13 +143,13 @@ class RecurringWeeklyEventsTest extends TestCase
         $startDate = Carbon::now();
 
         $this->events->add(EventFactory::createFromArray([
-                   'id' => 'weekly-event',
-                   'start_date' => $startDate->copy()->subDays(8)->toDateString(),
-                   'start_time' => '11:00',
-                   'recurrence' => 'weekly',
-                   'end_date' => $startDate->copy()->addWeeks(3)->toDateString(),
-                   'end_time' => '12:00',
-               ]));
+            'id' => 'weekly-event',
+            'start_date' => $startDate->copy()->subDays(8)->toDateString(),
+            'start_time' => '11:00',
+            'recurrence' => 'weekly',
+            'end_date' => $startDate->copy()->addWeeks(3)->toDateString(),
+            'end_time' => '12:00',
+        ]));
 
         $from = Carbon::now()->subDays(3);
         $to = $from->copy()->addDays(15);
