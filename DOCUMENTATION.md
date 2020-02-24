@@ -20,6 +20,9 @@ Should look like:
 events_collection: events
 ```
 
+## Templating
+
+Please see the example [calendar](/calendar.html) for how to create a monthly calendar using the `{{ events:calendar }}` tag.
 
 ## Fields
 
@@ -29,10 +32,14 @@ events_collection: events
 * `start_time` - **Optional (see `all_day`)** - Start time of the event.
 * `end_time` - **Optional (see `all_day`)** - Start date of the event.
 * `all_day` - **Optional** - boolean. If this is `true`, then neither `start_time` nor `end_time` are required
+
+### Recurring Events
+
 * `recurrence` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`, `every`
 * `interval` - **Optional** - required if `recurrence` is `every` and indicates the frequency of the event
 * `period` - **Optional** - required if `recurrence` is `every` and indicates the period of recurrence. One of `days`, `weeks`, `months`, `years`
 * `end_date` - **Optional** - when is the last event. If `recurrence` is set and this is not, the event goes on forever
+* `except_on` - **Optional** - a list of dates to **exclude**
 
 ### Multi-Day Events:
 * `multi_day` - boolean. When true, `start_date`, `start_time`, `end_time`, `recurrence`, `end_date` are not used

@@ -23,6 +23,10 @@ sections:
         width: 33
         display: Highlight
         create: false
+      tags:
+        taxonomy: tags
+        type: taxonomy
+        display: Tags
       details:
         type: section
         display: Details
@@ -37,33 +41,33 @@ sections:
       all_day:
         type: toggle
         width: 25
-        display: "All Day?"
+        display: 'All Day?'
       multi_day:
         type: toggle
         width: 25
-        display: "Multi-Day?"
+        display: 'Multi-Day?'
       start_date:
         allow_blank: false
         allow_time: false
         require_time: false
-        earliest_date: "January 1, 1900"
+        earliest_date: 'January 1, 1900'
         input_format: M/D/YYYY
         type: date
         width: 33
-        display: "Start Date"
+        display: 'Start Date'
         show_when:
           multi_day: false
       start_time:
         type: time
         width: 33
-        display: "Start Time"
+        display: 'Start Time'
         show_when:
           all_day: false
           multi_day: false
       end_time:
         type: time
         width: 33
-        display: "End Time"
+        display: 'End Time'
         show_when:
           all_day: false
           multi_day: false
@@ -75,22 +79,22 @@ sections:
             allow_time: false
             require_time: false
             input_format: M/D/YYYY
-            earliest_date: "January 1, 1900"
+            earliest_date: 'January 1, 1900'
             type: date
             width: 33
             display: Date
           start_time:
             type: time
             width: 33
-            display: "Start Time"
+            display: 'Start Time'
           end_time:
             type: time
             width: 33
-            display: "End Time"
+            display: 'End Time'
         type: grid
         display: Days
         min_rows: 2
-        add_row: "Add Day"
+        add_row: 'Add Day'
         show_when:
           multi_day: true
       recurrence_section:
@@ -107,7 +111,7 @@ sections:
           every: Every
         type: select
         width: 25
-        display: "Recurrence Type"
+        display: 'Recurrence Type'
         default: false
         show_when:
           multi_day: false
@@ -131,10 +135,10 @@ sections:
         allow_blank: true
         allow_time: false
         require_time: false
-        earliest_date: "January 1, 1900"
+        earliest_date: 'January 1, 1900'
         input_format: M/D/YYYY
         type: date
-        display: "End Date"
+        display: 'End Date'
         width: 25
         show_when:
           recurrence:
@@ -142,9 +146,34 @@ sections:
             - weekly
             - monthly
             - every
+      except:
+        mode: table
+        fields:
+          date:
+            allow_blank: false
+            allow_time: false
+            require_time: false
+            earliest_date: 'January 1, 1900'
+            type: date
+            display: Date
+        show_when:
+          recurrence:
+            - daily
+            - weekly
+            - monthly
+            - every
+        type: grid
+        display: Except
       bard_content:
         fieldset: content
         type: partial
         display: Content
+  sidebar:
+    display: Sidebar
+    fields:
+      partial_seo:
+        fieldset: partial_seo_data
+        type: partial
+        display: partial_seo
 taxonomies: false
-create_title: "Create Event"
+create_title: 'Create Event'

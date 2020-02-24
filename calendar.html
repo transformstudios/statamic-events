@@ -1,0 +1,54 @@
+<section class="full-calendar">
+	<div class="container">
+		<div class="row">
+			<div class="col-12 text-center">
+				<p>Tap on a day to see the event(s)</p>
+				<div class="nav">
+					<a href="{{ permalink }}?year={{ events:now_or_param modify="-1 month" format="Y" }}&month={{ events:now_or_param modify="-1 month" format="F" lower="true" }}">&nbsp;{{ events:now_or_param modify="-1 month" format="M" }}</a>
+					</a>
+					<h2><strong>{{ events:now_or_param format="M" }}</strong> {{ events:now_or_param format="Y" }}</h2>
+					<a href="{{ permalink }}?year={{ events:now_or_param modify="+1 month" format="Y" }}&month={{ events:now_or_param modify="+1 month" format="F" lower="true" }}">{{ events:now_or_param modify="+1 month" format="M" }}&nbsp;</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="row">
+			<div class="calendar full-view">
+				<div class="days">
+					<div class="day">Sun</div>
+					<div class="day">Mon</div>
+					<div class="day">Tue</div>
+					<div class="day">Wed</div>
+					<div class="day">Thu</div>
+					<div class="day">Fri</div>
+					<div class="day">Sat</div>
+				</div>
+				<div class="dates">
+					{{ events:calendar collection="events" :year="get.year" :month="get.month" }}
+						{{ if date | events.is_start_of_week }}<div class="week-row">{{ /if }}
+							<div class="day-cell{{ if date | is_today }} today{{ /if }}{{ if date | is_weekend }} weekend{{ /if }}{{ unless date | events.in_month }} not-month{{ /unless }}">
+								<div class="day-number">{{ date format="d" }}</div>
+								{{ unless no_results }}
+								<ul class="events">
+									{{ dates scope="event" }}
+										<li class="event-item" title="{{ title }}">
+										{{ if event:body_content }}<a href="{{ permalink }}">{{ /if }}
+												<div>
+													<span class="event-title">{{ title }}</span>
+													{{ if !all_day }}
+													<span class="event-time">{{ start_time format="g:i" }}&nbsp;{{ start_time format="A" }}</span>{{ /if }}
+												</div>
+											{{ if event:body_content }}</a>{{ /if }}
+										</li>
+									{{ /dates }}
+								</ul>
+								{{ /unless }}
+							</div>
+						{{ if date | events.is_end_of_week }}</div>{{ /if }}
+					{{ /events:calendar }}
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
