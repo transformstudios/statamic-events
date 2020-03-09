@@ -9,8 +9,8 @@ use Statamic\API\Request;
 use Spatie\CalendarLinks\Link;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
+use Statamic\Addons\Events\EventFactory;
 use Statamic\Addons\Collection\CollectionTags;
-use Statamic\Addons\Events\Types\EventFactory;
 
 class EventsTags extends CollectionTags
 {
