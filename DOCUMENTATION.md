@@ -2,9 +2,9 @@ Table Of Contents:
 
 * [Fieldset](#fieldset)
 * [Settings](#settings)
-* [Entry Data](#entry-data) [Entry Data](#entry-data)
-* [Entry Data](#entry-data)
-* [Entry Data](#entry-data)
+* [Templating](#templating)
+* [Fields](#fields)
+* [Usage](#usage)
 
 
 ## Fieldset
