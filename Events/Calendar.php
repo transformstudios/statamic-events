@@ -4,7 +4,7 @@ namespace Statamic\Addons\Events;
 
 use Carbon\Carbon;
 use Statamic\API\Entry as EntryAPI;
-use Statamic\Addons\Events\Types\EventFactory;
+use Statamic\Addons\Events\EventFactory;
 
 class Calendar
 {
