@@ -186,6 +186,7 @@ class SingleDayEventsTest extends TestCase
 
         $dates = collect([
             carbon('2019-11-27 11:00'),
+            carbon('2019-11-27 12:00'),
         ]);
 
         $nextDates = $this->nonAllDayEvent->datesBetween(carbon('2019-11-26'), carbon('2019-11-28'));
@@ -193,6 +194,7 @@ class SingleDayEventsTest extends TestCase
         $this->assertCount(1, $nextDates);
 
         $this->assertEquals($dates[0], $nextDates[0]->start());
+        $this->assertEquals($dates[1], $nextDates[0]->end());
 
         $this->assertEmpty(
             $this->allDayEvent->datesBetween(carbon('2019-11-28'), carbon('2019-11-29'))

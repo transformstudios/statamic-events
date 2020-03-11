@@ -42,7 +42,13 @@ class SingleDayEvent extends Event
         $start = $this->start();
 
         if ($start->between(carbon($from), carbon($to))) {
-            return collect([Schedule::fromCarbon($start)]);
+            $day = new Schedule([
+                'date' => $this->start_date,
+                'start_time' => $this->startTime(),
+                'end_time' => $this->endTime(),
+            ]);
+
+            return collect([$day]);
         }
 
         return collect([]);
