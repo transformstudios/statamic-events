@@ -8,9 +8,10 @@ use Statamic\API\URL;
 use Statamic\API\Request;
 use Spatie\CalendarLinks\Link;
 use Illuminate\Support\Collection;
-use Illuminate\Pagination\Paginator;
 use Statamic\Addons\Events\EventFactory;
+use Statamic\Presenters\PaginationPresenter;
 use Statamic\Addons\Collection\CollectionTags;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class EventsTags extends CollectionTags
 {
@@ -119,8 +120,11 @@ class EventsTags extends CollectionTags
 
         $events = $this->events->upcoming($this->limit + 1, $this->offset);
 
-        $paginator = new Paginator(
+        $count = $this->events->count();
+
+        $paginator = new LengthAwarePaginator(
             $events,
+            $count,
             $this->limit,
             $page
         );
@@ -129,8 +133,14 @@ class EventsTags extends CollectionTags
         $paginator->appends(Request::all());
 
         $this->paginationData = [
-            'prev_page' => $paginator->previousPageUrl(),
-            'next_page' => $paginator->nextPageUrl(),
+            'total_items'    => $count,
+            'items_per_page' => $this->limit,
+            'total_pages'    => $paginator->lastPage(),
+            'current_page'   => $paginator->currentPage(),
+            'prev_page'      => $paginator->previousPageUrl(),
+            'next_page'      => $paginator->nextPageUrl(),
+            'auto_links'     => $paginator->render(),
+            'links'          => $paginator->render(new PaginationPresenter($paginator))
         ];
 
         $this->dates = $events->slice(0, $this->limit);

@@ -68,4 +68,9 @@ class Events
                 return carbon($event->start_date)->setTimeFromTimeString($event->startTime());
             })->values();
     }
+
+    public function count()
+    {
+        return $this->events->count();
+    }
 }
