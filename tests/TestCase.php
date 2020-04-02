@@ -1,18 +1,18 @@
 <?php
 
-namespace DoubleThreeDigital\AddonBoilerplate\Tests;
+namespace TransformStudios\Events\Tests;
 
-use Statamic\Extend\Manifest;
-use Orchestra\Testbench\TestCase as OrchestraTestCase;
-use DoubleThreeDigital\AddonBoilerplate\ServiceProvider;
-use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
+use Statamic\Extend\Manifest;
+use TransformStudios\Events\ServiceProvider;
+use Statamic\Providers\StatamicServiceProvider;
+use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 abstract class TestCase extends OrchestraTestCase
 {
     protected function setUp(): void
     {
-        require_once(__DIR__.'/ExceptionHandler.php');
+        require_once __DIR__.'/ExceptionHandler.php';
 
         parent::setUp();
     }
@@ -37,11 +37,15 @@ abstract class TestCase extends OrchestraTestCase
         parent::getEnvironmentSetUp($app);
 
         $app->make(Manifest::class)->manifest = [
-            'doublethreedigital/addon-boilerplate' => [
-                'id' => 'doublethreedigital/addon-boilerplate',
-                'namespace' => 'DoubleThreeDigital\\AddonBoilerplate\\',
+            'transformstudios/events' => [
+                'id' => 'transformstudios/events',
+                'namespace' => 'TransformStudios\\Events\\',
             ],
         ];
+
+        Statamic::pushActionRoutes(function () {
+            return require_once realpath(__DIR__.'/../routes/actions.php');
+        });
     }
 
     protected function resolveApplicationConfiguration($app)
@@ -50,7 +54,7 @@ abstract class TestCase extends OrchestraTestCase
 
         $configs = [
             'assets', 'cp', 'forms', 'static_caching',
-            'sites', 'stache', 'system', 'users'
+            'sites', 'stache', 'system', 'users',
         ];
 
         foreach ($configs as $config) {
