@@ -1,16 +1,14 @@
-Events is a Statamic v2 addon/tag that allows you to create a calendar of events or list the next few upcoming events.
+![Statamic 3.0+](https://img.shields.io/badge/Statamic-3.0+-FF269E?style=for-the-badge&link=https://statamic.com)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/doublethreedigital/addon-boilerplate.svg?style=flat-square)](https://packagist.org/packages/doublethreedigital/addon-boilerplate)
 
-It supports:
+## About Addon Boilerplate
 
-* multi-day events
-* recurring events - daily, weekly, monthly, annually, every "x"
+This addon boilerplate is a base on which you can build testable Statamic 3 addons.
 
-It uses an existing collection (assuming it has the right fields in it), so you can use all the normal Statamic capabilities.
+## Using this boilerplate
 
-Please let us know if you have questions or suggestions.
+We've written [some documentation](./DOCUMENTATION.md) to help you out when using this boilerplate.
 
-Future ideas:
+## Contributing
 
-* port to v3
-* support download of events via iCal
-* support subscribing to an events feed
+Are you down with contributing? That's awesome, just make sure to follow [our contributors guide](./CONTRIBUTORS.md).

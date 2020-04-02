@@ -1,0 +1,47 @@
+{
+    "name": "transformstudios/events",
+    "type": "statamic-addon",
+    "description": "Statamic addon to create & manage events",
+    "authors": [
+        {
+            "name": "Erin Dalzell",
+            "email": "erin@transformstudios.com",
+            "homepage": "https://transformstudios.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TransformStudios\\Events\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TransformStudios\\Events\\Tests\\": "tests"
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Addon Boilerplate",
+            "description": "A Statamic 3 addon boilerplate, ready for testing."
+        },
+        "laravel": {
+            "providers": [
+                "TransformStudios\\Events\\ServiceProvider"
+            ]
+        }
+    },
+    "require": {
+	    "spatie/calendar-links": "1.*",
+        "statamic/cms": "^3.0@beta"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0",
+        "phpunit/phpunit": "^8.1"
+    },
+    "minimum-stability": "dev",
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
+}
