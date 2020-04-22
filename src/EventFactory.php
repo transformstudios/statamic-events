@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Addons\Events;
+namespace TransformStudios\Events;
 
-use Statamic\API\Arr;
-use Statamic\Addons\Events\Types\MultiDayEvent;
-use Statamic\Addons\Events\Types\RecurringEvent;
-use Statamic\Addons\Events\Types\SingleDayEvent;
+use Statamic\Support\Arr;
+use TransformStudios\Events\Types\MultiDayEvent;
+use TransformStudios\Events\Types\RecurringEvent;
+use TransformStudios\Events\Types\SingleDayEvent;
 
 class EventFactory
 {

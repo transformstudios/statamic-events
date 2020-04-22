@@ -1,9 +1,10 @@
 <?php
 
+namespace TransformStudios\Events\Tests;
+
 use Carbon\Carbon;
-use Statamic\Testing\TestCase;
-use Statamic\Addons\Events\EventFactory;
-use Statamic\Addons\Events\Types\SingleDayEvent;
+use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Types\SingleDayEvent;
 
 class SingleDayEventsTest extends TestCase
 {
@@ -16,7 +17,7 @@ class SingleDayEventsTest extends TestCase
     /** @var SingleDayEvent */
     private $recurrenceNoneEvent;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +45,7 @@ class SingleDayEventsTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 

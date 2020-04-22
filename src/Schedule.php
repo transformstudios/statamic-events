@@ -1,9 +1,9 @@
 <?php
 
-namespace Statamic\Addons\Events;
+namespace TransformStudios\Events;
 
 use Carbon\Carbon;
-use Statamic\API\Arr;
+use Statamic\Support\Arr;
 
 class Schedule
 {
@@ -70,14 +70,14 @@ class Schedule
         return $this->endTime;
     }
 
-    public static function now(): Schedule
+    public static function now(): self
     {
-        return Schedule::fromCarbon(Carbon::now());
+        return self::fromCarbon(Carbon::now());
     }
 
-    public static function fromCarbon(Carbon $date): Schedule
+    public static function fromCarbon(Carbon $date): self
     {
-        return new Schedule(
+        return new self(
             [
             'date' => $date->toDateString(),
             'start_time' => $date->toTimeString(),

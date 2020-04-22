@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Addons\Events\Types;
+namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;

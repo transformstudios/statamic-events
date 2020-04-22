@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Addons\Events\Types;
+namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
 use Statamic\API\Arr;
@@ -50,8 +50,8 @@ class MultiDayEvent extends Event
     }
 
     /**
-    * @param null|Carbon $after
-    */
+     * @param null|Carbon $after
+     */
     public function upcomingDate($after = null): ?Schedule
     {
         if (is_null($after)) {

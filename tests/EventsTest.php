@@ -1,7 +1,7 @@
 <?php
 
 use Carbon\Carbon;
-use Statamic\Testing\TestCase;
+use Tests\TestCase;
 use Statamic\Addons\Events\Events;
 use Statamic\Addons\Events\EventFactory;
 use Statamic\Addons\Events\Types\MultiDayEvent;
@@ -180,12 +180,12 @@ class EventsTest extends TestCase
 
         $this->assertEquals(
             Carbon::parse('2019-11-23 19:00'),
-            carbon($nextDates[0]->start_date . ' ' . $nextDates[0]->start_time)
+            carbon($nextDates[0]->start_date.' '.$nextDates[0]->start_time)
         );
 
         $this->assertEquals(
             Carbon::parse('2019-11-24 11:00'),
-            carbon($nextDates[1]->start_date . ' ' . $nextDates[1]->start_time)
+            carbon($nextDates[1]->start_date.' '.$nextDates[1]->start_time)
         );
     }
 }
