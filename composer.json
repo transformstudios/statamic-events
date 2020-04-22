@@ -12,7 +12,10 @@
     "autoload": {
         "psr-4": {
             "TransformStudios\\Events\\": "src"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -31,8 +34,8 @@
         }
     },
     "require": {
-	    "spatie/calendar-links": "1.*",
-        "statamic/cms": "^3.0@beta"
+        "spatie/calendar-links": "1.*",
+        "statamic/cms": "dev-carbon-helper"
     },
     "require-dev": {
         "orchestra/testbench": "^4.0",
@@ -43,5 +46,11 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/Users/erin/Documents/Development/cms"
+        }
+    ]
 }
