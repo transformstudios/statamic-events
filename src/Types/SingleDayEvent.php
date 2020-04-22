@@ -4,7 +4,7 @@ namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Statamic\Addons\Events\Schedule;
+use TransformStudios\Events\Schedule;
 
 class SingleDayEvent extends Event
 {

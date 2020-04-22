@@ -3,9 +3,9 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
-use Statamic\API\Arr;
+use Statamic\Support\Arr;
 use Illuminate\Support\Collection;
-use Statamic\Addons\Events\Schedule;
+use TransformStudios\Events\Schedule;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Event implements Arrayable
