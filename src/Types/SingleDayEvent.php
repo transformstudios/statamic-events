@@ -17,7 +17,7 @@ class SingleDayEvent extends Event
             $after = Carbon::now();
         }
 
-        if (carbon($after) >= $this->end()) {
+        if (Carbon::parse($after) >= $this->end()) {
             return null;
         }
 
@@ -41,7 +41,7 @@ class SingleDayEvent extends Event
     {
         $start = $this->start();
 
-        if ($start->between(carbon($from), carbon($to))) {
+        if ($start->between(Carbon::parse($from), Carbon::parse($to))) {
             $day = new Schedule([
                 'date' => $this->start_date,
                 'start_time' => $this->startTime(),

@@ -3,9 +3,8 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
-use Statamic\API\Arr;
 use Statamic\API\Str;
-use Statamic\API\Helper;
+use Statamic\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Addons\Events\Schedule;
 
@@ -16,7 +15,7 @@ class RecurringEvent extends Event
         $periodMap = [
             'daily' => 'days',
             'weekly' => 'weeks',
-            'monthly' => 'months'
+            'monthly' => 'months',
         ];
 
         // if type is daily/weekly/monthly, set the period and interval appropriately
@@ -27,6 +26,7 @@ class RecurringEvent extends Event
 
         parent::__construct($data);
     }
+
     public function isRecurring(): bool
     {
         return true;
@@ -35,7 +35,7 @@ class RecurringEvent extends Event
     public function endDate(): ?Carbon
     {
         if ($date = Arr::get($this->data, 'end_date')) {
-            return carbon($date);
+            return Carbon::parse($date);
         }
 
         return null;
@@ -43,7 +43,7 @@ class RecurringEvent extends Event
 
     public function end(): ?Carbon
     {
-        if (!$end = $this->endDate()) {
+        if (! $end = $this->endDate()) {
             return null;
         }
 
@@ -115,8 +115,8 @@ class RecurringEvent extends Event
 
     public function datesBetween($from, $to): Collection
     {
-        $from = carbon($from);
-        $to = carbon($to);
+        $from = Carbon::parse($from);
+        $to = Carbon::parse($to);
 
         if (($from->startOfDay() > $to->endOfDay()) ||
             ($this->start()->isAfter($to)) ||
@@ -187,6 +187,6 @@ class RecurringEvent extends Event
 
     private function periodMethod(string $prefix): string
     {
-        return $prefix . Str::toTitleCase($this->period);
+        return $prefix.Str::toTitleCase($this->period);
     }
 }

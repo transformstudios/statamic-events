@@ -8,7 +8,6 @@ use Statamic\API\URL;
 use Statamic\API\Request;
 use Spatie\CalendarLinks\Link;
 use Illuminate\Support\Collection;
-use Statamic\Addons\Events\EventFactory;
 use Statamic\Presenters\PaginationPresenter;
 use Statamic\Addons\Collection\CollectionTags;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -82,7 +81,7 @@ class EventsTags extends CollectionTags
         $to = $event->end();
 
         if ($event->isRecurring()) {
-            $from->setDateFrom(carbon($this->getParam('date')));
+            $from->setDateFrom(Carbon::parse($this->getParam('date')));
             $to = $from->copy()->setTimeFromTimeString($event->endTime());
         }
 
@@ -99,9 +98,9 @@ class EventsTags extends CollectionTags
 
     public function nowOrParam()
     {
-        $monthYear = request('month', Carbon::now()->englishMonth) . ' ' . request('year', Carbon::now()->year);
+        $monthYear = request('month', Carbon::now()->englishMonth).' '.request('year', Carbon::now()->year);
 
-        $month = carbon($monthYear);
+        $month = Carbon::parse($monthYear);
 
         if ($modify = $this->getParam('modify')) {
             $month->modify($modify);
@@ -140,7 +139,7 @@ class EventsTags extends CollectionTags
             'prev_page'      => $paginator->previousPageUrl(),
             'next_page'      => $paginator->nextPageUrl(),
             'auto_links'     => $paginator->render(),
-            'links'          => $paginator->render(new PaginationPresenter($paginator))
+            'links'          => $paginator->render(new PaginationPresenter($paginator)),
         ];
 
         $this->dates = $events->slice(0, $this->limit);
@@ -215,7 +214,7 @@ class EventsTags extends CollectionTags
     }
 
     /**
-     * Get any meta data that should be available in templates
+     * Get any meta data that should be available in templates.
      *
      * @return array
      */

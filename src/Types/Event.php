@@ -76,12 +76,12 @@ abstract class Event implements Arrayable
 
     public function start(): Carbon
     {
-        return carbon(Arr::get($this->data, 'start_date'))->setTimeFromTimeString($this->startTime());
+        return Carbon::parse(Arr::get($this->data, 'start_date'))->setTimeFromTimeString($this->startTime());
     }
 
     public function end(): ?Carbon
     {
-        return carbon(Arr::get($this->data, 'start_date'))->setTimeFromTimeString($this->endTime());
+        return Carbon::parse(Arr::get($this->data, 'start_date'))->setTimeFromTimeString($this->endTime());
     }
 
     public function toArray(): array

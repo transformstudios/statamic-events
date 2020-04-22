@@ -4,7 +4,6 @@ namespace Statamic\Addons\Events;
 
 use Carbon\Carbon;
 use Statamic\API\Entry as EntryAPI;
-use Statamic\Addons\Events\EventFactory;
 
 class Calendar
 {
@@ -35,7 +34,7 @@ class Calendar
             $year = Carbon::now()->year;
         }
 
-        $carbonMonth = carbon($month . ' ' . $year);
+        $carbonMonth = Carbon::parse($month.' '.$year);
 
         $from = $carbonMonth->copy()->startOfMonth()->startOfWeek();
         $to = $carbonMonth->copy()->endOfMonth()->endOfWeek();

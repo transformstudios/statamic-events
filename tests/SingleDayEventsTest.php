@@ -73,17 +73,17 @@ class SingleDayEventsTest extends TestCase
 
     public function test_can_get_start()
     {
-        $this->assertEquals(carbon('2019-11-27 00:00'), $this->allDayEvent->start());
-        $this->assertEquals(carbon('2019-11-27 11:00'), $this->nonAllDayEvent->start());
+        $this->assertEquals(Carbon::parse('2019-11-27 00:00'), $this->allDayEvent->start());
+        $this->assertEquals(Carbon::parse('2019-11-27 11:00'), $this->nonAllDayEvent->start());
     }
 
     public function test_can_get_end()
     {
         $endOfDayTime = Carbon::now()->endOfDay()->format('G:i');
 
-        $endOfDay = carbon('2019-11-27')->setTimeFromTimeString($endOfDayTime);
+        $endOfDay = Carbon::parse('2019-11-27')->setTimeFromTimeString($endOfDayTime);
         $this->assertEquals($endOfDay, $this->allDayEvent->end());
-        $this->assertEquals(carbon('2019-11-27 12:00'), $this->nonAllDayEvent->end());
+        $this->assertEquals(Carbon::parse('2019-11-27 12:00'), $this->nonAllDayEvent->end());
     }
 
     public function test_can_get_end_when_none_set()
@@ -95,7 +95,7 @@ class SingleDayEventsTest extends TestCase
 
         $endOfDayTime = Carbon::now()->endOfDay()->format('G:i');
 
-        $endOfDay = carbon('2019-11-27')->setTimeFromTimeString($endOfDayTime);
+        $endOfDay = Carbon::parse('2019-11-27')->setTimeFromTimeString($endOfDayTime);
         $this->assertEquals($endOfDay, $event->end());
     }
 
@@ -107,53 +107,53 @@ class SingleDayEventsTest extends TestCase
 
         $startOfDayTime = Carbon::now()->startOfDay()->toTimeString();
 
-        $startOfDay = carbon('2019-11-27')->setTimeFromTimeString($startOfDayTime);
+        $startOfDay = Carbon::parse('2019-11-27')->setTimeFromTimeString($startOfDayTime);
         $this->assertEquals($startOfDay, $event->start());
     }
 
     public function test_get_null_next_date_if_after_end_date()
     {
         $this->assertNull(
-            $this->allDayEvent->upcomingDate(carbon('2019-11-28'))
+            $this->allDayEvent->upcomingDate(Carbon::parse('2019-11-28'))
         );
         $this->assertNull(
-            $this->nonAllDayEvent->upcomingDate(carbon('2019-11-28'))
+            $this->nonAllDayEvent->upcomingDate(Carbon::parse('2019-11-28'))
         );
     }
 
     public function test_can_generate_next_datetime_if_before()
     {
         $this->assertEquals(
-            carbon('2019-11-27')->setTimeFromTimeString('00:00:00'),
-            $this->allDayEvent->upcomingDate(carbon('2019-11-22'))->start()
+            Carbon::parse('2019-11-27')->setTimeFromTimeString('00:00:00'),
+            $this->allDayEvent->upcomingDate(Carbon::parse('2019-11-22'))->start()
         );
         $this->assertEquals(
-            carbon('2019-11-27')->setTimeFromTimeString('11:00:00'),
-            $this->nonAllDayEvent->upcomingDate(carbon('2019-11-22'))->start()
+            Carbon::parse('2019-11-27')->setTimeFromTimeString('11:00:00'),
+            $this->nonAllDayEvent->upcomingDate(Carbon::parse('2019-11-22'))->start()
         );
         $this->assertEquals(
-            carbon('2019-11-27')->setTimeFromTimeString('12:00:00'),
-            $this->nonAllDayEvent->upcomingDate(carbon('2019-11-22'))->end()
+            Carbon::parse('2019-11-27')->setTimeFromTimeString('12:00:00'),
+            $this->nonAllDayEvent->upcomingDate(Carbon::parse('2019-11-22'))->end()
         );
     }
 
     public function test_returns_start_if_during()
     {
         $this->assertEquals(
-            carbon('2019-11-27')->setTimeFromTimeString('11:00:00'),
-            $this->nonAllDayEvent->upcomingDate(carbon('2019-11-27 11:30'))->start()
+            Carbon::parse('2019-11-27')->setTimeFromTimeString('11:00:00'),
+            $this->nonAllDayEvent->upcomingDate(Carbon::parse('2019-11-27 11:30'))->start()
         );
         $this->assertEquals(
-            carbon('2019-11-27')->setTimeFromTimeString('00:00:00'),
-            $this->allDayEvent->upcomingDate(carbon('2019-11-27 11:30'))->start()
+            Carbon::parse('2019-11-27')->setTimeFromTimeString('00:00:00'),
+            $this->allDayEvent->upcomingDate(Carbon::parse('2019-11-27 11:30'))->start()
         );
     }
 
     public function test_can_generate_next_dates_when_before_start()
     {
-        Carbon::setTestNow(carbon('2019-11-23'));
+        Carbon::setTestNow(Carbon::parse('2019-11-23'));
         $dates = collect([
-            carbon('2019-11-27 00:00'),
+            Carbon::parse('2019-11-27 00:00'),
         ]);
 
         $nextDates = $this->allDayEvent->upcomingDates();
@@ -163,7 +163,7 @@ class SingleDayEventsTest extends TestCase
         $this->assertEquals($dates[0], $nextDates[0]->start());
 
         $dates = collect([
-            carbon('2019-11-27 11:00'),
+            Carbon::parse('2019-11-27 11:00'),
         ]);
 
         $nextDates = $this->nonAllDayEvent->upcomingDates();
@@ -176,21 +176,21 @@ class SingleDayEventsTest extends TestCase
     public function test_can_generate_between_dates()
     {
         $dates = collect([
-            carbon('2019-11-27 00:00'),
+            Carbon::parse('2019-11-27 00:00'),
         ]);
 
-        $nextDates = $this->allDayEvent->datesBetween(carbon('2019-11-26'), carbon('2019-11-28'));
+        $nextDates = $this->allDayEvent->datesBetween(Carbon::parse('2019-11-26'), Carbon::parse('2019-11-28'));
 
         $this->assertCount(1, $nextDates);
 
         $this->assertEquals($dates[0], $nextDates[0]->start());
 
         $dates = collect([
-            carbon('2019-11-27 11:00'),
-            carbon('2019-11-27 12:00'),
+            Carbon::parse('2019-11-27 11:00'),
+            Carbon::parse('2019-11-27 12:00'),
         ]);
 
-        $nextDates = $this->nonAllDayEvent->datesBetween(carbon('2019-11-26'), carbon('2019-11-28'));
+        $nextDates = $this->nonAllDayEvent->datesBetween(Carbon::parse('2019-11-26'), Carbon::parse('2019-11-28'));
 
         $this->assertCount(1, $nextDates);
 
@@ -198,10 +198,10 @@ class SingleDayEventsTest extends TestCase
         $this->assertEquals($dates[1], $nextDates[0]->end());
 
         $this->assertEmpty(
-            $this->allDayEvent->datesBetween(carbon('2019-11-28'), carbon('2019-11-29'))
+            $this->allDayEvent->datesBetween(Carbon::parse('2019-11-28'), Carbon::parse('2019-11-29'))
         );
         $this->assertEmpty(
-            $this->nonAllDayEvent->datesBetween(carbon('2019-11-28'), carbon('2019-11-29'))
+            $this->nonAllDayEvent->datesBetween(Carbon::parse('2019-11-28'), Carbon::parse('2019-11-29'))
         );
     }
 }

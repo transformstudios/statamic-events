@@ -2,6 +2,7 @@
 
 namespace Statamic\Addons\Events;
 
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Addons\Events\Types\Event;
 
@@ -43,7 +44,7 @@ class Events
             }
         )->filter()
             ->sortBy(function ($event, $ignore) {
-                return carbon($event->start_date)->setTimeFromTimeString($event->startTime());
+                return Carbon::parse($event->start_date)->setTimeFromTimeString($event->startTime());
             })->values()
             ->splice($offset, $limit);
 
@@ -65,7 +66,7 @@ class Events
             });
         })->filter()
             ->sortBy(function ($event, $ignore) {
-                return carbon($event->start_date)->setTimeFromTimeString($event->startTime());
+                return Carbon::parse($event->start_date)->setTimeFromTimeString($event->startTime());
             })->values();
     }
 

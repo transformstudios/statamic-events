@@ -8,6 +8,6 @@ class IsStartOfWeekModifier extends Modifier
 {
     public function index($value, $params, $context)
     {
-        return carbon($value)->isSunday();
+        return Carbon::parse($value)->isSunday();
     }
 }

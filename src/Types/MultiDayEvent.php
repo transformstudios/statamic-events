@@ -101,8 +101,8 @@ class MultiDayEvent extends Event
 
     public function datesBetween($from, $to): Collection
     {
-        $from = carbon($from);
-        $to = carbon($to);
+        $from = Carbon::parse($from);
+        $to = Carbon::parse($to);
 
         if (($from->startOfDay() > $to->endOfDay()) ||
             ($this->start()->isAfter($to)) ||

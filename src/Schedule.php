@@ -21,18 +21,18 @@ class Schedule
         $this->endDate = Arr::get($data, 'end_date', $this->date);
 
         if ($isAllDay) {
-            $date = carbon($this->date);
+            $date = Carbon::parse($this->date);
             $this->startTime = $date->startOfDay()->format('G:i');
             $this->endTime = $date->endOfDay()->format('G:i');
         } else {
-            $this->startTime = Arr::get($data, 'start_time', carbon($this->date)->startOfDay()->toTimeString());
-            $this->endTime = Arr::get($data, 'end_time', carbon($this->date)->endOfDay()->toTimeString());
+            $this->startTime = Arr::get($data, 'start_time', Carbon::parse($this->date)->startOfDay()->toTimeString());
+            $this->endTime = Arr::get($data, 'end_time', Carbon::parse($this->date)->endOfDay()->toTimeString());
         }
     }
 
     public function start(): Carbon
     {
-        return carbon($this->date)->setTimeFromTimeString($this->startTime);
+        return Carbon::parse($this->date)->setTimeFromTimeString($this->startTime);
     }
 
     public function startDate(): string
@@ -47,7 +47,7 @@ class Schedule
 
     public function end(): Carbon
     {
-        return carbon($this->endDate)->setTimeFromTimeString($this->endTime);
+        return Carbon::parse($this->endDate)->setTimeFromTimeString($this->endTime);
     }
 
     public function endDate($date = null)
