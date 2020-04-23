@@ -3,16 +3,15 @@
 namespace TransformStudios\Events\Tests;
 
 use Carbon\Carbon;
-use Statamic\Testing\TestCase;
-use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\EventFactory;
+use TransformStudios\Events\Events;
+use TransformStudios\Events\EventFactory;
 
 class RecurringMixedEventsTest extends TestCase
 {
     /** @var Events */
     private $events;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -24,7 +23,7 @@ class RecurringMixedEventsTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
