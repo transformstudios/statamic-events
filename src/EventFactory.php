@@ -3,6 +3,7 @@
 namespace TransformStudios\Events;
 
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use TransformStudios\Events\Types\MultiDayEvent;
 use TransformStudios\Events\Types\RecurringEvent;
 use TransformStudios\Events\Types\SingleDayEvent;
@@ -16,7 +17,7 @@ class EventFactory
         }
 
         // Statamic can save the recurrence "none" as "false" so we need to check for that
-        if (bool(Arr::get($data, 'recurrence', false))) {
+        if (Str::toBool(Arr::get($data, 'recurrence', false))) {
             return new RecurringEvent($data);
         }
 
