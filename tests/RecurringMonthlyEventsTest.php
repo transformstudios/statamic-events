@@ -3,28 +3,16 @@
 namespace TransformStudios\Events\Tests;
 
 use Carbon\Carbon;
-use Statamic\Testing\TestCase;
-use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\EventFactory;
+use TransformStudios\Events\EventFactory;
 
 class RecurringMonthlyEventsTest extends TestCase
 {
-    /** @var Events */
-    private $events;
-
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
-
-        $this->events = new Events();
     }
 
-    /**
-     * Clean up the testing environment before the next test.
-     *
-     * @return void
-     */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -53,7 +41,7 @@ class RecurringMonthlyEventsTest extends TestCase
 
     public function test_can_generate_next_monthly_date_if_after()
     {
-        Carbon::setTestNow(carbon('2019-11-24 10:50'));
+        Carbon::setTestNow(Carbon::parse('2019-11-24 10:50'));
 
         $startDate = Carbon::now()->setTimeFromTimeString('11:00:00');
 
