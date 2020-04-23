@@ -3,9 +3,9 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
-use Statamic\API\Str;
 use Statamic\Support\Arr;
-use Statamic\Addons\Events\Day;
+use Statamic\Support\Str;
+use TransformStudios\Events\Day;
 use Illuminate\Support\Collection;
 
 class RecurringEvent extends Event
