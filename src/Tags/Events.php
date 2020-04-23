@@ -1,46 +1,43 @@
 <?php
 
-namespace Statamic\Addons\Events;
+namespace TransformStudios\Events\Tags;
 
 use Carbon\Carbon;
-use Statamic\API\Arr;
-use Statamic\API\URL;
-use Statamic\API\Request;
+use Statamic\Tags\Tags;
+use Statamic\Support\Arr;
 use Spatie\CalendarLinks\Link;
 use Illuminate\Support\Collection;
-use Statamic\Presenters\PaginationPresenter;
-use Statamic\Addons\Collection\CollectionTags;
+use Statamic\Facades\Endpoint\URL;
+use Statamic\Addons\Events\Calendar;
+use TransformStudios\Events\EventFactory;
 use Illuminate\Pagination\LengthAwarePaginator;
+use TransformStudios\Events\Events as EventsActions;
 
-class EventsTags extends CollectionTags
+class Events extends Tags
 {
-    /** @var Events */
-    private $events;
+    private EventsActions $events;
 
-    /** @var Collection */
-    private $dates;
+    private Collection $dates;
 
     private $paginationData;
 
     public function __construct()
     {
-        parent::__construct();
-
         $this->dates = collect();
-        $this->events = new Events();
+        $this->events = new self();
 
         Carbon::setWeekStartsAt(Carbon::SUNDAY);
         Carbon::setWeekEndsAt(Carbon::SATURDAY);
     }
 
-    public function upcoming()
+    public function upcoming(): array
     {
-        $this->limit = $this->getInt('limit', 1);
-        $this->offset = $this->getInt('offset', 0);
+        $this->limit = $this->params->int('limit', 1);
+        $this->offset = $this->params->int('offset', 0);
 
-        $this->loadEvents($this->getBool('collapse_multi_days', false));
+        $this->loadEvents($this->params->bool('collapse_multi_days', false));
 
-        if ($this->getBool('paginate')) {
+        if ($this->params->bool('paginate')) {
             $this->paginate();
         } else {
             $this->dates = $this->events->upcoming($this->limit, $this->offset);
@@ -49,31 +46,29 @@ class EventsTags extends CollectionTags
         return $this->output();
     }
 
-    public function calendar()
+    public function calendar(): array
     {
-        $calendar = new Calendar($this->getParam('collection', $this->getConfig('events_collection')));
+        $calendar = new Calendar($this->params->get('collection', config('events.events_collection')));
 
-        return $this->parseLoop($calendar->month($this->getParam('month'), $this->getParam('year')));
+        return $calendar->month($this->params->get('month'), $this->params->get('year'));
     }
 
-    public function in()
+    public function in(): array
     {
-        $this->loadEvents($this->getBool('collapse_multi_days', false));
+        $this->loadEvents($this->params->bool('collapse_multi_days', false));
 
         $from = Carbon::now()->startOfDay();
-        $to = Carbon::now()->modify($this->getParam('next'))->endOfDay();
+        $to = Carbon::now()->modify($this->params->get('next'))->endOfDay();
 
         $this->loadDates($from, $to);
 
-        return $this->parseLoop(
-            array_merge(
-                $this->makeEmptyDates($from, $to),
-                $this->dates->toArray()
-            )
+        return array_merge(
+            $this->makeEmptyDates($from, $to),
+            $this->dates->toArray()
         );
     }
 
-    public function downloadLink()
+    public function downloadLink(): string
     {
         $event = EventFactory::createFromArray($this->context);
 
@@ -89,14 +84,14 @@ class EventsTags extends CollectionTags
         $allDay = Arr::get($this->context, 'all_day', false);
         $location = Arr::get($this->context, 'location', '');
 
-        $type = $this->getParam('type');
+        $type = $this->params->get('type');
 
         $link = Link::create($title, $from, $to, $allDay)->address($location);
 
         return $link->$type();
     }
 
-    public function nowOrParam()
+    public function nowOrParam(): string
     {
         $monthYear = request('month', Carbon::now()->englishMonth).' '.request('year', Carbon::now()->year);
 
@@ -106,14 +101,14 @@ class EventsTags extends CollectionTags
             $month->modify($modify);
         }
 
-        return $month->format($this->getParam('format'));
+        return $month->format($this->params->get('format'));
     }
 
-    protected function paginate()
+    protected function paginate(): void
     {
         $this->paginated = true;
 
-        $page = (int) Request::get('page', 1);
+        $page = (int) request('page', 1);
 
         $this->offset = (($page - 1) * $this->limit) + $this->offset;
 
@@ -129,7 +124,7 @@ class EventsTags extends CollectionTags
         );
 
         $paginator->setPath(URL::makeAbsolute(URL::getCurrent()));
-        $paginator->appends(Request::all());
+        $paginator->appends(request()->all());
 
         $this->paginationData = [
             'total_items'    => $count,
@@ -139,13 +134,13 @@ class EventsTags extends CollectionTags
             'prev_page'      => $paginator->previousPageUrl(),
             'next_page'      => $paginator->nextPageUrl(),
             'auto_links'     => $paginator->render(),
-            'links'          => $paginator->render(new PaginationPresenter($paginator)),
+            'links'          => $paginator->render(),
         ];
 
         $this->dates = $events->slice(0, $this->limit);
     }
 
-    protected function output()
+    protected function output(): array
     {
         $data = array_merge(
             $this->getEventsMetaData(),
@@ -156,22 +151,18 @@ class EventsTags extends CollectionTags
             $data = array_merge($data, ['paginate' => $this->paginationData]);
         }
 
-        return $this->parse($data);
+        return $data;
     }
 
-    private function loadDates($from, $to)
+    private function loadDates($from, $to): void
     {
         $this->dates = $this->events
             ->all($from, $to)
-            ->groupBy(function ($event, $key) {
-                return $event->start_date;
-            })
-            ->map(function ($days, $key) {
-                return [
+            ->groupBy(fn ($event, $key) => $event->start_date)
+            ->map(fn ($days, $key) => [
                     'date' => $key,
                     'dates' => $days->toArray(),
-                ];
-            });
+                ]);
     }
 
     private function loadEvents(bool $collapseMultiDays = false)
@@ -213,12 +204,7 @@ class EventsTags extends CollectionTags
         return $dates;
     }
 
-    /**
-     * Get any meta data that should be available in templates.
-     *
-     * @return array
-     */
-    protected function getEventsMetaData()
+    protected function getEventsMetaData(): array
     {
         return [
             'total_results' => $this->dates->count(),
