@@ -75,7 +75,7 @@ class MultiDayEvent extends Event
 
         return $this
             ->days()
-            ->first(function ($ignore, $day) use ($after) {
+            ->first(function ($day, $ignore) use ($after) {
                 return $after < $day->start();
             });
     }
