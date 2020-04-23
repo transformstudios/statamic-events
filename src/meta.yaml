@@ -1,7 +1,0 @@
-name: Events
-version: "1.4"
-developer: "Transform Studios"
-description: "Allows you to create a calendar of events or list the next few upcoming events"
-url: https://statamic.com/marketplace/addons/events
-developer_url: https://transformstudios.coma
-commercial: true
