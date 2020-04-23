@@ -65,9 +65,8 @@ class Events
                 return $event;
             });
         })->filter()
-            ->sortBy(function ($event, $ignore) {
-                return Carbon::parse($event->start_date)->setTimeFromTimeString($event->startTime());
-            })->values();
+        ->sortBy(fn ($event, $ignore) =>$event->start())
+        ->values();
     }
 
     public function count()
