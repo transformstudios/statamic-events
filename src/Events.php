@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Addons\Events;
+namespace TransformStudios\Events;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Statamic\Addons\Events\Types\Event;
+use TransformStudios\Events\Types\Event;
 
 class Events
 {
