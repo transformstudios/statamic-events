@@ -32,12 +32,12 @@
         }
     },
     "require": {
+        "php": "^7.4",
         "spatie/calendar-links": "1.*",
         "statamic/cms": "3.0.*@beta"
     },
     "require-dev": {
         "orchestra/testbench": "^4.0",
-        "phpunit/phpunit": "^8.5",
         "spatie/test-time": "^1.2"
     },
     "minimum-stability": "dev",
