@@ -1,5 +1,7 @@
 <?php
 
+namespace TransformStudios\Events\Tests;
+
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;

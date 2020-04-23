@@ -1,5 +1,7 @@
 <?php
 
+namespace TransformStudios\Events\Tests;
+
 use Carbon\Carbon;
 use Statamic\Testing\TestCase;
 use Statamic\Addons\Events\Events;
@@ -293,8 +295,8 @@ class RecurringDailyEventsTest extends TestCase
             'recurrence' => 'daily',
             'except' => [
                 ['date' => Carbon::now()->addDays(2)->toDateString()],
-                ['date' => Carbon::now()->addDays(4)->toDateString()]
-            ]
+                ['date' => Carbon::now()->addDays(4)->toDateString()],
+            ],
         ]));
 
         $from = Carbon::now()->subDays(1);
