@@ -4,8 +4,8 @@ namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
 use Statamic\Support\Arr;
+use TransformStudios\Events\Day;
 use Illuminate\Support\Collection;
-use TransformStudios\Events\Schedule;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Event implements Arrayable
@@ -13,7 +13,7 @@ abstract class Event implements Arrayable
     /** @var array */
     protected $data;
 
-    abstract public function upcomingDate($after = null): ?Schedule;
+    abstract public function upcomingDate($after = null): ?Day;
 
     abstract public function upcomingDates($limit = 2, $offset = 0): Collection;
 

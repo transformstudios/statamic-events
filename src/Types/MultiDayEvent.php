@@ -3,9 +3,9 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
-use Statamic\API\Arr;
+use Statamic\Support\Arr;
+use TransformStudios\Events\Day;
 use Illuminate\Support\Collection;
-use Statamic\Addons\Events\Schedule;
 
 class MultiDayEvent extends Event
 {
@@ -20,7 +20,7 @@ class MultiDayEvent extends Event
 
         $this->days = collect(Arr::get($data, 'days', []))
             ->map(function ($day, $ignore) use ($isAllDay) {
-                return new Schedule($day, $isAllDay);
+                return new Day($day, $isAllDay);
             });
     }
 
@@ -39,12 +39,12 @@ class MultiDayEvent extends Event
         return $this->lastDay()->end();
     }
 
-    public function firstDay(): Schedule
+    public function firstDay(): Day
     {
         return $this->days()->first();
     }
 
-    public function lastDay(): Schedule
+    public function lastDay(): Day
     {
         return $this->days()->last();
     }
@@ -52,7 +52,7 @@ class MultiDayEvent extends Event
     /**
      * @param null|Carbon $after
      */
-    public function upcomingDate($after = null): ?Schedule
+    public function upcomingDate($after = null): ?Day
     {
         if (is_null($after)) {
             $after = Carbon::now();
@@ -86,7 +86,7 @@ class MultiDayEvent extends Event
 
         $dates = collect();
 
-        $day = Schedule::now();
+        $day = Day::now();
 
         if ($this->asSingleDay) {
             return collect([$this->upcomingDate(Carbon::now())]);

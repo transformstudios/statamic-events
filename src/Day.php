@@ -5,7 +5,7 @@ namespace TransformStudios\Events;
 use Carbon\Carbon;
 use Statamic\Support\Arr;
 
-class Schedule
+class Day
 {
     private $date;
 
@@ -25,8 +25,8 @@ class Schedule
             $this->startTime = $date->startOfDay()->format('G:i');
             $this->endTime = $date->endOfDay()->format('G:i');
         } else {
-            $this->startTime = Arr::get($data, 'start_time', Carbon::parse($this->date)->startOfDay()->toTimeString());
-            $this->endTime = Arr::get($data, 'end_time', Carbon::parse($this->date)->endOfDay()->toTimeString());
+            $this->startTime = Arr::get($data, 'start_time', Carbon::parse($this->date)->startOfDay()->format('G:i'));
+            $this->endTime = Arr::get($data, 'end_time', Carbon::parse($this->date)->endOfDay()->format('G:i'));
         }
     }
 
@@ -80,8 +80,8 @@ class Schedule
         return new self(
             [
             'date' => $date->toDateString(),
-            'start_time' => $date->toTimeString(),
-            'end_time' => $date->endOfDay()->toTimeString(),
+            'start_time' => $date->format('G:i'),
+            'end_time' => $date->endOfDay()->format('G:i'),
             ]
         );
     }

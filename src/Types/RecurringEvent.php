@@ -5,8 +5,8 @@ namespace TransformStudios\Events\Types;
 use Carbon\Carbon;
 use Statamic\API\Str;
 use Statamic\Support\Arr;
+use Statamic\Addons\Events\Day;
 use Illuminate\Support\Collection;
-use Statamic\Addons\Events\Schedule;
 
 class RecurringEvent extends Event
 {
@@ -57,7 +57,7 @@ class RecurringEvent extends Event
     /**
      * @param null|Carbon $after
      */
-    public function upcomingDate($after = null): ?Schedule
+    public function upcomingDate($after = null): ?Day
     {
         if (is_null($after)) {
             $after = Carbon::now();
@@ -66,7 +66,7 @@ class RecurringEvent extends Event
         $start = $this->start();
 
         if ($after < $start->copy()->setTimeFromTimeString($this->endTime())) {
-            return new Schedule(
+            return new Day(
                 [
                     'date' => $start->toDateString(),
                     'start_time' => $this->startTime(),
@@ -88,7 +88,7 @@ class RecurringEvent extends Event
             return $this->upcomingDate($this->addInterval($nextDate));
         }
 
-        return new Schedule(
+        return new Day(
             [
                 'date' => $nextDate->toDateString(),
                 'start_time' => $this->startTime(),

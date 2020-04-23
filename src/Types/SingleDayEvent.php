@@ -3,15 +3,15 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
+use TransformStudios\Events\Day;
 use Illuminate\Support\Collection;
-use TransformStudios\Events\Schedule;
 
 class SingleDayEvent extends Event
 {
     /**
      * @param string|Carbon $after
      */
-    public function upcomingDate($after = null): ?Schedule
+    public function upcomingDate($after = null): ?Day
     {
         if (is_null($after)) {
             $after = Carbon::now();
@@ -21,7 +21,7 @@ class SingleDayEvent extends Event
             return null;
         }
 
-        return new Schedule([
+        return new Day([
             'date' => $this->start_date,
             'start_time' => $this->startTime(),
             'end_time' => $this->endTime(),
@@ -42,7 +42,7 @@ class SingleDayEvent extends Event
         $start = $this->start();
 
         if ($start->between(Carbon::parse($from), Carbon::parse($to))) {
-            $day = new Schedule([
+            $day = new Day([
                 'date' => $this->start_date,
                 'start_time' => $this->startTime(),
                 'end_time' => $this->endTime(),
