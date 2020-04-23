@@ -1,7 +1,8 @@
 <?php
 
+namespace TransformStudios\Events\Tests;
+
 use Carbon\Carbon;
-use Tests\TestCase;
 use TransformStudios\Events\Events;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Types\MultiDayEvent;
@@ -14,7 +15,7 @@ class MultiDayEventsTest extends TestCase
     /** @var MultiDayEvent */
     private $allDayEvent;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -78,7 +79,7 @@ class MultiDayEventsTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
