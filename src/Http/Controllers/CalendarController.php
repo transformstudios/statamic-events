@@ -1,18 +1,16 @@
 <?php
 
-namespace Statamic\Addons\Events;
+namespace TransformStudios\Events\Http\Controllers;
 
 use Carbon\Carbon;
 use Statamic\API\Entry;
 use Illuminate\Http\Request;
-use Statamic\Extend\Controller;
+use Statamic\Http\Controllers\Controller;
 
-class EventsController extends Controller
+class CalendarController extends Controller
 {
     public function __construct()
     {
-        parent::__construct();
-
         Carbon::setWeekStartsAt(Carbon::SUNDAY);
         Carbon::setWeekEndsAt(Carbon::SATURDAY);
     }
@@ -25,7 +23,7 @@ class EventsController extends Controller
     }
 
     /**
-     * Get the next function
+     * Get the next function.
      *
      * @return array
      */
