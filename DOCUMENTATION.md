@@ -9,7 +9,7 @@ Table Of Contents:
 
 ## Fieldset
 
-See [here](/event.yaml). You can add this to your collection fieldsets via the `partial` fieldtype.
+See [here](https://github.com/transformstudios/statamic-events/blob/master/event.yaml). You can add this to your collection fieldsets via the `partial` fieldtype.
 
 ## Settings
 
@@ -22,7 +22,7 @@ events_collection: events
 
 ## Templating
 
-Please see the example [calendar](/calendar.html) for how to create a monthly calendar using the `{{ events:calendar }}` tag.
+Please see the example [calendar](https://github.com/transformstudios/statamic-events/blob/master/calendar.html) for how to create a monthly calendar using the `{{ events:calendar }}` tag.
 
 ## Fields
 
@@ -89,7 +89,7 @@ Parameters:
 {{ /events:calendar }}
 ```
 
-Full example [here](calendar.html).
+Full example [here](https://github.com/transformstudios/statamic-events/blob/master/calendar.html).
 
 #### API
 
