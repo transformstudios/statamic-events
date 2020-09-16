@@ -3,15 +3,14 @@
 namespace Statamic\Addons\Events;
 
 use Carbon\Carbon;
-use Statamic\API\Arr;
-use Statamic\API\URL;
-use Statamic\API\Request;
-use Spatie\CalendarLinks\Link;
-use Illuminate\Support\Collection;
-use Statamic\Addons\Events\EventFactory;
-use Statamic\Presenters\PaginationPresenter;
-use Statamic\Addons\Collection\CollectionTags;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Spatie\CalendarLinks\Link;
+use Statamic\Addons\Collection\CollectionTags;
+use Statamic\API\Arr;
+use Statamic\API\Request;
+use Statamic\API\URL;
+use Statamic\Presenters\PaginationPresenter;
 
 class EventsTags extends CollectionTags
 {
@@ -99,7 +98,7 @@ class EventsTags extends CollectionTags
 
     public function nowOrParam()
     {
-        $monthYear = request('month', Carbon::now()->englishMonth) . ' ' . request('year', Carbon::now()->year);
+        $monthYear = request('month', Carbon::now()->englishMonth).' '.request('year', Carbon::now()->year);
 
         $month = carbon($monthYear);
 
@@ -140,7 +139,7 @@ class EventsTags extends CollectionTags
             'prev_page'      => $paginator->previousPageUrl(),
             'next_page'      => $paginator->nextPageUrl(),
             'auto_links'     => $paginator->render(),
-            'links'          => $paginator->render(new PaginationPresenter($paginator))
+            'links'          => $paginator->render(new PaginationPresenter($paginator)),
         ];
 
         $this->dates = $events->slice(0, $this->limit);
@@ -179,7 +178,20 @@ class EventsTags extends CollectionTags
     {
         $this->parameters['show_future'] = true;
 
+        // Need to "remove" the limit, otherwise the `collect` below will limit the entries.
+        // We need to get all the entries, then make the events AND THEN limit.
+        // Didn't use a new parameter because that would break all existing instances and
+        // would be a much larger code change.
+        // @TODO refactor when move to v3
+        if ($limit = $this->getInt('limit')) {
+            unset($this->parameters['limit']);
+        }
+
         $this->collect($this->get('collection'));
+
+        if ($limit) {
+            $this->limit = $this->parameters['limit'] = $limit;
+        }
 
         $this->collection->each(
             function ($event) use ($collapseMultiDays) {
@@ -215,7 +227,7 @@ class EventsTags extends CollectionTags
     }
 
     /**
-     * Get any meta data that should be available in templates
+     * Get any meta data that should be available in templates.
      *
      * @return array
      */
