@@ -14,9 +14,4 @@ class ServiceProvider extends AddonServiceProvider
     protected $tags = [
         Events::class,
     ];
-
-    public function boot()
-    {
-        parent::boot();
-    }
 }
