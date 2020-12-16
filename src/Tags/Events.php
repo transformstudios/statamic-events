@@ -24,7 +24,7 @@ class Events extends Tags
     public function __construct()
     {
         $this->dates = collect();
-        $this->events = new self();
+        $this->events = new EventsActions;
 
         Carbon::setWeekStartsAt(Carbon::SUNDAY);
         Carbon::setWeekEndsAt(Carbon::SATURDAY);
@@ -50,7 +50,7 @@ class Events extends Tags
     {
         $calendar = new Calendar($this->params->get('collection', config('events.events_collection')));
 
-        return $calendar->month($this->params->get('month'), $this->params->get('year'));
+        return array_values($calendar->month($this->params->get('month'), $this->params->get('year')));
     }
 
     public function in(): array
