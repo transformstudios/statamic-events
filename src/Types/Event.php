@@ -3,10 +3,11 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Collection;
+use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use TransformStudios\Events\Day;
-use Illuminate\Support\Collection;
-use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Event implements Arrayable
 {
@@ -26,12 +27,12 @@ abstract class Event implements Arrayable
 
     public function get($name, $default = null)
     {
-        return Arr::get($this->data, $name, $default);
+        return $this->raw($this->data, $name, $default);
     }
 
     public function __get($name)
     {
-        return Arr::get($this->data, $name);
+        return $this->get($name);
     }
 
     public function __set($name, $value)
@@ -41,7 +42,7 @@ abstract class Event implements Arrayable
 
     public function isAllDay(): bool
     {
-        return Arr::get($this->data, 'all_day', false);
+        return $this->raw($this->data, 'all_day', false);
     }
 
     public function isMultiDay(): bool
@@ -61,7 +62,7 @@ abstract class Event implements Arrayable
             return $time;
         }
 
-        return Arr::get($this->data, 'start_time', $time);
+        return $this->raw($this->data, 'start_time', $time);
     }
 
     public function endTime(): string
@@ -71,12 +72,12 @@ abstract class Event implements Arrayable
             return $time;
         }
 
-        return Arr::get($this->data, 'end_time', $time);
+        return $this->raw($this->data, 'end_time', $time);
     }
 
     public function start(): Carbon
     {
-        return Carbon::parse(Arr::get($this->data, 'start_date'))->setTimeFromTimeString($this->startTime());
+        return Carbon::parse($this->raw($this->data, 'start_date'))->setTimeFromTimeString($this->startTime());
     }
 
     public function end(): ?Carbon
@@ -87,5 +88,16 @@ abstract class Event implements Arrayable
     public function toArray(): array
     {
         return $this->data;
+    }
+
+    protected function raw($data, $key, $default = null)
+    {
+        $value = Arr::get($data, $key, $default);
+
+        if ($value instanceof Value) {
+            return $value->raw();
+        }
+
+        return $value;
     }
 }

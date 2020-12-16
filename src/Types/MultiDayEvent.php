@@ -4,7 +4,6 @@ namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Statamic\Support\Arr;
 use TransformStudios\Events\Day;
 
 class MultiDayEvent extends Event
@@ -18,7 +17,7 @@ class MultiDayEvent extends Event
 
         $isAllDay = $this->isAllDay();
 
-        $this->days = collect(Arr::get($data, 'days', []))
+        $this->days = collect($this->raw($data, 'days', []))
             ->map(function ($day, $ignore) use ($isAllDay) {
                 return new Day($day, $isAllDay);
             });

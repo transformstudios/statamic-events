@@ -3,10 +3,9 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
-use Statamic\Support\Arr;
+use Illuminate\Support\Collection;
 use Statamic\Support\Str;
 use TransformStudios\Events\Day;
-use Illuminate\Support\Collection;
 
 class RecurringEvent extends Event
 {
@@ -19,7 +18,7 @@ class RecurringEvent extends Event
         ];
 
         // if type is daily/weekly/monthly, set the period and interval appropriately
-        if (array_key_exists($data['recurrence'], $periodMap)) {
+        if (array_key_exists($this->raw($data, 'recurrence'), $periodMap)) {
             $data['period'] = $periodMap[$data['recurrence']];
             $data['interval'] = 1;
         }
@@ -34,7 +33,7 @@ class RecurringEvent extends Event
 
     public function endDate(): ?Carbon
     {
-        if ($date = Arr::get($this->data, 'end_date')) {
+        if ($date = $this->raw($this->data, 'end_date')) {
             return Carbon::parse($date);
         }
 

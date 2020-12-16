@@ -3,8 +3,8 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
-use TransformStudios\Events\Day;
 use Illuminate\Support\Collection;
+use TransformStudios\Events\Day;
 
 class SingleDayEvent extends Event
 {
