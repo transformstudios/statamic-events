@@ -1,12 +1,12 @@
 <?php
 
-namespace Statamic\Addons\Events\Modifiers;
+namespace TransformStudios\Events\Modifiers;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
+use Statamic\Modifiers\Modifier;
 use Statamic\Support\Arr;
-use Statamic\Extend\Modifier;
 
-class InMonthModifier extends Modifier
+class InMonth extends Modifier
 {
     public function index($value, $params, $context)
     {
