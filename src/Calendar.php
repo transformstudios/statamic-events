@@ -18,7 +18,7 @@ class Calendar
             ->queryEntries()
             ->where('published', true)
             ->get()
-            ->each(fn ($event) => $this->events->add(EventFactory::createFromArray($event->toArray())));
+            ->each(fn ($event) => $this->events->add(EventFactory::createFromArray($event->toAugmentedArray())));
     }
 
     /**
