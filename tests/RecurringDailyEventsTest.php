@@ -3,8 +3,8 @@
 namespace TransformStudios\Events\Tests;
 
 use Carbon\Carbon;
-use TransformStudios\Events\Events;
 use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Events;
 use TransformStudios\Events\Types\RecurringEvent;
 
 class RecurringDailyEventsTest extends TestCase

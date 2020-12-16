@@ -1,10 +1,11 @@
 <?php
 
+namespace TransformStudios\Events\Tests;
+
 use Carbon\Carbon;
-use Tests\TestCase;
-use Statamic\Addons\Events\Events;
-use Statamic\Addons\Events\EventFactory;
-use Statamic\Addons\Events\Types\MultiDayEvent;
+use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Events;
+use TransformStudios\Events\Types\MultiDayEvent;
 
 class EventsTest extends TestCase
 {
@@ -14,7 +15,7 @@ class EventsTest extends TestCase
     /** @var MultiDayEvent */
     private $allDayEvent;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -62,7 +63,7 @@ class EventsTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -169,6 +170,7 @@ class EventsTest extends TestCase
         Carbon::setTestNow(Carbon::parse('2019-11-19'));
 
         $nextDates = $this->event->upcomingDates(2, 1);
+
         $this->assertCount(2, $nextDates);
 
         $this->assertEquals(Carbon::parse('2019-11-24 11:00'), $nextDates[0]->start());

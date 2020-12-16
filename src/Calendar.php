@@ -1,9 +1,9 @@
 <?php
 
-namespace Statamic\Addons\Events;
+namespace TransformStudios\Events;
 
 use Carbon\Carbon;
-use Statamic\API\Entry as EntryAPI;
+use Statamic\Facades\Collection;
 
 class Calendar
 {
@@ -14,11 +14,11 @@ class Calendar
     {
         $this->events = new Events;
 
-        EntryAPI::whereCollection($handle)
-            ->removeUnpublished()
-            ->each(function ($event) {
-                return $this->events->add(EventFactory::createFromArray($event->toArray()));
-            });
+        Collection::find($handle)
+            ->queryEntries()
+            ->where('published', true)
+            ->get()
+            ->each(fn ($event) => $this->events->add(EventFactory::createFromArray($event->toArray())));
     }
 
     /**

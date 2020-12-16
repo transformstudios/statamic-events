@@ -3,9 +3,9 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Statamic\Support\Arr;
 use TransformStudios\Events\Day;
-use Illuminate\Support\Collection;
 
 class MultiDayEvent extends Event
 {
@@ -96,7 +96,7 @@ class MultiDayEvent extends Event
             $dates->push($day);
         }
 
-        return $dates->slice($offset, $limit);
+        return $dates->slice($offset, $limit)->values();
     }
 
     public function datesBetween($from, $to): Collection

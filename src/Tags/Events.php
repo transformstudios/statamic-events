@@ -3,14 +3,14 @@
 namespace TransformStudios\Events\Tags;
 
 use Carbon\Carbon;
-use Statamic\Tags\Tags;
-use Statamic\Support\Arr;
-use Spatie\CalendarLinks\Link;
-use Illuminate\Support\Collection;
-use Statamic\Facades\Endpoint\URL;
-use Statamic\Addons\Events\Calendar;
-use TransformStudios\Events\EventFactory;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
+use Spatie\CalendarLinks\Link;
+use Statamic\Facades\Endpoint\URL;
+use Statamic\Support\Arr;
+use Statamic\Tags\Tags;
+use TransformStudios\Events\Calendar;
+use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events as EventsActions;
 
 class Events extends Tags

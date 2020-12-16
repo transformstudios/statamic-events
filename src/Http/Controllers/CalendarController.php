@@ -3,8 +3,9 @@
 namespace TransformStudios\Events\Http\Controllers;
 
 use Carbon\Carbon;
-use Statamic\API\Entry;
 use Illuminate\Http\Request;
+use Statamic\Addons\Events\Calendar;
+use Statamic\API\Entry;
 use Statamic\Http\Controllers\Controller;
 
 class CalendarController extends Controller
