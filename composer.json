@@ -32,15 +32,15 @@
         }
     },
     "require": {
-        "php": "^7.4",
+        "php": "^7.4 || ^8.0",
+        "laravel/framework": "^7.0 || ^8.0",
         "spatie/calendar-links": "1.*",
-        "statamic/cms": "3.0.*@beta"
+        "statamic/cms": "3.0.*"
     },
     "require-dev": {
-        "orchestra/testbench": "^4.0",
+        "orchestra/testbench": "^5.0",
         "spatie/test-time": "^1.2"
     },
-    "minimum-stability": "dev",
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
