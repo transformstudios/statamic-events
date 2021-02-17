@@ -53,7 +53,7 @@ class Events
 
     public function all($from, $to)
     {
-        return $this->events->flatMap(function ($event, $ignore) use ($from, $to) {
+        return $this->events->flatMap(function (Event $event, $ignore) use ($from, $to) {
             $days = $event->datesBetween($from, $to);
 
             return $days->map(function ($day, $ignore) use ($event) {

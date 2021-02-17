@@ -161,7 +161,7 @@ class RecurringEvent extends Event
         // to check a few things
         // @todo dis be some ugly code, refactor
         if ($this->interval == 1) {
-            // we're in a subsuquent week but after (day-wise) the start, so go to
+            // we're in a subsequent week but after (day-wise) the start, so go to
             // the next period
             if ($this->period == 'weeks' && $after->dayOfWeek > $start->dayOfWeek) {
                 $periods++;
