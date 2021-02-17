@@ -97,7 +97,7 @@ class Events extends Tags
 
         $month = Carbon::parse($monthYear);
 
-        if ($modify = $this->getParam('modify')) {
+        if ($modify = $this->params->get('modify')) {
             $month->modify($modify);
         }
 
