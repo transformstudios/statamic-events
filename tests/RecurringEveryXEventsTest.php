@@ -3,8 +3,8 @@
 namespace TransformStudios\Events\Tests;
 
 use Carbon\Carbon;
-use TransformStudios\Events\Events;
 use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Events;
 use TransformStudios\Events\Types\RecurringEvent;
 
 class RecurringEveryXEventsTest extends TestCase
@@ -366,5 +366,42 @@ class RecurringEveryXEventsTest extends TestCase
         $events = $this->events->all($from, $to);
 
         $this->assertCount(6, $events);
+    }
+
+    public function test_can_generate_next_x_weeks_if_in_different_weeks()
+    {
+        $event = EventFactory::createFromArray(
+            [
+                'start_date' => '2020-01-03',
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'every',
+                'interval' => 2,
+                'period' => 'weeks',
+            ]
+        );
+
+        $day = $event->upcomingDate(Carbon::parse('2021-01-31'));
+
+        $this->assertNotNull($day);
+        $this->assertEquals('2021-02-12', $day->startDate());
+    }
+
+    public function test_returns_null_when_dates_between_dont_have_event()
+    {
+        $event = EventFactory::createFromArray(
+            [
+                'start_date' => '2021-01-29',
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'every',
+                'interval' => 2,
+                'period' => 'weeks',
+            ]
+        );
+
+        $dates = $event->datesBetween('2021-02-18', '2021-02-19');
+
+        $this->assertEmpty($dates);
     }
 }
