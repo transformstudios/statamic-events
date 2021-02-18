@@ -43,10 +43,10 @@ class Events
                     });
             }
         )->filter()
-            ->sortBy(function ($event, $ignore) {
-                return Carbon::parse($event->start_date)->setTimeFromTimeString($event->startTime());
-            })->values()
-            ->splice($offset, $limit);
+        ->sortBy(function ($event, $ignore) {
+            return Carbon::parse($event->start_date)->setTimeFromTimeString($event->startTime());
+        })->values()
+        ->splice($offset, $limit);
 
         return $limit === 1 ? $events->first() : $events;
     }
