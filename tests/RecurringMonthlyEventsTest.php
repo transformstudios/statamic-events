@@ -66,9 +66,11 @@ class RecurringMonthlyEventsTest extends TestCase
             $nextDate->start()
         );
 
-        $nextDate = $event->upcomingDate($startDate->copy()->addYears(1)->addMonths(1)->addDays(5));
+        $after = $startDate->copy()->addYears(1)->addMonths(1)->addDays(5);
+
+        $nextDate = $event->upcomingDate($after);
         $this->assertEquals(
-            $startDate->copy()->addYears(1)->addMonths(1),
+            $startDate->copy()->addYears(1)->addMonths(2),
             $nextDate->start()
         );
     }
