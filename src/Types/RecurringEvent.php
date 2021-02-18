@@ -80,7 +80,9 @@ class RecurringEvent extends Event
             return null;
         }
 
-        $nextDate = $this->next($after);
+        if (! $nextDate = $this->next($after)) {
+            return null;
+        }
 
         if ($this->excludedDate($nextDate)) {
             // add the period*interval to get to the next one
@@ -146,9 +148,10 @@ class RecurringEvent extends Event
     }
 
     // this is guaranteed to be AFTER the start
-    private function next(Carbon $after): Carbon
+    private function next(Carbon $after): ?Carbon
     {
         $start = $this->start()->startOfDay();
+
         $diff = $after->{$this->periodMethod('diffIn')}($start);
 
         $periods = intdiv($diff, $this->interval);
@@ -157,7 +160,7 @@ class RecurringEvent extends Event
             $periods++;
         }
 
-        // if the interval is one the above `mod` doesn't work right and we need
+        // if the interval is one, the above `mod` doesn't work right and we need
         // to check a few things
         // @todo dis be some ugly code, refactor
         if ($this->interval == 1) {
@@ -169,14 +172,24 @@ class RecurringEvent extends Event
 
             // we're in a subsequent month but we're after (date-wise) the start so
             // go to the next period
-            if ($this->period == 'months' && $after->year == $start->year && $after->day > $start->day) {
+            if ($this->period == 'months' && $after->year >= $start->year && $after->day > $start->day) {
                 $periods++;
             }
         }
 
-        $increment = ($periods ?: 1) * $this->interval;
+        $start->{$this->periodMethod('add')}(($periods ?: 1) * $this->interval);
 
-        return $start->{$this->periodMethod('add')}($increment);
+        // if the generated date is in the same Carbon week (defaults to monday) as the after date,
+        // but had an earlier day of week, we're one 'period' too soon, add one more.
+        if ($start->weekOfYear == $after->weekOfYear && $start->dayOfYear < $after->dayOfYear) {
+            $start->{$this->periodMethod('add')}($this->interval);
+        }
+
+        if ($start < $after->startOfDay()) {
+            return null;
+        }
+
+        return $start;
     }
 
     private function addInterval(Carbon $date)
