@@ -8,12 +8,12 @@ use Illuminate\Support\Collection;
 use Spatie\CalendarLinks\Link;
 use Statamic\Facades\Endpoint\URL;
 use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
+use Statamic\Tags\Collection\Collection as CollectionTag;
 use TransformStudios\Events\Calendar;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events as EventsActions;
 
-class Events extends Tags
+class Events extends CollectionTag
 {
     private EventsActions $events;
 
@@ -43,7 +43,7 @@ class Events extends Tags
             $this->dates = $this->events->upcoming($this->limit, $this->offset);
         }
 
-        return $this->output();
+        return $this->outputData();
     }
 
     public function calendar(): array
@@ -62,10 +62,10 @@ class Events extends Tags
 
         $this->loadDates($from, $to);
 
-        return array_merge(
+        return array_values(array_merge(
             $this->makeEmptyDates($from, $to),
             $this->dates->toArray()
-        );
+        ));
     }
 
     public function downloadLink(): string
@@ -140,7 +140,7 @@ class Events extends Tags
         $this->dates = $events->slice(0, $this->limit);
     }
 
-    protected function output(): array
+    protected function outputData(): array
     {
         $data = array_merge(
             $this->getEventsMetaData(),
@@ -167,16 +167,17 @@ class Events extends Tags
 
     private function loadEvents(bool $collapseMultiDays = false)
     {
-        $this->parameters['show_future'] = true;
+        $this->params->put('show_future', true);
+        if (! $this->params->has('collection')) {
+            $this->params->put('from', 'events');
+        }
 
-        $this->collect($this->get('collection'));
-
-        $this->collection->each(
+        parent::index()->each(
             function ($event) use ($collapseMultiDays) {
                 $this->events->add(
                     EventFactory::createFromArray(
                         array_merge(
-                            $event->toArray(),
+                            $event->toAugmentedArray(),
                             [
                                 'asSingleDay' => $collapseMultiDays,
                             ]
