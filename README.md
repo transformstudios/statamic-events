@@ -19,4 +19,4 @@ Future ideas:
 
 ## Documentation
 
-We've written [some documentation](https://statamic.com/addons/transform/DOCUMENTATION.md) to help you out when using this boilerplate.
+We've written [some documentation](https://statamic.com/addons/transform/events/docs) to help you out when using this boilerplate.
