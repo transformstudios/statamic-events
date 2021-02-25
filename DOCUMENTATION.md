@@ -160,6 +160,12 @@ dates:
   -
   ...
 ```
+### Today
+
+Tag pair that returns events today, 1 required param, `collection`
+* `collection` - which collection has the events
+
+Data and templating like the `events:in` tag
 
 ### Upcoming Events
 
