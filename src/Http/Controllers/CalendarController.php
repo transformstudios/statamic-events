@@ -4,9 +4,10 @@ namespace TransformStudios\Events\Http\Controllers;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Statamic\Addons\Events\Calendar;
-use Statamic\API\Entry;
+use Statamic\Facades\Entry;
 use Statamic\Http\Controllers\Controller;
+use TransformStudios\Events\Calendar;
+use TransformStudios\Events\Events;
 
 class CalendarController extends Controller
 {
@@ -38,9 +39,7 @@ class CalendarController extends Controller
 
         $events = new Events();
 
-        Entry::whereCollection($request->input('collection'))->each(function ($event) use ($events) {
-            $events->add($event->toArray());
-        });
+        Entry::whereCollection($request->input('collection'))->each(fn ($event) => $events->add($event->toArray()));
 
         return $events
                 ->upcoming(
