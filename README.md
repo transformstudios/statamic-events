@@ -1,5 +1,5 @@
 ![Statamic 3.0+](https://img.shields.io/badge/Statamic-3.0+-FF269E?style=for-the-badge&link=https://statamic.com)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/doublethreedigital/addon-boilerplate.svg?style=flat-square)](https://packagist.org/packages/doublethreedigital/addon-boilerplate)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/doublethreedigital/addon-boilerplate.svg?style=flat-square)](https://packagist.org/packages/transformstudios/events)
 
 Events is a Statamic v3 addon/tag that allows you to create a calendar of events or list the next few upcoming events.
 
