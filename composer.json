@@ -1,6 +1,7 @@
 {
     "name": "transformstudios/events",
     "type": "statamic-addon",
+    "license": "proprietary"
     "description": "Statamic addon to create & manage events",
     "authors": [
         {
@@ -35,10 +36,13 @@
         "php": "^7.4 || ^8.0",
         "laravel/framework": "^7.30.3 || ^8.22.1",
         "spatie/calendar-links": "1.*",
-        "statamic/cms": "3.0.*"
+        "statamic/cms": "^3.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^5.0",
+        "mockery/mockery": "^1.3.1",
+        "nunomaduro/collision": "^4.1 || ^5.0",
+        "phpunit/phpunit": "^8.0 || ^9.0",
+        "orchestra/testbench": "^5.0 || ^6.0",
         "spatie/test-time": "^1.2"
     },
     "config": {
