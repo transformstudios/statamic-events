@@ -1,7 +1,7 @@
 {
     "name": "transformstudios/events",
     "type": "statamic-addon",
-    "license": "proprietary"
+    "license": "proprietary",
     "description": "Statamic addon to create & manage events",
     "authors": [
         {
