@@ -30,42 +30,11 @@ class Events extends CollectionTag
         Carbon::setWeekEndsAt(Carbon::SATURDAY);
     }
 
-    public function upcoming(): array
-    {
-        $this->limit = $this->params->int('limit', 1);
-        $this->offset = $this->params->int('offset', 0);
-
-        $this->loadEvents($this->params->bool('collapse_multi_days', false));
-
-        if ($this->params->bool('paginate')) {
-            $this->paginate();
-        } else {
-            $this->dates = $this->events->upcoming($this->limit, $this->offset);
-        }
-
-        return $this->outputData();
-    }
-
     public function calendar(): array
     {
         $calendar = new Calendar($this->params->get('collection', config('events.events_collection')));
 
         return array_values($calendar->month($this->params->get('month'), $this->params->get('year')));
-    }
-
-    public function in(): array
-    {
-        $this->loadEvents($this->params->bool('collapse_multi_days', false));
-
-        $from = Carbon::now()->startOfDay();
-        $to = Carbon::now()->modify($this->params->get('next'))->endOfDay();
-
-        $this->loadDates($from, $to);
-
-        return array_values(array_merge(
-            $this->makeEmptyDates($from, $to),
-            $this->dates->toArray()
-        ));
     }
 
     public function downloadLink(): string
@@ -91,6 +60,21 @@ class Events extends CollectionTag
         return $link->$type();
     }
 
+    public function in(): array
+    {
+        $this->loadEvents($this->params->bool('collapse_multi_days', false));
+
+        $from = Carbon::now()->startOfDay();
+        $to = Carbon::now()->modify($this->params->get('next'))->endOfDay();
+
+        $this->loadDates($from, $to);
+
+        return array_values(array_merge(
+            $this->makeEmptyDates($from, $to),
+            $this->dates->toArray()
+        ));
+    }
+
     public function nowOrParam(): string
     {
         $monthYear = request('month', Carbon::now()->englishMonth).' '.request('year', Carbon::now()->year);
@@ -102,6 +86,37 @@ class Events extends CollectionTag
         }
 
         return $month->format($this->params->get('format'));
+    }
+
+    public function today(): array
+    {
+        $this->loadEvents($this->params->bool('collapse_multi_days', false));
+
+        $from = Carbon::now()->startOfDay();
+        $to = Carbon::now()->endOfDay();
+
+        $this->loadDates($from, $to);
+
+        return array_values(array_merge(
+            $this->makeEmptyDates($from, $to),
+            $this->dates->toArray()
+        ));
+    }
+
+    public function upcoming(): array
+    {
+        $this->limit = $this->params->int('limit', 1);
+        $this->offset = $this->params->int('offset', 0);
+
+        $this->loadEvents($this->params->bool('collapse_multi_days', false));
+
+        if ($this->params->bool('paginate')) {
+            $this->paginate();
+        } else {
+            $this->dates = $this->events->upcoming($this->limit, $this->offset);
+        }
+
+        return $this->outputData();
     }
 
     protected function paginate(): void
