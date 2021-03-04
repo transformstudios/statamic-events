@@ -170,6 +170,33 @@ class RecurringEveryXEventsTest extends TestCase
         $nextDate = $event->upcomingDate(Carbon::now()->addWeeks(2));
 
         $this->assertEquals($startDate, $nextDate->start());
+
+        $nextDate = $event->upcomingDate(Carbon::now()->addDays(8));
+
+        $this->assertEquals($startDate, $nextDate->start());
+    }
+
+    public function test_can_generate_next_dates_if_after_weeks()
+    {
+        $startDate = Carbon::parse('2021-03-04')->setTimeFromTimeString('11:00:00');
+
+        $event = [
+            'start_date' => '2021-01-18',
+            // 'start_date' => $startDate->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'every',
+            'interval' => 2,
+            'period' => 'weeks',
+        ];
+
+        $event = EventFactory::createFromArray($event);
+
+        $date = $event->upcomingDate($startDate);
+
+        $this->assertNotNull($date);
+
+        $this->assertEquals('2021-03-15', $date->startDate());
     }
 
     public function test_can_generate_next_date_if_after_months()
