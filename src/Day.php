@@ -17,7 +17,8 @@ class Day
 
     public function __construct($data, bool $isAllDay = false)
     {
-        $this->date = Arr::get($data, 'date', Carbon::now()->toDateString());
+        $this->date = Arr::get($data, 'date') ?: Carbon::now()->toDateString();
+
         $this->endDate = Arr::get($data, 'end_date', $this->date);
 
         if ($isAllDay) {

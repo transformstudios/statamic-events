@@ -95,9 +95,9 @@ abstract class Event implements Arrayable
         $value = Arr::get($data, $key, $default);
 
         if ($value instanceof Value) {
-            return $value->raw();
+            return $value->raw() ?: $default;
         }
 
-        return $value;
+        return $value ?: $default;
     }
 }

@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Spatie\CalendarLinks\Link;
-use Statamic\Facades\Endpoint\URL;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Tags\Collection\Collection as CollectionTag;
 use TransformStudios\Events\Calendar;
@@ -15,9 +15,13 @@ use TransformStudios\Events\Events as EventsActions;
 
 class Events extends CollectionTag
 {
+    /**
+     * @var Collection|Event
+     */
+    private $dates;
     private EventsActions $events;
-
-    private Collection $dates;
+    private $limit;
+    private bool $paginated = false;
 
     private $paginationData;
 
@@ -106,6 +110,7 @@ class Events extends CollectionTag
     public function upcoming(): array
     {
         $this->limit = $this->params->int('limit', 1);
+
         $this->offset = $this->params->int('offset', 0);
 
         $this->loadEvents($this->params->bool('collapse_multi_days', false));
@@ -187,7 +192,31 @@ class Events extends CollectionTag
             $this->params->put('from', 'events');
         }
 
-        parent::index()->each(
+        // Need to "remove" the limit & paginate, otherwise the `collect` below will limit & paginate the entries.
+        // We need to get all the entries, then make the events AND THEN limit & paginate.
+        // Didn't use a new parameter because that would break all existing instances and
+        // would be a much larger code change.
+        // @TODO refactor when move to v3
+        $limit = $this->params->pull('limit');
+
+        $paginate = $this->params->pull('paginate', false);
+
+        $events = parent::index();
+
+        if ($limit) {
+            $this->limit = $limit;
+            $this->params->put('limit', $limit);
+        }
+
+        if ($paginate) {
+            $this->params->put('paginate', $paginate);
+        }
+
+        if ($as = $this->params->get('as')) {
+            $events = $events[$as];
+        }
+
+        $events->each(
             function ($event) use ($collapseMultiDays) {
                 $this->events->add(
                     EventFactory::createFromArray(
