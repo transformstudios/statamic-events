@@ -181,10 +181,11 @@ class RecurringEvent extends Event
 
         // if the generated date is in the same Carbon week (defaults to monday) as the after date,
         // but had an earlier day of week, we're one 'period' too soon, add one more.
-        if ($start->weekOfYear == $after->weekOfYear && $start->dayOfYear < $after->dayOfYear) {
+        if (($start->weekOfYear == $after->weekOfYear && $start->dayOfYear < $after->dayOfYear) || ($start->weekOfYear < $after->weekOfYear)) {
             $start->{$this->periodMethod('add')}($this->interval);
         }
 
+        // dd($start->weekOfYear, $after->weekOfYear, $start->dayOfWeek, $after->dayOfWeek);
         if ($start < $after->startOfDay()) {
             return null;
         }
