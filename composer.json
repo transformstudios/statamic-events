@@ -23,8 +23,8 @@
     },
     "extra": {
         "statamic": {
-            "name": "Addon Boilerplate",
-            "description": "A Statamic 3 addon boilerplate, ready for testing."
+            "name": "Events",
+            "description": "Statamic addon to create & manage events"
         },
         "laravel": {
             "providers": [
