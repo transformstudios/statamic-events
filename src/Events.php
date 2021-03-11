@@ -38,6 +38,8 @@ class Events
 
                         $event->end_date = $day->endDate();
                         $event->end_time = $day->endTime();
+                        $event->start = $day->start();
+                        $event->end = $day->end();
 
                         return $event;
                     });
@@ -61,6 +63,8 @@ class Events
                 $event->start_date = $day->start()->toDateString();
                 $event->start_time = $day->startTime();
                 $event->end_time = $day->endTime();
+                $event->start = $day->start();
+                $event->end = $day->end();
 
                 return $event;
             });
