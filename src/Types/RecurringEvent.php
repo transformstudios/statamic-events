@@ -11,6 +11,8 @@ class RecurringEvent extends Event
 {
     public function __construct($data)
     {
+        parent::__construct($data);
+
         $periodMap = [
             'daily' => 'days',
             'weekly' => 'weeks',
@@ -18,8 +20,9 @@ class RecurringEvent extends Event
         ];
 
         // if type is daily/weekly/monthly, set the period and interval appropriately
-        if (array_key_exists($this->raw($data, 'recurrence'), $periodMap)) {
-            $data['period'] = $periodMap[$data['recurrence']];
+        $recurrence = $this->raw($data, 'recurrence');
+        if (array_key_exists($recurrence, $periodMap)) {
+            $data['period'] = $periodMap[$recurrence];
             $data['interval'] = 1;
         }
 
