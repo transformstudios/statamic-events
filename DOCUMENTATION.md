@@ -13,11 +13,13 @@ See [here](https://github.com/transformstudios/statamic-events/blob/master/event
 
 ## Settings
 
-In the addon settings, pick the collection that has your Events.
+Publish the config with `php artisan vendor:publish --tag=event-config`.
 
-Should look like:
-```yaml
-events_collection: events
+Then you can set the collection to use:
+```php
+return [
+    'events_collection' => 'events',
+];
 ```
 
 ## Templating
