@@ -13,7 +13,7 @@ See [here](https://github.com/transformstudios/statamic-events/blob/master/event
 
 ## Settings
 
-Publish the config with `php artisan vendor:publish --tag=event-config`.
+Publish the config with `php artisan vendor:publish --tag=events-config`.
 
 Then you can set the collection to use:
 ```php
