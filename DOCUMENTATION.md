@@ -9,7 +9,9 @@ Table Of Contents:
 
 ## Fieldset
 
-See [here](https://github.com/transformstudios/statamic-events/blob/master/event.yaml). You can add this to your collection fieldsets via the `partial` fieldtype.
+In your collection's blueprint, make sure you have fields like in our sample [fieldset](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml).
+
+You can also use our sample fieldset by publishing it `php artisan vendor:publish --tag=events-fieldsets`, then in your blueprint import the `Events` fieldset.
 
 ## Settings
 
