@@ -39,9 +39,8 @@ class SingleDayEvent extends Event
 
     public function datesBetween($from, $to): Collection
     {
-        $start = $this->start();
-
-        if ($start->between(Carbon::parse($from), Carbon::parse($to))) {
+        if ($this->start()->between(Carbon::parse($from), Carbon::parse($to)) ||
+            $this->end()->between(Carbon::parse($from), Carbon::parse($to))) {
             $day = new Day([
                 'date' => $this->start_date,
                 'start_time' => $this->startTime(),
