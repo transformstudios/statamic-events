@@ -96,7 +96,7 @@ class Events extends CollectionTag
     {
         $this->loadEvents($this->params->bool('collapse_multi_days', false));
 
-        $from = Carbon::now()->startOfDay();
+        $from = $this->params->get('ignore_finished') ? Carbon::now() : Carbon::now()->startOfDay();
         $to = Carbon::now()->endOfDay();
 
         $this->loadDates($from, $to);
