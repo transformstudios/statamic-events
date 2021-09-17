@@ -26,7 +26,7 @@ return [
 
 ## Templating
 
-Please see the example [calendar](https://github.com/transformstudios/statamic-events/blob/master/calendar.html) for how to create a monthly calendar using the `{{ events:calendar }}` tag.
+Please see the example [calendar](https://github.com/transformstudios/statamic-events-v3/blob/master/calendar.html) for how to create a monthly calendar using the `{{ events:calendar }}` tag.
 
 ## Fields
 

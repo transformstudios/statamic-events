@@ -1,7 +1,7 @@
 <section class="full-calendar">
 	<div class="container">
 		<div class="row">
-			<div class="col-12 text-center">
+			<div class="text-center col-12">
 				<p>Tap on a day to see the event(s)</p>
 				<div class="nav">
 					<a href="{{ permalink }}?year={{ events:now_or_param modify="-1 month" format="Y" }}&month={{ events:now_or_param modify="-1 month" format="F" lower="true" }}">&nbsp;{{ events:now_or_param modify="-1 month" format="M" }}</a>
@@ -26,8 +26,8 @@
 				</div>
 				<div class="dates">
 					{{ events:calendar collection="events" :year="get.year" :month="get.month" }}
-						{{ if date | events.is_start_of_week }}<div class="week-row">{{ /if }}
-							<div class="day-cell{{ if date | is_today }} today{{ /if }}{{ if date | is_weekend }} weekend{{ /if }}{{ unless date | events.in_month }} not-month{{ /unless }}">
+						{{ if date | is_start_of_week }}<div class="week-row">{{ /if }}
+							<div class="day-cell{{ if date | is_today }} today{{ /if }}{{ if date | is_weekend }} weekend{{ /if }}{{ unless date | in_month }} not-month{{ /unless }}">
 								<div class="day-number">{{ date format="d" }}</div>
 								{{ unless no_results }}
 								<ul class="events">
@@ -45,7 +45,7 @@
 								</ul>
 								{{ /unless }}
 							</div>
-						{{ if date | events.is_end_of_week }}</div>{{ /if }}
+						{{ if date | is_end_of_week }}</div>{{ /if }}
 					{{ /events:calendar }}
 				</div>
 			</div>
