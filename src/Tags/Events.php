@@ -49,17 +49,16 @@ class Events extends CollectionTag
         $to = $event->end();
 
         if ($event->isRecurring()) {
-            $from->setDateFrom(Carbon::parse($this->getParam('date')));
+            $from->setDateFrom(Carbon::parse($this->params->get('date')));
             $to = $from->copy()->setTimeFromTimeString($event->endTime());
         }
 
         $title = Arr::get($this->context, 'title');
-        $allDay = Arr::get($this->context, 'all_day', false);
         $location = Arr::get($this->context, 'location', '');
 
         $type = $this->params->get('type');
 
-        $link = Link::create($title, $from, $to, $allDay)->address($location);
+        $link = Link::create($title, $from, $to, $event->isAllDay())->address($location);
 
         return $link->$type();
     }
