@@ -252,6 +252,7 @@ paginate:
 Single Tag returns a url to download the event data and add it to your calendar. Tag presumes you are in an events context, i.e. your events entry
 
 Parameters:
+
 * `date` - required if a recurring event
 * `type` - required, supported opions are: `google`, `yahoo`, `webOutlook`, `ics` (for iCloud folks)
 
