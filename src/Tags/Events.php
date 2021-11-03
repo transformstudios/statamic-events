@@ -250,14 +250,8 @@ class Events extends CollectionTag
 
     protected function getEventsMetaData(): array
     {
-        if (! $this->dates) {
-            return [
-                'total_results' => 0,
-            ];
-        }
-
         return [
-            'total_results' => $this->dates->count(),
+            'total_results' => $this->dates ? $this->dates->count() : 0,
         ];
     }
 }
