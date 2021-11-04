@@ -22,7 +22,7 @@ class Events
     }
 
     /**
-     * @return Collection|Event
+     * @return Collection
      */
     public function upcoming(int $limit = 1, int $offset = 0)
     {
@@ -50,7 +50,7 @@ class Events
         })->values()
         ->splice($offset, $limit);
 
-        return $limit === 1 ? $events->first() : $events;
+        return $events;
     }
 
     public function all($from, $to)
