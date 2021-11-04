@@ -19,7 +19,6 @@ fields:
       allow_blank: false
       allow_time: false
       require_time: false
-      earliest_date: 'January 1, 1900'
       input_format: M/D/YYYY
       width: 33
       display: 'Start Date'
@@ -57,7 +56,6 @@ fields:
             allow_time: false
             require_time: false
             input_format: M/D/YYYY
-            earliest_date: 'January 1, 1900'
             width: 33
             display: Date
         -
@@ -73,7 +71,6 @@ fields:
             width: 33
             display: 'End Time'
       display: Days
-      min_rows: 2
       add_row: 'Add Day'
       listable: hidden
       reorderable: true
