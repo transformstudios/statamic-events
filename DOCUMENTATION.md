@@ -254,7 +254,7 @@ Single Tag returns a url to download the event data and add it to your calendar.
 Parameters:
 
 * `date` - required if a recurring event
-* `type` - required, supported opions are: `google`, `yahoo`, `webOutlook`, `ics` (for iCloud folks)
+* `type` - supported options are: `google`, `yahoo`, `webOutlook`, `ics`. Defaults to `ics`
 
 *Example*:
 
