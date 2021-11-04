@@ -56,7 +56,7 @@ class Events extends CollectionTag
         $title = Arr::get($this->context, 'title');
         $location = Arr::get($this->context, 'location', '');
 
-        $type = $this->params->get('type');
+        $type = $this->params->get('type', 'ics');
 
         $link = Link::create($title, $from, $to, $event->isAllDay())->address($location);
 
