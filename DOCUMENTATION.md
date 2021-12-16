@@ -202,6 +202,7 @@ no_results: true
 If there are events, each event has all the entry data **plus**:
 
 * `date` - which is the next time this event happens
+* `has_end_time` - `true` when event has actual end time, instead of the "end of day"
 * `multi_day` - `true` when this is a multi-day event (like Thanksgiving or a conference)
   * when it is a multi-day event, there is also an array of `days` that contains:
     * `start_time`

@@ -14,7 +14,6 @@ Please let us know if you have questions or suggestions.
 
 Future ideas:
 
-* support download of events via iCal
 * support subscribing to an events feed
 
 ## Documentation
