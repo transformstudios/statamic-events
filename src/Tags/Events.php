@@ -5,6 +5,7 @@ namespace TransformStudios\Events\Tags;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Spatie\CalendarLinks\Link;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
@@ -32,6 +33,33 @@ class Events extends CollectionTag
 
         Carbon::setWeekStartsAt(Carbon::SUNDAY);
         Carbon::setWeekEndsAt(Carbon::SATURDAY);
+    }
+
+    public function between()
+    {
+        $from = $this->params->pull('from');
+        $to = $this->params->pull('to');
+
+        $this->loadEvents($this->params->bool('collapse_multi_days', false));
+
+        if (! $from) {
+            Log::error('Missing `from` parameter in `events:between` tag');
+
+            return;
+        }
+
+        if (! $to) {
+            Log::error('Missing `to` parameter in `events:between` tag');
+
+            return;
+        }
+
+        $this->loadDates($from, $to);
+
+        return array_values(array_merge(
+            $this->makeEmptyDates($from, $to),
+            $this->dates->toArray()
+        ));
     }
 
     public function calendar(): array
@@ -234,9 +262,9 @@ class Events extends CollectionTag
     private function makeEmptyDates($from, $to): array
     {
         $dates = [];
-        $currentDay = $from;
+        $currentDay = $from = Carbon::parse($from);
 
-        foreach (range(0, $to->diffInDays($from)) as $ignore) {
+        foreach (range(0, Carbon::parse($to)->diffInDays($from)) as $ignore) {
             $date = $currentDay->toDateString();
             $dates[$date] = [
                 'date' => $date,
