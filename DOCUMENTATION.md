@@ -67,6 +67,52 @@ days:
 
 ## Usage
 
+### Between
+
+Tag pair that returns a range of dates.
+3 required params, `collection`, `from` & `to`.
+* `collection` - which collection has the events
+* `from` - date to start from
+* `to` - date to end at
+
+*Example*:
+
+```
+{{ events:betweeb collection="events" from="Jan 1 2022" to="March 31 2022" }}
+  {{ date }} {{# date of event #}}
+  {{ if no_results }}
+    {{# whatever you need to when for an empty day #}}
+  {{ else }}
+    {{ dates }}
+      ...other entry data...
+      {{ date }}
+    {{ /dates }}
+  {{ /if }}
+{{ /events:between }}
+```
+
+*Data*:
+
+If there are no events on a given day, data returned is:
+
+```
+date: January 1, 2022
+no_results: true
+```
+
+If there are events, each event has all the entry data **plus** `date` which is the next time this event happens:
+
+```
+date: January 1, 2022
+dates:
+  -
+    ...
+    date: January 3, 2022
+    ...
+  -
+  ...
+```
+
 ### Calendar
 
 #### Tag
