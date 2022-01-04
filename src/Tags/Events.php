@@ -54,6 +54,9 @@ class Events extends CollectionTag
             return;
         }
 
+        $from = Carbon::parse($from)->startOfDay();
+        $to = Carbon::parse($to)->endOfDay();
+
         $this->loadDates($from, $to);
 
         return array_values(array_merge(
