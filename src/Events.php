@@ -8,53 +8,45 @@ use TransformStudios\Events\Types\Event;
 
 class Events
 {
-    /** @var Collection */
-    private $events;
+    private Collection $events;
 
     public function __construct()
     {
         $this->events = collect();
     }
 
-    public function add(Event $event)
+    public function add(Event $event): void
     {
         $this->events->push($event);
     }
 
-    /**
-     * @return Collection
-     */
-    public function upcoming(int $limit = 1, int $offset = 0)
+    public function upcoming(int $limit = 1, int $offset = 0): Collection
     {
-        $events = $this->events->flatMap(
-            function ($event, $ignore) use ($limit, $offset) {
-                return $event
-                    ->upcomingDates($limit * ($offset + 1))
-                    ->filter()
-                    ->map(function ($day, $ignore) use ($event) {
-                        $event = clone $event;
-                        $event->has_end_time = $day->hasEndTime();
-                        $event->start_date = $day->startDate();
-                        $event->start_time = $day->startTime();
+        return $this->events->flatMap(
+            fn (Event $event, bool $ignore) => $event
+                ->upcomingDates($limit * ($offset + 1))
+                ->filter()
+                ->map(function (Day $day, bool $ignore) use ($event) {
+                    $event = clone $event;
+                    $event->has_end_time = $day->hasEndTime();
+                    $event->start_date = $day->startDate();
+                    $event->start_time = $day->startTime();
 
-                        $event->end_date = $day->endDate();
-                        $event->end_time = $day->endTime();
-                        $event->start = $day->start();
-                        $event->end = $day->end();
+                    $event->end_date = $day->endDate();
+                    $event->end_time = $day->endTime();
+                    $event->start = $day->start();
+                    $event->end = $day->end();
 
-                        return $event;
-                    });
-            }
-        )->filter()
-        ->sortBy(function ($event, $ignore) {
-            return Carbon::parse($event->start_date)->setTimeFromTimeString($event->startTime());
-        })->values()
+                    return $event;
+                })
+        )
+        ->filter()
+        ->sortBy(fn ($event, $ignore) => Carbon::parse($event->start_date)->setTimeFromTimeString($event->startTime()))
+        ->values()
         ->splice($offset, $limit);
-
-        return $events;
     }
 
-    public function all($from, $to)
+    public function all(Carbon|string $from, Carbon|string $to): Collection
     {
         return $this->events->flatMap(function (Event $event, $ignore) use ($from, $to) {
             $days = $event->datesBetween($from, $to);
@@ -71,11 +63,11 @@ class Events
                 return $event;
             });
         })->filter()
-        ->sortBy(fn ($event, $ignore) =>$event->start())
+        ->sortBy(fn ($event, $ignore) => $event->start())
         ->values();
     }
 
-    public function count()
+    public function count(): int
     {
         return $this->events->count();
     }
