@@ -54,9 +54,23 @@ class Events extends CollectionTag
             return;
         }
 
-        $this->loadDates(Carbon::parse($from)->startOfDay(), Carbon::parse($to)->endOfDay());
+        $from = Carbon::parse($from)->startOfDay();
+        $to = Carbon::parse($to)->endOfDay();
 
-        return $this->dates->toArray();
+        if ($this->params->bool('paginate')) {
+            $this->limit = $this->params->int('limit', 1);
+
+            $this->offset = $this->params->int('offset', 0);
+
+            $this->setOffsetForPagination();
+            $this->paginate($this->events->all($from, $to)->slice($this->offset, $this->limit));
+
+            return $this->outputData();
+        }
+
+        $this->loadDates($from, $to, false);
+
+        return $this->outputData();
     }
 
     public function calendar(): array
