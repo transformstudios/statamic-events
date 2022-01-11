@@ -136,7 +136,8 @@ class Events extends CollectionTag
 
         $this->loadDates(
             $this->params->get('ignore_finished') ? Carbon::now() : Carbon::now()->startOfDay(),
-            Carbon::now()->endOfDay()
+            Carbon::now()->endOfDay(),
+            false
         );
 
         return $this->dates->toArray();
