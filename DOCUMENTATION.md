@@ -78,7 +78,7 @@ Tag pair that returns a range of dates.
 *Example*:
 
 ```
-{{ events:betweeb collection="events" from="Jan 1 2022" to="March 31 2022" }}
+{{ events:between collection="events" from="Jan 1 2022" to="March 31 2022" }}
   {{ date }} {{# date of event #}}
   {{ if no_results }}
     {{# whatever you need to when for an empty day #}}
@@ -111,6 +111,31 @@ dates:
     ...
   -
   ...
+```
+**Pagination**
+
+If you want to paginate the results, add `paginate="true"` to the tag. Then the tag will look for a `page` query parameter and paginate appropriately.
+
+*Example*
+```
+{{ events:between collection="events" from="Jan 1 2022" to="March 31 2022" limit="2" paginate="true" }}
+  {{ dates }}
+    ...other entry data
+    {{ date }}
+  {{ /dates }}
+  {{ pagination }}
+    {{ if prev_page }}<a href="{{ prev_page }}">Previous</a>{{ /if }}
+    {{ if next_page }}<a href="{{ next_page }}">Next</a>{{ /if }}
+  {{ /pagination }}
+{{ /events:between }}
+```
+*Data*
+
+* All the usual data (above), plus:
+```
+paginate:
+  next_page: /events?page=3
+  prev_page: /events?page=1
 ```
 
 ### Calendar
