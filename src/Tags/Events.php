@@ -63,7 +63,7 @@ class Events extends CollectionTag
             $this->offset = $this->params->int('offset', 0);
 
             $this->setOffsetForPagination();
-            $this->paginate($this->events->all($from, $to)->slice($this->offset, $this->limit));
+            $this->paginateBetween($this->events->all($from, $to));
 
             return $this->outputData();
         }
@@ -199,6 +199,38 @@ class Events extends CollectionTag
         ];
 
         $this->dates = $events->slice(0, $this->limit);
+    }
+
+    protected function paginateBetween(Collection $events): void
+    {
+        $this->paginated = true;
+
+        $page = (int) request('page', 1);
+
+        
+        $paginator = new LengthAwarePaginator(
+            items: $events,
+            total: $count = $events->count(),
+            perPage: $this->limit,
+            currentPage: $page
+        );
+
+        $paginator
+            ->setPath(URL::makeAbsolute(URL::getCurrent()))
+            ->appends(request()->all());
+
+        $this->paginationData = [
+            'total_items'    => $count,
+            'items_per_page' => $this->limit,
+            'total_pages'    => $paginator->lastPage(),
+            'current_page'   => $paginator->currentPage(),
+            'prev_page'      => $paginator->previousPageUrl(),
+            'next_page'      => $paginator->nextPageUrl(),
+            'auto_links'     => $paginator->render(),
+            'links'          => $paginator->render(),
+        ];
+
+        $this->dates = $events->slice($this->offset, $this->limit);
     }
 
     protected function outputData(): array
