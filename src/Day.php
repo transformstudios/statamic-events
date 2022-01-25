@@ -26,7 +26,7 @@ class Day
             $this->startTime = $date->startOfDay()->format('G:i');
             $this->endTime = $date->endOfDay()->format('G:i');
         } else {
-            $this->hasEndTime = Arr::has($data, 'end_time');
+            $this->endTime = Arr::has($data, 'end_time');
             $this->startTime = Arr::get($data, 'start_time', Carbon::parse($this->date)->startOfDay()->format('G:i'));
             $this->endTime = Arr::get($data, 'end_time', Carbon::parse($this->date)->endOfDay()->format('G:i'));
         }
@@ -34,7 +34,7 @@ class Day
 
     public function hasEndTime(): bool
     {
-        return $this->hasEndTime;
+        return $this->endTime;
     }
 
     public function start(): Carbon
