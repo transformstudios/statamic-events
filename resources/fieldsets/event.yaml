@@ -125,7 +125,6 @@ fields:
       allow_blank: true
       allow_time: false
       require_time: false
-      earliest_date: 'January 1, 1900'
       input_format: M/D/YYYY
       display: 'End Date'
       width: 25
