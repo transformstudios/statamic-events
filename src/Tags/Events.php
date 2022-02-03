@@ -207,7 +207,6 @@ class Events extends CollectionTag
 
         $page = (int) request('page', 1);
 
-        
         $paginator = new LengthAwarePaginator(
             items: $events,
             total: $count = $events->count(),
@@ -295,12 +294,13 @@ class Events extends CollectionTag
         $events->each(
             fn ($event) => $this->events->add(
                 EventFactory::createFromArray(
-                    array_merge(
-                        $event->toAugmentedArray(),
-                        [
-                            'asSingleDay' => $collapseMultiDays,
-                        ]
-                    )
+                    $event
+                        ->merge(
+                            [
+                                'asSingleDay' => $collapseMultiDays,
+                                'has_end_time' => $event->has('end_time'),
+                            ]
+                        )->toAugmentedArray(),
                 )
             )
         );

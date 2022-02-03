@@ -28,7 +28,6 @@ class Events
                 ->filter()
                 ->map(function (Day $day, bool $ignore) use ($event) {
                     $event = clone $event;
-                    $event->has_end_time = $day->hasEndTime();
                     $event->start_date = $day->startDate();
                     $event->start_time = $day->startTime();
 
@@ -53,7 +52,6 @@ class Events
 
             return $days->map(function ($day, $ignore) use ($event) {
                 $event = clone $event;
-                $event->has_end_time = $day->hasEndTime();
                 $event->start_date = $day->start()->toDateString();
                 $event->start_time = $day->startTime();
                 $event->end_time = $day->endTime();
