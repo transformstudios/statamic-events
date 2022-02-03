@@ -32,11 +32,6 @@ class Day
         }
     }
 
-    public function hasEndTime(): bool
-    {
-        return $this->endTime;
-    }
-
     public function start(): Carbon
     {
         return Carbon::parse($this->date)->setTimeFromTimeString($this->startTime);
