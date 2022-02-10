@@ -3,101 +3,89 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
-use Illuminate\Contracts\Support\Arrayable;
+use Carbon\CarbonInterface;
+use DateTimeInterface;
 use Illuminate\Support\Collection;
-use Statamic\Fields\Value;
-use Statamic\Support\Arr;
-use TransformStudios\Events\Day;
+use RRule\RRuleInterface;
+use Statamic\Entries\Entry;
 
-abstract class Event implements Arrayable
+abstract class Event
 {
-    /** @var array */
-    protected $data;
+    abstract protected function rule(): RRuleInterface;
 
-    abstract public function upcomingDate($after = null): ?Day;
-
-    abstract public function upcomingDates($limit = 2, $offset = 0): Collection;
-
-    abstract public function datesBetween($from, $to): Collection;
-
-    public function __construct($data)
+    public function __construct(protected Entry $event)
     {
-        $this->data = $data;
     }
 
-    public function get($name, $default = null)
+    public function occurrencesBetween(string|Carbon $from, string|Carbon $to): Collection
     {
-        return $this->raw($this->data, $name, $default);
+        $dates = $this->rule()->getOccurrencesBetween($from, $to);
+
+        return $this->collect($dates);
     }
 
-    public function __get($name)
+    public function nextOccurrences(int $limit = 1): Collection
     {
-        return $this->get($name);
+        $dates = $this->rule()->getOccurrencesAfter(now(), true, $limit);
+
+        return $this->collect($dates);
     }
 
-    public function __set($name, $value)
+    private function collect(array $dates): Collection
     {
-        return Arr::set($this->data, $name, $value);
+        return collect($dates)
+            ->map(fn (DateTimeInterface $date) => $this->supplement(Carbon::parse($date)));
+    }
+
+    private function supplement(CarbonInterface $date): Entry
+    {
+        $occurence = clone $this->event;
+        $occurence->setSupplement('start', $date->setTimeFromTimeString($this->endTime()));
+
+        if ($endTime = $this->end_time) {
+            $occurence->setSupplement('end', $date->setTimeFromTimeString($endTime));
+        }
+
+        return $occurence;
+    }
+
+    public function __get(string $key): mixed
+    {
+        return $this->event->get($key);
     }
 
     public function isAllDay(): bool
     {
-        return $this->raw($this->data, 'all_day', false);
+        return $this->event->get('all_day', false);
     }
 
     public function isMultiDay(): bool
     {
-        return false;
-    }
-
-    public function isRecurring(): bool
-    {
-        return false;
+        return $this->event->get('multi_day', false);
     }
 
     public function startTime(): string
     {
-        $time = Carbon::now()->startOfDay()->format('G:i');
-        if ($this->isAllDay()) {
-            return $time;
-        }
-
-        return $this->raw($this->data, 'start_time', $time);
+        return $this->start_time ?? now()->startOfDay()->format('G:i');
     }
 
     public function endTime(): string
     {
-        $time = Carbon::now()->endOfDay()->format('G:i');
-        if ($this->isAllDay()) {
-            return $time;
-        }
-
-        return $this->raw($this->data, 'end_time', $time);
+        return $this->end_time ?? Carbon::now()->endOfDay()->format('G:i');
     }
 
     public function start(): Carbon
     {
-        return Carbon::parse($this->raw($this->data, 'start_date'))->setTimeFromTimeString($this->startTime());
+        return Carbon::parse($this->start_date)
+            ->setTimeFromTimeString($this->startTime());
     }
 
     public function end(): ?Carbon
     {
-        return Carbon::parse(Arr::get($this->data, 'start_date'))->setTimeFromTimeString($this->endTime());
-    }
-
-    public function toArray(): array
-    {
-        return $this->data;
-    }
-
-    protected function raw($data, $key, $default = null)
-    {
-        $value = Arr::get($data, $key, $default);
-
-        if ($value instanceof Value) {
-            return $value->raw() ?: $default;
+        if (! $endDate = $this->end_date) {
+            return null;
         }
 
-        return $value ?: $default;
+        return Carbon::parse($endDate)->setTimeFromTimeString($this->endTime());
     }
 }
