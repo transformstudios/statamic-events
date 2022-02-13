@@ -40,14 +40,14 @@ abstract class Event
 
     private function supplement(CarbonInterface $date): Entry
     {
-        $occurence = clone $this->event;
-        $occurence->setSupplement('start', $date->setTimeFromTimeString($this->endTime()));
+        $occurrence = unserialize(serialize($this->event));
+        $occurrence->setSupplement('start', $date->setTimeFromTimeString($this->startTime()));
 
         if ($endTime = $this->end_time) {
-            $occurence->setSupplement('end', $date->setTimeFromTimeString($endTime));
+            $occurrence->setSupplement('end', $date->setTimeFromTimeString($endTime));
         }
 
-        return $occurence;
+        return $occurrence;
     }
 
     public function __get(string $key): mixed
