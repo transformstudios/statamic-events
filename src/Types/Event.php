@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Types;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Support\Collection;
@@ -34,7 +35,7 @@ abstract class Event
     private function collect(array $dates): Collection
     {
         return collect($dates)
-            ->map(fn (DateTimeInterface $date) => $this->supplement(Carbon::parse($date)));
+            ->map(fn (DateTimeInterface $date) => $this->supplement(CarbonImmutable::parse($date)));
     }
 
     private function supplement(CarbonInterface $date): Entry
