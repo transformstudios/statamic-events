@@ -71,7 +71,7 @@ abstract class Event
 
     public function endTime(): string
     {
-        return $this->end_time ?? Carbon::now()->endOfDay()->format('G:i');
+        return $this->end_time ?? now()->endOfDay()->format('G:i');
     }
 
     public function start(): Carbon
