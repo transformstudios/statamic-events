@@ -1,0 +1,175 @@
+title: Event
+sections:
+  main:
+    display: Main
+    fields:
+      -
+        handle: multi_day
+        field:
+          type: toggle
+          width: 50
+          display: 'Multi-Day?'
+          if:
+            all_day: 'equals false'
+      -
+        handle: all_day
+        field:
+          type: toggle
+          width: 50
+          display: 'All Day?'
+          instructions_position: above
+          listable: hidden
+          default: false
+          if:
+            multi_day: 'equals false'
+      -
+        handle: start_date
+        field:
+          type: date
+          allow_blank: false
+          allow_time: false
+          require_time: false
+          input_format: M/D/YYYY
+          width: 25
+          display: 'Start Date'
+          instructions_position: above
+          listable: hidden
+          mode: single
+          time_enabled: false
+          time_required: false
+          full_width: false
+          inline: false
+          columns: 1
+          rows: 1
+          if:
+            multi_day: 'equals false'
+      -
+        handle: start_time
+        field:
+          type: time
+          width: 25
+          display: 'Start Time'
+          if:
+            multi_day: 'equals false'
+            all_day: 'equals false'
+      -
+        handle: end_time
+        field:
+          type: time
+          width: 25
+          display: 'End Time'
+          if:
+            multi_day: 'equals false'
+            all_day: 'equals false'
+      -
+        handle: timezone
+        field:
+          options:
+            pdt: PDT
+            pst: PST
+            cdt: CDT
+            cst: CST
+            edt: EDT
+            est: EST
+          multiple: false
+          max_items: 1
+          clearable: false
+          searchable: true
+          taggable: false
+          push_tags: false
+          cast_booleans: false
+          display: Timezone
+          type: select
+          icon: select
+          listable: hidden
+          instructions_position: above
+          width: 25
+      -
+        handle: days
+        field:
+          type: grid
+          mode: table
+          fields:
+            -
+              handle: date
+              field:
+                type: date
+                allow_blank: false
+                allow_time: false
+                require_time: false
+                input_format: M/D/YYYY
+                display: Date
+            -
+              handle: start_time
+              field:
+                type: time
+                display: 'Start Time'
+            -
+              handle: end_time
+              field:
+                type: time
+                display: 'End Time'
+          display: Days
+          min_rows: 2
+          add_row: 'Add Day'
+          instructions_position: above
+          listable: hidden
+          reorderable: true
+          if:
+            multi_day: 'equals true'
+      -
+        handle: recurrence_section
+        field:
+          type: section
+          display: Recurrence
+          instructions_position: above
+          listable: hidden
+          if:
+            multi_day: 'equals false'
+      -
+        handle: recurrence
+        field:
+          type: select
+          options:
+            0: None
+            daily: Daily
+            weekly: Weekly
+            monthly: Monthly
+            every: Every
+          width: 25
+          display: 'Recurrence Type'
+          default: false
+          if:
+            multi_day: 'equals false'
+      -
+        handle: interval
+        field:
+          type: integer
+          width: 25
+          display: Interval
+          show_when:
+            recurrence: every
+      -
+        handle: period
+        field:
+          type: select
+          options:
+            days: Days
+            weeks: Weeks
+            years: Years
+          display: Period
+          width: 25
+          show_when:
+            recurrence: every
+      -
+        handle: end_date
+        field:
+          type: date
+          allow_blank: true
+          allow_time: false
+          require_time: false
+          input_format: M/D/YYYY
+          display: 'End Date'
+          width: 25
+          show_when:
+            recurrence: 'contains_any daily, weekly, monthly, every'

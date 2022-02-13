@@ -3,101 +3,59 @@
 namespace TransformStudios\Events\Tests;
 
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Statamic\Entries\AugmentedEntry;
+use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
-use TransformStudios\Events\Events;
-use TransformStudios\Events\Types\RecurringEvent;
 
 class RecurringDailyEventsTest extends TestCase
 {
-    /** @var Events */
-    private $events;
-
-    public function setUp(): void
+    /** @test */
+    public function nullNextDateIfNowAfterEndDate()
     {
-        parent::setUp();
+        $recurringEntry = Entry::make()
+            ->blueprint($this->blueprint)
+            ->collection('events')
+            ->data([
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'end_date' => Carbon::now()->addDays(2)->toDateString(),
+                'recurrence' => 'daily',
+            ]);
 
-        $this->events = new Events();
+        $event = EventFactory::createFromEntry($recurringEntry);
+
+        Carbon::setTestNow(now()->addDays(3));
+        $nextOccurrences = $event->nextOccurrences();
+
+        $this->assertEmpty($nextOccurrences);
     }
 
-    /**
-     * Clean up the testing environment before the next test.
-     *
-     * @return void
-     */
-    public function tearDown(): void
+    /** @test */
+    public function canGenerateNextDayIfNowIsBefore()
     {
-        parent::tearDown();
+        $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
 
-        Carbon::setTestNow();
-    }
+        $recurringEntry = Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->data([
+                'start_date' => $startDate->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+            ]);
 
-    public function test_can_create_recurring_event()
-    {
-        $event = [
-            'start_date' => Carbon::now()->toDateString(),
-            'start_time' => '11:00',
-            'recurrence' => 'daily',
-            'all_day' => true,
-        ];
+        $event = EventFactory::createFromEntry($recurringEntry);
 
-        $event = EventFactory::createFromArray($event);
+        Carbon::setTestNow($startDate->setTimeFromTimeString('10:59:00'));
 
-        $this->assertTrue($event instanceof RecurringEvent);
-        $this->assertTrue($event->isRecurring());
-        $this->assertFalse($event->isMultiDay());
-    }
+        $nextOccurrences = $event->nextOccurrences(3);
 
-    public function test_get_end_date_null_if_no_end_date()
-    {
-        $event = [
-            'start_date' => Carbon::now()->toDateString(),
-            'start_time' => '11:00',
-            'recurrence' => 'daily',
-            'all_day' => true,
-        ];
+        $this->assertCount(3, $nextOccurrences);
 
-        $event = EventFactory::createFromArray($event);
-
-        $this->assertNull($event->endDate());
-        $this->assertNull($event->end());
-    }
-
-    public function test_get_null_next_date_if_after_end_date()
-    {
-        $event = [
-            'start_date' => Carbon::now()->toDateString(),
-            'start_time' => '11:00',
-            'end_time' => '12:00',
-            'end_date' => Carbon::now()->addDays(2)->toDateString(),
-            'recurrence' => 'daily',
-        ];
-
-        $event = EventFactory::createFromArray($event);
-
-        $nextDate = $event->upcomingDate(Carbon::now()->addDay(3));
-
-        $this->assertNull($nextDate);
-    }
-
-    public function test_can_generate_next_day_if_before()
-    {
-        $startDate = Carbon::now()->setTimeFromTimeString('11:00');
-        $event = [
-            'start_date' => $startDate->toDateString(),
-            'start_time' => '11:00',
-            'end_time' => '12:00',
-            'recurrence' => 'daily',
-        ];
-
-        $nextDate = EventFactory::createFromArray($event)
-            ->upcomingDate($startDate->copy()->subDays(1));
-
-        $this->assertEquals($startDate, $nextDate->start());
-
-        $nextDate = EventFactory::createFromArray($event)
-            ->upcomingDate(Carbon::now()->setTimeFromTimeString('10:59:00'));
-
-        $this->assertEquals($startDate, $nextDate->start());
+        $this->assertEquals($startDate, $nextOccurrences->first()->augmentedValue('start'));
     }
 
     public function test_can_generate_next_day_if_during()

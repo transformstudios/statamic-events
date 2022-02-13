@@ -7,7 +7,7 @@ use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
 use TransformStudios\Events\Types\MultiDayEvent;
 
-class EventsTest extends TestCase
+class RecurringEventsTest extends TestCase
 {
     /** @var MultiDayEvent */
     private $event;
