@@ -10,7 +10,7 @@ class RecurringEvent extends Event
     protected function rule(): RRuleInterface
     {
         $rule = [
-            'dtstart' => $this->start()->endOfDay(),
+            'dtstart' => $this->start(),
             'freq' => $this->frequency(),
         ];
 
