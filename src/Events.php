@@ -26,6 +26,7 @@ class Events
                 ->map($occurrences)
                 ->flatten()
                 ->sortBy(fn (Entry $occurrence) => $occurrence->augmentedValue('start'))
+                ->values()
         );
     }
 
