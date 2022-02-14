@@ -7,7 +7,7 @@ use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
 use TransformStudios\Events\Types\MultiDayEvent;
 
-class RecurringEventsTest extends TestCase
+class EventsTest extends TestCase
 {
     /** @var MultiDayEvent */
     private $event;
@@ -58,19 +58,8 @@ class RecurringEventsTest extends TestCase
         );
     }
 
-    /**
-     * Clean up the testing environment before the next test.
-     *
-     * @return void
-     */
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow();
-    }
-
-    public function test_can_generate_next_dates_when_before_start()
+    /** @test */
+    public function canGenerateDatesWhenNowBeforeStart()
     {
         $dates = [
             Carbon::parse('2019-11-20'),
