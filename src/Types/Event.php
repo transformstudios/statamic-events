@@ -2,7 +2,6 @@
 
 namespace TransformStudios\Events\Types;
 
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
@@ -18,7 +17,7 @@ abstract class Event
     {
     }
 
-    public function occurrencesBetween(string|Carbon $from, string|Carbon $to): Collection
+    public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
     {
         $dates = $this->rule()->getOccurrencesBetween($from, $to);
 
@@ -55,6 +54,12 @@ abstract class Event
         return $this->event->get($key);
     }
 
+    // Should these be somewhere else?
+    public function hasEndTime(): bool
+    {
+        return $this->event->get('end_time', false);
+    }
+
     public function isAllDay(): bool
     {
         return $this->event->get('all_day', false);
@@ -63,6 +68,11 @@ abstract class Event
     public function isMultiDay(): bool
     {
         return $this->event->get('multi_day', false);
+    }
+
+    public function isRecurring(): bool
+    {
+        return $this->event->get('recurrence', false);
     }
 
     public function startTime(): string
@@ -75,18 +85,11 @@ abstract class Event
         return $this->end_time ?? now()->endOfDay()->format('G:i');
     }
 
-    public function start(): Carbon
+    public function start(): CarbonImmutable
     {
-        return Carbon::parse($this->start_date)
+        return CarbonImmutable::parse($this->start_date)
             ->setTimeFromTimeString($this->startTime());
     }
 
-    public function end(): ?Carbon
-    {
-        if (! $endDate = $this->end_date) {
-            return null;
-        }
-
-        return Carbon::parse($endDate)->setTimeFromTimeString($this->endTime());
-    }
+    abstract public function end(): ?CarbonImmutable;
 }

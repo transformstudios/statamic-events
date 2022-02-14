@@ -2,71 +2,66 @@
 
 namespace TransformStudios\Events;
 
-use Carbon\Carbon;
-use Illuminate\Support\Collection;
-use TransformStudios\Events\Types\Event;
+use Illuminate\Support\Carbon;
+use Statamic\Entries\Entry;
+use Statamic\Entries\EntryCollection;
+use Statamic\Facades\Entry as EntryFacade;
 
 class Events
 {
-    private Collection $events;
+    private string $collection = 'events';
+    private int $limit = 1;
+    private array $taxonomies = [];
 
-    public function __construct()
+    public static function make(): self
     {
-        $this->events = collect();
+        return new static;
     }
 
-    public function add(Event $event): void
+    private function __construct()
     {
-        $this->events->push($event);
+        EntryCollection::macro(
+            'generate',
+            fn (callable $occurrences) => $this
+                ->map($occurrences)
+                ->flatten()
+                ->sortBy(fn (Entry $occurrence) => $occurrence->augmentedValue('start'))
+        );
     }
 
-    public function upcoming(int $limit = 1, int $offset = 0): Collection
+    public function collection(string $handle): self
     {
-        return $this->events->flatMap(
-            fn (Event $event, bool $ignore) => $event
-                ->upcomingDates($limit * ($offset + 1))
-                ->filter()
-                ->map(function (Day $day, bool $ignore) use ($event) {
-                    $event = clone $event;
-                    $event->start_date = $day->startDate();
-                    $event->start_time = $day->startTime();
+        $this->collection = $handle;
 
-                    $event->end_date = $day->endDate();
-                    $event->end_time = $day->endTime();
-                    $event->start = $day->start();
-                    $event->end = $day->end();
-
-                    return $event;
-                })
-        )
-        ->filter()
-        ->sortBy(fn ($event, $ignore) => Carbon::parse($event->start_date)->setTimeFromTimeString($event->startTime()))
-        ->values()
-        ->splice($offset, $limit);
+        return $this;
     }
 
-    public function all(Carbon|string $from, Carbon|string $to): Collection
+    public function limit(int $limit): self
     {
-        return $this->events->flatMap(function (Event $event, $ignore) use ($from, $to) {
-            $days = $event->datesBetween($from, $to);
+        $this->limit = $limit;
 
-            return $days->map(function ($day, $ignore) use ($event) {
-                $event = clone $event;
-                $event->start_date = $day->start()->toDateString();
-                $event->start_time = $day->startTime();
-                $event->end_time = $day->endTime();
-                $event->start = $day->start();
-                $event->end = $day->end();
-
-                return $event;
-            });
-        })->filter()
-        ->sortBy(fn ($event, $ignore) => $event->start())
-        ->values();
+        return $this;
     }
 
-    public function count(): int
+    public function between(Carbon $from, Carbon $to): EntryCollection
     {
-        return $this->events->count();
+        return $this
+            ->get()
+            ->generate(fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->occurrencesBetween(from: $from, to: $to));
+    }
+
+    public function upcoming(int $limit = 1): EntryCollection
+    {
+        return $this
+            ->get()
+            ->generate(fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->nextOccurrences(limit: $limit));
+    }
+
+    private function get(): EntryCollection
+    {
+        return EntryFacade::query()
+            ->where('collection', $this->collection)
+            // @todo filtering by taxonomies and other filters
+            ->get();
     }
 }

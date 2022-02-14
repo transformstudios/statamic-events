@@ -10,16 +10,16 @@ use TransformStudios\Events\Types\SingleDayEvent;
 
 class EventFactory
 {
-    public static function createFromEntry(Entry $entry): Event
+    public static function createFromEntry(Entry $event): Event
     {
-        if ($entry->value('multi_day')) {
-            return new MultiDayEvent($entry);
+        if ($event->value('multi_day')) {
+            return new MultiDayEvent($event);
         }
 
-        if ($entry->value('recurrence')) {
-            return new RecurringEvent($entry);
+        if ($event->value('recurrence')) {
+            return new RecurringEvent($event);
         }
 
-        return new SingleDayEvent($entry);
+        return new SingleDayEvent($event);
     }
 }
