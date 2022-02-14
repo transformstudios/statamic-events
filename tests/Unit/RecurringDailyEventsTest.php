@@ -1,11 +1,12 @@
 <?php
 
-namespace TransformStudios\Events\Tests;
+namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Tests\TestCase;
 
 class RecurringDailyEventsTest extends TestCase
 {
@@ -13,7 +14,7 @@ class RecurringDailyEventsTest extends TestCase
     public function nullNextDateIfNowAfterEndDate()
     {
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint)
+            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),

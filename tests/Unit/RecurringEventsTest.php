@@ -1,10 +1,11 @@
 <?php
 
-namespace TransformStudios\Events\Tests;
+namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Tests\TestCase;
 use TransformStudios\Events\Types\RecurringEvent;
 
 class RecurringEventsTest extends TestCase
@@ -13,7 +14,7 @@ class RecurringEventsTest extends TestCase
     public function canCreateRecurringEvent()
     {
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint)
+            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),
