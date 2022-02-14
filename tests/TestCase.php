@@ -20,6 +20,19 @@ abstract class TestCase extends OrchestraTestCase
     protected Collection $collection;
     protected Blueprint $blueprint;
 
+    public function setup(): void
+    {
+        parent::setup();
+        $this->preventSavingStacheItemsToDisk();
+    }
+
+    public function tearDown(): void
+    {
+        $this->deleteFakeStacheDirectory();
+
+        parent::tearDown();
+    }
+
     protected function getPackageProviders($app)
     {
         return [
@@ -76,16 +89,10 @@ abstract class TestCase extends OrchestraTestCase
 
             $this->blueprint = BlueprintFacade::makeFromFields($blueprintFields)
                 ->setNamespace('collections.events')
-                ->setHandle('event');
+                ->setHandle('event')
+                ->save();
 
             $this->collection = CollectionFacade::make('events')->save();
         });
-    }
-
-    public function tearDown(): void
-    {
-        $this->deleteFakeStacheDirectory();
-
-        parent::tearDown();
     }
 }
