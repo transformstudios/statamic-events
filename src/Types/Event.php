@@ -37,7 +37,7 @@ abstract class Event
             ->map(fn (DateTimeInterface $date) => $this->supplement(CarbonImmutable::parse($date)));
     }
 
-    private function supplement(CarbonInterface $date): Entry
+    protected function supplement(CarbonInterface $date): Entry
     {
         $occurrence = unserialize(serialize($this->event));
         $occurrence->setSupplement('start', $date->setTimeFromTimeString($this->startTime()));

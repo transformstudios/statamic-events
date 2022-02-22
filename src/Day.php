@@ -2,89 +2,34 @@
 
 namespace TransformStudios\Events;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Statamic\Support\Arr;
 
 class Day
 {
-    private $date;
+    private ?string $startTime;
+    private ?string $endTime;
+    private CarbonImmutable $date;
 
-    private $startTime;
-
-    private $endTime;
-
-    private $endDate;
-
-    public function __construct($data, bool $isAllDay = false)
+    public function __construct(array $data, private bool $isAllDay = false)
     {
-        $this->date = Arr::get($data, 'date') ?: Carbon::now()->toDateString();
-
-        $this->endDate = Arr::get($data, 'end_date', $this->date);
-
-        if ($isAllDay) {
-            $date = Carbon::parse($this->date);
-            $this->startTime = $date->startOfDay()->format('G:i');
-            $this->endTime = $date->endOfDay()->format('G:i');
-        } else {
-            $this->endTime = Arr::has($data, 'end_time');
-            $this->startTime = Arr::get($data, 'start_time', Carbon::parse($this->date)->startOfDay()->format('G:i'));
-            $this->endTime = Arr::get($data, 'end_time', Carbon::parse($this->date)->endOfDay()->format('G:i'));
-        }
+        $this->date = CarbonImmutable::parse(Arr::get($data, 'date'));
+        $this->startTime = Arr::get($data, 'start_time');
+        $this->endTime = Arr::get($data, 'end_time');
     }
 
-    public function start(): Carbon
+    public function isAllDay(): bool
     {
-        return Carbon::parse($this->date)->setTimeFromTimeString($this->startTime);
+        return $this->isAllDay;
     }
 
-    public function startDate(): string
+    public function start(): CarbonImmutable
     {
-        return $this->date;
+        return $this->isAllDay ? $this->date->startOfDay() : $this->date->setTimeFromTimeString($this->startTime);
     }
 
-    public function startTime(): string
+    public function end(): CarbonImmutable
     {
-        return $this->startTime;
-    }
-
-    public function end(): Carbon
-    {
-        return Carbon::parse($this->endDate)->setTimeFromTimeString($this->endTime);
-    }
-
-    public function endDate($date = null)
-    {
-        if (is_null($date)) {
-            return $this->endDate;
-        }
-
-        if ($date instanceof Carbon) {
-            $date = $date->toDateString();
-        }
-
-        $this->endDate = $date;
-
-        return $this;
-    }
-
-    public function endTime(): string
-    {
-        return $this->endTime;
-    }
-
-    public static function now(): self
-    {
-        return self::fromCarbon(Carbon::now());
-    }
-
-    public static function fromCarbon(Carbon $date): self
-    {
-        return new self(
-            [
-            'date' => $date->toDateString(),
-            'start_time' => $date->format('G:i'),
-            'end_time' => $date->endOfDay()->format('G:i'),
-            ]
-        );
+        return $this->isAllDay ? $this->date->endOfDay() : $this->date->setTimeFromTimeString($this->endTime);
     }
 }

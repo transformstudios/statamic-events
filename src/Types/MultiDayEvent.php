@@ -2,132 +2,55 @@
 
 namespace TransformStudios\Events\Types;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use RRule\RRule;
+use RRule\RRuleInterface;
+use RRule\RSet;
+use Statamic\Entries\Entry;
 use TransformStudios\Events\Day;
 
 class MultiDayEvent extends Event
 {
-    /** @var Collection */
-    private $days;
+    private Collection $days;
 
-    public function __construct($data)
+    public function __construct(Entry $event)
     {
-        parent::__construct($data);
+        parent::__construct($event);
 
-        $isAllDay = $this->isAllDay();
-
-        $this->days = collect($this->raw($data, 'days', []))
-            ->map(function ($day, $ignore) use ($isAllDay) {
-                return new Day($day, $isAllDay);
-            });
+        $this->days = collect($this->event->days)
+            ->map(fn (array $day) => new Day($day, $this->isAllDay()));
     }
 
-    public function isMultiDay(): bool
+    protected function rule(): RRuleInterface
     {
-        return true;
+        return tap(new RSet(), fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([
+                'count' => 1,
+                'dtstart' => $day->end(),
+                'freq' => RRule::DAILY,
+            ])));
     }
 
-    public function start(): Carbon
+    protected function supplement(CarbonInterface $date): Entry
     {
-        return $this->firstDay()->start();
+        /** @var Entry */
+        $occurrence = unserialize(serialize($this->event));
+
+        $day = $this->days->first(fn (Day $day) => $date->isSameDay($day->start()));
+
+        return $occurrence
+            ->setSupplement('start', $day->start())
+            ->setSupplement('end', $day->end());
     }
 
-    public function end(): Carbon
+    public function start(): CarbonImmutable
     {
-        return $this->lastDay()->end();
+        return $this->days->first()->start();
     }
 
-    public function firstDay(): Day
+    public function end(): CarbonImmutable
     {
-        return $this->days()->first();
-    }
-
-    public function lastDay(): Day
-    {
-        return $this->days()->last();
-    }
-
-    /**
-     * @param null|Carbon $after
-     */
-    public function upcomingDate($after = null): ?Day
-    {
-        if (is_null($after)) {
-            $after = Carbon::now();
-        }
-
-        $first = $this->firstDay();
-        $end = $this->lastDay()->end();
-
-        if ($this->asSingleDay) {
-            $first->endDate($end);
-        }
-
-        if ($after < $first->start() || ($this->asSingleDay && $after <= $end)) {
-            return $first;
-        }
-
-        if ($after > $end) {
-            return null;
-        }
-
-        return $this
-            ->days()
-            ->first(function ($day, $ignore) use ($after) {
-                return $after < $day->start();
-            });
-    }
-
-    public function upcomingDates($limit = 2, $offset = 0): Collection
-    {
-        $total = $offset ? $limit * $offset : $limit;
-
-        $dates = collect();
-
-        $day = Day::now();
-
-        if ($this->asSingleDay) {
-            return collect([$this->upcomingDate(Carbon::now())]);
-        }
-
-        while (($day = $this->upcomingDate($day->start())) && $dates->count() <= $total) {
-            $dates->push($day);
-        }
-
-        return $dates->slice($offset, $limit)->values();
-    }
-
-    public function datesBetween($from, $to): Collection
-    {
-        $from = Carbon::parse($from);
-        $to = Carbon::parse($to);
-
-        if (($from->startOfDay() > $to->endOfDay()) ||
-            ($this->start()->isAfter($to)) ||
-            ($this->end()->isBefore($from))
-        ) {
-            return collect();
-        }
-
-        $days = collect();
-        $day = $this->upcomingDate($from);
-
-        while ($day && $day->start() < $to) {
-            $days->push($day);
-            $day = $this->upcomingDate($day->start());
-        }
-
-        return $days;
-    }
-
-    private function days()
-    {
-        return collect($this->days)
-            ->sortBy(
-                function ($day) {
-                    return $day->start();
-                }
-            );
+        return $this->days->last()->end();
     }
 }
