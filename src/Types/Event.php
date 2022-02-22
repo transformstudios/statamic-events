@@ -19,16 +19,12 @@ abstract class Event
 
     public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
     {
-        $dates = $this->rule()->getOccurrencesBetween($from, $to);
-
-        return $this->collect($dates);
+        return $this->collect($this->rule()->getOccurrencesBetween($from, $to));
     }
 
     public function nextOccurrences(int $limit = 1): Collection
     {
-        $dates = $this->rule()->getOccurrencesAfter(now(), true, $limit);
-
-        return $this->collect($dates);
+        return $this->collect($this->rule()->getOccurrencesAfter(now(), true, $limit));
     }
 
     private function collect(array $dates): Collection
