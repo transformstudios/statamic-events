@@ -55,58 +55,6 @@ class EventsTest extends TestCase
         $this->assertEquals($expectedStartDates[2], $occurrences[2]->augmentedValue('start'));
         $this->assertEquals($expectedStartDates[3], $occurrences[3]->augmentedValue('start'));
 
-        // $events = new Events();
-        // $events->add($this->event);
-        // $events->add(EventFactory::createFromArray(
-        //     [
-        //         'start_date' => '2019-11-27',
-        //         'start_time' => '11:00',
-        //         'end_time' => '12:00',
-        //     ]
-        // ));
-
-        // $dates = [
-        //     Carbon::parse('2019-11-23 19:00'),
-        //     Carbon::parse('2019-11-24 11:00'),
-        //     Carbon::parse('2019-11-25 11:00'),
-        //     Carbon::parse('2019-11-27 11:00'),
-        // ];
-
-        // $nextDates = $events->upcoming(4);
-
-        // $this->assertCount(4, $nextDates);
-
-        // $this->assertEquals($dates[0], Carbon::parse($nextDates[0]->start_date)->setTimeFromTimeString($nextDates[0]->start_time));
-        // $this->assertEquals($dates[1], Carbon::parse($nextDates[1]->start_date)->setTimeFromTimeString($nextDates[1]->start_time));
-        // $this->assertEquals($dates[2], Carbon::parse($nextDates[2]->start_date)->setTimeFromTimeString($nextDates[2]->start_time));
-        // $this->assertEquals($dates[3], Carbon::parse($nextDates[3]->start_date)->setTimeFromTimeString($nextDates[3]->start_time));
-
-        // $events = new Events();
-
-        // $event = EventFactory::createFromArray(
-        //     [
-        //         'start_date' => '2019-11-21',
-        //         'start_time' => '11:00',
-        //         'end_time' => '12:00',
-        //     ]
-        // );
-
-        // $this->event->asSingleDay = true;
-        // $event->asSingleDay = true;
-        // $events->add($this->event);
-        // $events->add($event);
-
-        // $dates = [
-        //     Carbon::parse('2019-11-21 11:00'),
-        //     Carbon::parse('2019-11-23 19:00'),
-        // ];
-
-        // $nextDates = $events->upcoming(4);
-
-        // $this->assertCount(2, $nextDates);
-
-        // $this->assertEquals($dates[0], Carbon::parse($nextDates[0]->start_date)->setTimeFromTimeString($nextDates[0]->start_time));
-        // $this->assertEquals($dates[1], Carbon::parse($nextDates[1]->start_date)->setTimeFromTimeString($nextDates[1]->start_time));
     }
 
     public function test_empty_collection_when_after_end()
