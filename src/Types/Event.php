@@ -35,8 +35,8 @@ abstract class Event
 
     protected function supplement(CarbonInterface $date): Entry
     {
-        $occurrence = unserialize(serialize($this->event));
-        $occurrence->setSupplement('start', $date->setTimeFromTimeString($this->startTime()));
+        $occurrence = unserialize(serialize($this->event))
+            ->setSupplement('start', $date->setTimeFromTimeString($this->startTime()));
 
         if ($endTime = $this->end_time) {
             $occurrence->setSupplement('end', $date->setTimeFromTimeString($endTime));
