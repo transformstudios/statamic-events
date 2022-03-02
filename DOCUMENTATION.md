@@ -321,17 +321,21 @@ paginate:
 
 ### Download Links
 
-Single Tag returns a url to download the event data and add it to your calendar. Tag presumes you are in an events context, i.e. your events entry
+Single Tag returns a url to the event data and add it to your calendar. Tag presumes you are in an events context, i.e. your events entry
 
 Parameters:
 
 * `date` - required if a recurring event
 * `type` - supported options are: `google`, `yahoo`, `webOutlook`, `ics`. Defaults to `ics`
 
+To give the file a name, use the `download` attribute.
+
 *Example*:
 
 ```
-<a href="{{ events:download_link
+<a
+    download="event-{{ date format='Ymd' }}.ics"
+    href="{{ events:download_link
     start_date="{{ get:date }}" {{# getting the date from the `date` query param #}}
     type="google"
 }}">Google</a>
