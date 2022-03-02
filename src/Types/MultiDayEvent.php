@@ -25,23 +25,26 @@ class MultiDayEvent extends Event
 
     protected function rule(): RRuleInterface
     {
-        return tap(new RSet(), fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([
+        return tap(
+            new RSet(),
+            fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([
                 'count' => 1,
                 'dtstart' => $day->end(),
                 'freq' => RRule::DAILY,
-            ])));
+            ]))
+        );
     }
 
     protected function supplement(CarbonInterface $date): Entry
     {
-        /** @var Entry */
-        $occurrence = unserialize(serialize($this->event));
-
         $day = $this->days->first(fn (Day $day) => $date->isSameDay($day->start()));
 
-        return $occurrence
-            ->setSupplement('start', $day->start())
-            ->setSupplement('end', $day->end());
+        return tap(
+            unserialize(serialize($this->event)),
+            fn (Entry $occurrence) => $occurrence
+                ->setSupplement('start', $day->start())
+                ->setSupplement('end', $day->end())
+        );
     }
 
     public function start(): CarbonImmutable
