@@ -24,7 +24,7 @@ class Events
         // https://laravel.com/docs/9.x/collections#extending-collections
         // receives a collection of Entries
         EntryCollection::macro(
-            'generate',
+            'occurrences',
             fn (callable $occurrences) => $this
                 // takes each entry and generates a collection of Events
                 // we pass in different closures that generate different events,
@@ -62,13 +62,13 @@ class Events
     private function output(callable $type): EntryCollection
     {
         return $this
-            ->get()
-            ->generate($type)
+            ->entries()
+            ->occurrences($type)
             ->take($this->limit);
     }
 
     // gets the relevant entries, based on the filters etc
-    private function get(): EntryCollection
+    private function entries(): EntryCollection
     {
         return EntryFacade::query()
             ->where('collection', $this->collection)
