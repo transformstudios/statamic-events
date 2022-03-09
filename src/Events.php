@@ -10,7 +10,8 @@ use Statamic\Facades\Entry as EntryFacade;
 class Events
 {
     private string $collection = 'events';
-    private int $limit = 1;
+    private ?int $limit = null;
+    private ?EntryCollection $occurrences = null;
     private array $taxonomies = [];
 
     public static function make(): self
@@ -20,11 +21,15 @@ class Events
 
     private function __construct()
     {
+        // https://laravel.com/docs/9.x/collections#extending-collections
+        // receives a collection of Entries
         EntryCollection::macro(
             'generate',
             fn (callable $occurrences) => $this
-                ->map($occurrences)
-                ->flatten()
+                // takes each entry and generates a collection of Events
+                // we pass in different closures that generate different events,
+                // then flatten
+                ->flatMap($occurrences)
                 ->sortBy(fn (Entry $occurrence) => $occurrence->augmentedValue('start'))
                 ->values()
         );
@@ -46,18 +51,23 @@ class Events
 
     public function between(Carbon $from, Carbon $to): EntryCollection
     {
-        return $this
-            ->get()
-            ->generate(fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->occurrencesBetween(from: $from, to: $to));
+        return $this->output(fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->occurrencesBetween(from: $from, to: $to));
     }
 
     public function upcoming(int $limit = 1): EntryCollection
     {
-        return $this
-            ->get()
-            ->generate(fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->nextOccurrences(limit: $limit));
+        return $this->output(fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->nextOccurrences(limit: $limit));
     }
 
+    private function output(callable $type): EntryCollection
+    {
+        return $this
+            ->get()
+            ->generate($type)
+            ->take($this->limit);
+    }
+
+    // gets the relevant entries, based on the filters etc
     private function get(): EntryCollection
     {
         return EntryFacade::query()
