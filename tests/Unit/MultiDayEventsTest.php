@@ -1,11 +1,12 @@
 <?php
 
-namespace TransformStudios\Events\Tests;
+namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
+use TransformStudios\Events\Tests\TestCase;
 use TransformStudios\Events\Types\MultiDayEvent;
 
 class MultiDayEventsTest extends TestCase
@@ -137,180 +138,182 @@ class MultiDayEventsTest extends TestCase
         );
     }
 
-    public function test_can_generate_next_dates_when_before_start()
-    {
-        $dates = collect([
-            Carbon::parse('2019-11-23 19:00'),
-            Carbon::parse('2019-11-24 11:00'),
-        ]);
+    /*
+        public function test_can_generate_next_dates_when_before_start()
+        {
+            $dates = collect([
+                Carbon::parse('2019-11-23 19:00'),
+                Carbon::parse('2019-11-24 11:00'),
+            ]);
 
-        Carbon::setTestNow(Carbon::parse('2019-11-23'));
+            Carbon::setTestNow(Carbon::parse('2019-11-23'));
 
-        $nextDates = $this->event->upcomingDates();
+            $nextDates = $this->event->upcomingDates();
 
-        $this->assertCount(2, $nextDates);
+            $this->assertCount(2, $nextDates);
 
-        $this->assertEquals($dates[0], $nextDates[0]->start());
-        $this->assertEquals($dates[1], $nextDates[1]->start());
-    }
+            $this->assertEquals($dates[0], $nextDates[0]->start());
+            $this->assertEquals($dates[1], $nextDates[1]->start());
+        }
 
-    public function test_can_generate_next_dates_when_during()
-    {
-        $dates = collect([
-            Carbon::parse('2019-11-24 11:00'),
-            Carbon::parse('2019-11-25 11:00'),
-        ]);
-
-        Carbon::setTestNow(Carbon::parse('2019-11-24'));
-
-        $nextDates = $this->event->upcomingDates();
-
-        $this->assertCount(2, $nextDates);
-
-        $this->assertEquals($dates[0], $nextDates[0]->start());
-        $this->assertEquals($dates[1], $nextDates[1]->start());
-
-        $nextDates = $this->event->upcomingDates(3);
-
-        $this->assertEquals($dates[0], $nextDates[0]->start());
-        $this->assertEquals($dates[1], $nextDates[1]->start());
-    }
-
-    public function test_can_generate_between_dates()
-    {
-        $nextDates = $this->event->datesBetween(Carbon::parse('2019-11-23'), Carbon::parse('2019-11-26'));
-
-        $dates = collect([
-            Carbon::parse('2019-11-23 19:00'),
-            Carbon::parse('2019-11-24 11:00'),
-            Carbon::parse('2019-11-25 11:00'),
-        ]);
-
-        $this->assertCount(3, $nextDates);
-
-        $this->assertEquals($dates[0], $nextDates[0]->start());
-        $this->assertEquals($dates[1], $nextDates[1]->start());
-        $this->assertEquals($dates[2], $nextDates[2]->start());
-
-        $dates = collect(
-            [
+        public function test_can_generate_next_dates_when_during()
+        {
+            $dates = collect([
                 Carbon::parse('2019-11-24 11:00'),
                 Carbon::parse('2019-11-25 11:00'),
-            ]
-        );
+            ]);
 
-        $nextDates = $this->event->datesBetween(Carbon::parse('2019-11-24'), Carbon::parse('2019-11-26'));
+            Carbon::setTestNow(Carbon::parse('2019-11-24'));
 
-        $this->assertEquals($dates[0], $nextDates[0]->start());
-        $this->assertEquals($dates[1], $nextDates[1]->start());
+            $nextDates = $this->event->upcomingDates();
 
-        $this->assertEmpty(
-            $this->event->datesBetween(Carbon::parse('2019-11-26'), Carbon::parse('2019-11-28'))
-        );
-    }
+            $this->assertCount(2, $nextDates);
 
-    public function test_can_generate_only_start_date_when_collapsed()
-    {
-        Carbon::setTestNow(Carbon::parse('2019-11-19'));
+            $this->assertEquals($dates[0], $nextDates[0]->start());
+            $this->assertEquals($dates[1], $nextDates[1]->start());
 
-        $this->allDayEvent->asSingleDay = true;
-        $this->event->asSingleDay = true;
-        $nextDates = $this->allDayEvent->upcomingDates();
+            $nextDates = $this->event->upcomingDates(3);
 
-        $dates = collect([
-            Carbon::parse('2019-11-20'),
-        ]);
+            $this->assertEquals($dates[0], $nextDates[0]->start());
+            $this->assertEquals($dates[1], $nextDates[1]->start());
+        }
 
-        $this->assertCount(1, $nextDates);
+        public function test_can_generate_between_dates()
+        {
+            $nextDates = $this->event->datesBetween(Carbon::parse('2019-11-23'), Carbon::parse('2019-11-26'));
 
-        $this->assertEquals($dates[0], $nextDates[0]->start());
+            $dates = collect([
+                Carbon::parse('2019-11-23 19:00'),
+                Carbon::parse('2019-11-24 11:00'),
+                Carbon::parse('2019-11-25 11:00'),
+            ]);
 
-        $nextDates = $this->event->upcomingDates();
+            $this->assertCount(3, $nextDates);
 
-        $dates = collect([
-            Carbon::parse('2019-11-23 7PM'),
-        ]);
+            $this->assertEquals($dates[0], $nextDates[0]->start());
+            $this->assertEquals($dates[1], $nextDates[1]->start());
+            $this->assertEquals($dates[2], $nextDates[2]->start());
 
-        $this->assertCount(1, $nextDates);
+            $dates = collect(
+                [
+                    Carbon::parse('2019-11-24 11:00'),
+                    Carbon::parse('2019-11-25 11:00'),
+                ]
+            );
 
-        $this->assertEquals($dates[0], $nextDates[0]->start());
-    }
+            $nextDates = $this->event->datesBetween(Carbon::parse('2019-11-24'), Carbon::parse('2019-11-26'));
 
-    public function test_can_generate_start_date_when_during_and_collapsed()
-    {
-        Carbon::setTestNow(Carbon::parse('2019-11-21 12:00'));
+            $this->assertEquals($dates[0], $nextDates[0]->start());
+            $this->assertEquals($dates[1], $nextDates[1]->start());
 
-        $this->allDayEvent->asSingleDay = true;
-        $nextDates = $this->allDayEvent->upcomingDates();
+            $this->assertEmpty(
+                $this->event->datesBetween(Carbon::parse('2019-11-26'), Carbon::parse('2019-11-28'))
+            );
+        }
 
-        $dates = collect([
-            Carbon::parse('2019-11-20'),
-        ]);
+        public function test_can_generate_only_start_date_when_collapsed()
+        {
+            Carbon::setTestNow(Carbon::parse('2019-11-19'));
 
-        $this->assertCount(1, $nextDates);
+            $this->allDayEvent->asSingleDay = true;
+            $this->event->asSingleDay = true;
+            $nextDates = $this->allDayEvent->upcomingDates();
 
-        $this->assertEquals($dates[0], $nextDates[0]->start());
-    }
+            $dates = collect([
+                Carbon::parse('2019-11-20'),
+            ]);
 
-    public function test_exposes_end_date_when_collapsed()
-    {
-        Carbon::setTestNow(Carbon::parse('2019-11-21 12:00'));
+            $this->assertCount(1, $nextDates);
 
-        $this->event->asSingleDay = true;
+            $this->assertEquals($dates[0], $nextDates[0]->start());
 
-        $events = new Events();
+            $nextDates = $this->event->upcomingDates();
 
-        $events->add($this->event);
+            $dates = collect([
+                Carbon::parse('2019-11-23 7PM'),
+            ]);
 
-        $nextDates = $this->event->upcomingDates();
+            $this->assertCount(1, $nextDates);
 
-        $this->assertCount(1, $nextDates);
-        $this->assertEquals('2019-11-25', $nextDates[0]->endDate());
+            $this->assertEquals($dates[0], $nextDates[0]->start());
+        }
 
-        $next = $events->upcoming(1);
-    }
+        public function test_can_generate_start_date_when_during_and_collapsed()
+        {
+            Carbon::setTestNow(Carbon::parse('2019-11-21 12:00'));
 
-    public function test_can_get_all_events_when_during()
-    {
-        Carbon::setTestNow(Carbon::parse('2019-11-24'));
-        $event = EventFactory::createFromArray(
-            [
-                'multi_day' => true,
-                'days' => [
-                    [
-                        'date' => '2019-11-23',
-                        'start_time' => '19:00',
-                        'end_time' => '21:00',
+            $this->allDayEvent->asSingleDay = true;
+            $nextDates = $this->allDayEvent->upcomingDates();
+
+            $dates = collect([
+                Carbon::parse('2019-11-20'),
+            ]);
+
+            $this->assertCount(1, $nextDates);
+
+            $this->assertEquals($dates[0], $nextDates[0]->start());
+        }
+
+        public function test_exposes_end_date_when_collapsed()
+        {
+            Carbon::setTestNow(Carbon::parse('2019-11-21 12:00'));
+
+            $this->event->asSingleDay = true;
+
+            $events = new Events();
+
+            $events->add($this->event);
+
+            $nextDates = $this->event->upcomingDates();
+
+            $this->assertCount(1, $nextDates);
+            $this->assertEquals('2019-11-25', $nextDates[0]->endDate());
+
+            $next = $events->upcoming(1);
+        }
+
+        public function test_can_get_all_events_when_during()
+        {
+            Carbon::setTestNow(Carbon::parse('2019-11-24'));
+            $event = EventFactory::createFromArray(
+                [
+                    'multi_day' => true,
+                    'days' => [
+                        [
+                            'date' => '2019-11-23',
+                            'start_time' => '19:00',
+                            'end_time' => '21:00',
+                        ],
+                        [
+                            'date' => '2019-11-25',
+                            'start_time' => '11:00',
+                            'end_time' => '15:00',
+                        ],
+                        [
+                            'date' => '2019-11-26',
+                            'start_time' => '11:00',
+                            'end_time' => '15:00',
+                        ],
                     ],
-                    [
-                        'date' => '2019-11-25',
-                        'start_time' => '11:00',
-                        'end_time' => '15:00',
-                    ],
-                    [
-                        'date' => '2019-11-26',
-                        'start_time' => '11:00',
-                        'end_time' => '15:00',
-                    ],
-                ],
-            ]
-        );
+                ]
+            );
 
-        $events = new Events();
+            $events = new Events();
 
-        $events->add($event);
+            $events->add($event);
 
-        $nextDates = $events->all(Carbon::now(), Carbon::now()->addDays(8))
-            ->groupBy(function ($event, $key) {
-                return $event->start_date;
-            })
-            ->map(function ($days, $key) {
-                return [
-                    'date' => $key,
-                    'dates' => $days->toArray(),
-                ];
-            });
+            $nextDates = $events->all(Carbon::now(), Carbon::now()->addDays(8))
+                ->groupBy(function ($event, $key) {
+                    return $event->start_date;
+                })
+                ->map(function ($days, $key) {
+                    return [
+                        'date' => $key,
+                        'dates' => $days->toArray(),
+                    ];
+                });
 
-        $this->assertCount(2, $nextDates);
-    }
+            $this->assertCount(2, $nextDates);
+        }
+        */
 }

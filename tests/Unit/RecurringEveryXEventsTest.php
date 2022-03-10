@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Types\RecurringEvent;
 
 class RecurringEveryXEventsTest extends TestCase
 {
@@ -26,7 +27,7 @@ class RecurringEveryXEventsTest extends TestCase
 
         $event = EventFactory::createFromEntry($recurringEntry);
 
-        $this->assertInstanceOf(self::class, $event);
+        $this->assertInstanceOf(RecurringEvent::class, $event);
     }
 
     /** @test */
@@ -297,7 +298,7 @@ class RecurringEveryXEventsTest extends TestCase
         $this->assertEquals($events[0], $occurrences[0]->augmentedValue('start'));
         $this->assertEquals($events[1], $occurrences[1]->augmentedValue('start'));
     }
-
+    /*
     public function test_can_get_last_day_when_before()
     {
         Carbon::setTestNow(Carbon::now()->setTimeFromTimeString('10:30'));
@@ -412,4 +413,5 @@ class RecurringEveryXEventsTest extends TestCase
 
         $this->assertEmpty($dates);
     }
+*/
 }

@@ -37,8 +37,7 @@ class EventsTest extends TestCase
                 'start_time' => '13:00',
             ])->save();
 
-        $occurrences = Events::make()
-            ->collection('events')
+        $occurrences = Events::fromCollection(handle: 'events')
             ->between(now(), now()->addDays(2)->endOfDay());
 
         $expectedStartDates = [
@@ -72,13 +71,11 @@ class EventsTest extends TestCase
                 'recurrence' => 'daily',
             ])->save();
 
-        $occurrences = Events::make()
-            ->collection('events')
+        $occurrences = Events::fromCollection(handle: 'events')
             ->upcoming(10);
 
         $this->assertCount(10, $occurrences);
-        $occurrences = Events::make()
-            ->collection('events')
+        $occurrences = Events::fromCollection(handle: 'events')
             ->limit(2)
             ->upcoming(10);
 
@@ -102,13 +99,11 @@ class EventsTest extends TestCase
                 'recurrence' => 'daily',
             ])->save();
 
-        $occurrences = Events::make()
-            ->collection('events')
+        $occurrences = Events::fromCollection(handle: 'events')
             ->between(now(), now()->addDays(9)->endOfDay());
 
         $this->assertCount(10, $occurrences);
-        $occurrences = Events::make()
-            ->collection('events')
+        $occurrences = Events::fromCollection(handle: 'events')
             ->limit(2)
             ->between(now(), now()->addDays(9)->endOfDay());
 
