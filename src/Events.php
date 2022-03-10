@@ -9,22 +9,18 @@ use Statamic\Facades\Entry as EntryFacade;
 
 class Events
 {
-    private string $collection = 'events';
     private EntryCollection $entries;
     private ?int $limit = null;
     private ?EntryCollection $occurrences = null;
     private array $taxonomies = [];
 
-    public static function make(): self
+    public static function fromCollection(string $handle): self
     {
-        return new static;
+        return new static(collection: $handle);
     }
 
-    public function collection(string $handle): self
+    private function __construct(private string $collection)
     {
-        $this->collection = $handle;
-
-        return $this;
     }
 
     public function limit(int $limit): self
