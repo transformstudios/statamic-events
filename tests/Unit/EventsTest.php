@@ -109,6 +109,130 @@ class EventsTest extends TestCase
 
         $this->assertCount(2, $occurrences);
     }
+
+    /** @test */
+    public function canFilterEvents()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('recurring-event')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+            ])->save();
+
+        Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('other-event')
+            ->data([
+                'title' => 'Other Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+            ])->save();
+
+        $occurrences = Events::fromCollection(handle: 'events')
+            ->filter('title:contains', 'Other')
+            ->between(now(), now()->addDays(9)->endOfDay());
+
+        $this->assertCount(10, $occurrences);
+    }
+
+    /** @test */
+    public function canFilterMultipleEvents()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('recurring-event')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+            ])->save();
+
+        Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('other-event')
+            ->data([
+                'title' => 'Other Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+            ])->save();
+
+        Entry::make()
+                ->blueprint($this->blueprint->handle())
+                ->collection('events')
+                ->slug('other-event')
+                ->data([
+                    'title' => 'Other Event 2',
+                    'start_date' => Carbon::now()->toDateString(),
+                    'start_time' => '11:00',
+                    'end_time' => '12:00',
+                    'recurrence' => 'weekly',
+                ])->save();
+
+        $occurrences = Events::fromCollection(handle: 'events')
+            ->filter('title:contains', 'Other')
+            ->filter('recurrence:is', 'daily')
+            ->between(now(), now()->addDays(9)->endOfDay());
+
+        $this->assertCount(10, $occurrences);
+    }
+
+    /** @test */
+    public function canFilterByTermEvents()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('recurring-event')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+                'categories' => ['one'],
+            ])->save();
+
+        Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('other-event')
+            ->data([
+                'title' => 'Other Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+                'categories' => ['two'],
+            ])->save();
+
+        $occurrences = Events::fromCollection(handle: 'events')
+            ->terms('categories::two')
+            ->between(now(), now()->addDays(9)->endOfDay());
+
+        $this->assertCount(10, $occurrences);
+    }
+
     // public function test_empty_collection_when_after_end()
     // {
     //     $events = new Events();
