@@ -4,6 +4,7 @@ namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
 use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Tests\TestCase;
 
 class RecurringMonthlyEventsTest extends TestCase
 {

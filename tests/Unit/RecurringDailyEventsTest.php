@@ -55,7 +55,7 @@ class RecurringDailyEventsTest extends TestCase
 
         $this->assertCount(3, $nextOccurrences);
 
-        $this->assertEquals($startDate, $nextOccurrences->first()->augmentedValue('start'));
+        $this->assertEquals($startDate, $nextOccurrences->first()->start);
     }
 
     /** @test */
@@ -77,7 +77,7 @@ class RecurringDailyEventsTest extends TestCase
         $event = EventFactory::createFromEntry($recurringEntry);
         $nextOccurrences = $event->nextOccurrences();
 
-        $this->assertEquals($startDate, $nextOccurrences[0]->augmentedValue('start'));
+        $this->assertEquals($startDate, $nextOccurrences[0]->start);
     }
 
     // public function test_can_generate_next_day_if_after()

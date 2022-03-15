@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Tests\TestCase;
 use TransformStudios\Events\Types\SingleDayEvent;
 
 class SingleDayEventsTest extends TestCase
@@ -109,7 +110,7 @@ class SingleDayEventsTest extends TestCase
 
         $this->assertCount(1, $nextOccurrences);
 
-        $this->assertEquals($startDate, $nextOccurrences->first()->augmentedValue('start'));
+        $this->assertEquals($startDate, $nextOccurrences->first()->start);
     }
 
     /** @test */
@@ -130,6 +131,6 @@ class SingleDayEventsTest extends TestCase
         $event = EventFactory::createFromEntry($recurringEntry);
         $nextOccurrences = $event->nextOccurrences();
 
-        $this->assertEquals($startDate, $nextOccurrences[0]->augmentedValue('start'));
+        $this->assertEquals($startDate, $nextOccurrences[0]->start);
     }
 }

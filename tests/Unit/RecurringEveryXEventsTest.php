@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Tests\TestCase;
 use TransformStudios\Events\Types\RecurringEvent;
 
 class RecurringEveryXEventsTest extends TestCase
@@ -95,19 +96,19 @@ class RecurringEveryXEventsTest extends TestCase
 
         $this->assertCount(1, $occurrences);
 
-        $this->assertEquals($startDate, $occurrences[0]->augmentedValue('start'));
+        $this->assertEquals($startDate, $occurrences[0]->start);
 
         Carbon::setTestNow(now()->setTimeFromTimeString('10:59:59'));
         $occurrences = EventFactory::createFromEntry($recurringEntry)
             ->nextOccurrences(1);
 
-        $this->assertEquals($startDate, $occurrences[0]->augmentedValue('start'));
+        $this->assertEquals($startDate, $occurrences[0]->start);
     }
 
     /** @test */
     public function canGenerateOccurrenceIfDuring()
     {
-        $startDate = Carbon::now()->setTimeFromTimeString('11:00');
+        $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
         $recurringEntry = Entry::make()
             ->blueprint($this->blueprint->handle())
             ->collection('events')
@@ -120,11 +121,11 @@ class RecurringEveryXEventsTest extends TestCase
                 'period' => 'days',
             ]);
 
-        Carbon::setTestNow(now()->addMinutes(10));
+        Carbon::setTestNow($startDate->addMinutes(10));
         $occurrences = EventFactory::createFromEntry($recurringEntry)
             ->nextOccurrences(1);
 
-        $this->assertEquals($startDate, $occurrences[0]->augmentedValue('start'));
+        $this->assertEquals($startDate, $occurrences[0]->start);
     }
 
     /** @test */
@@ -150,7 +151,7 @@ class RecurringEveryXEventsTest extends TestCase
 
         $occurrences = $event->nextOccurrences(1);
 
-        $this->assertEquals($startDate->addDays(2), $occurrences[0]->augmentedValue('start'));
+        $this->assertEquals($startDate->addDays(2), $occurrences[0]->start);
 
         // $nextDate = $event->upcomingDate(Carbon::now()->addDays(2));
 
@@ -180,7 +181,7 @@ class RecurringEveryXEventsTest extends TestCase
 
         $occurrences = $event->nextOccurrences(1);
 
-        $this->assertEquals($startDate->addWeeks(2), $occurrences[0]->augmentedValue('start'));
+        $this->assertEquals($startDate->addWeeks(2), $occurrences[0]->start);
     }
 
     /** @test */
@@ -206,7 +207,7 @@ class RecurringEveryXEventsTest extends TestCase
 
         $this->assertNotEmpty($occurrences);
 
-        $this->assertEquals(Carbon::parse('2021-03-15')->setTimeFromTimeString('11:00:00'), $occurrences[0]->augmentedValue('start'));
+        $this->assertEquals(Carbon::parse('2021-03-15')->setTimeFromTimeString('11:00:00'), $occurrences[0]->start);
     }
 
     /** @test */
@@ -232,7 +233,7 @@ class RecurringEveryXEventsTest extends TestCase
 
         $occurrences = $event->nextOccurrences(1);
 
-        $this->assertEquals($startDate->setTimeFromTimeString('11:00:00'), $occurrences[0]->augmentedValue('start'));
+        $this->assertEquals($startDate->setTimeFromTimeString('11:00:00'), $occurrences[0]->start);
     }
 
     /** @test */
@@ -262,8 +263,8 @@ class RecurringEveryXEventsTest extends TestCase
 
         $this->assertCount(2, $occurrences);
 
-        $this->assertEquals($events[0], $occurrences[0]->augmentedValue('start'));
-        $this->assertEquals($events[1], $occurrences[1]->augmentedValue('start'));
+        $this->assertEquals($events[0], $occurrences[0]->start);
+        $this->assertEquals($events[1], $occurrences[1]->start);
     }
 
     /** @test */
@@ -295,8 +296,8 @@ class RecurringEveryXEventsTest extends TestCase
 
         $this->assertCount(2, $occurrences);
 
-        $this->assertEquals($events[0], $occurrences[0]->augmentedValue('start'));
-        $this->assertEquals($events[1], $occurrences[1]->augmentedValue('start'));
+        $this->assertEquals($events[0], $occurrences[0]->start);
+        $this->assertEquals($events[1], $occurrences[1]->start);
     }
     /*
     public function test_can_get_last_day_when_before()

@@ -5,6 +5,7 @@ namespace TransformStudios\Events\Tests\Unit;
 use Carbon\Carbon;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
+use TransformStudios\Events\Tests\TestCase;
 
 class RecurringMixedEventsTest extends TestCase
 {
@@ -15,20 +16,9 @@ class RecurringMixedEventsTest extends TestCase
     {
         parent::setUp();
 
-        $this->events = new Events();
+        // $this->events = new Events();
     }
 
-    /**
-     * Clean up the testing environment before the next test.
-     *
-     * @return void
-     */
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow();
-    }
     /*
     public function test_generates_next_occurrence_when_multiple_events()
     {

@@ -9,6 +9,7 @@ use RRule\RRule;
 use RRule\RRuleInterface;
 use RRule\RSet;
 use Statamic\Entries\Entry;
+use Statamic\Fields\Values;
 use TransformStudios\Events\Day;
 
 class MultiDayEvent extends Event
@@ -20,7 +21,7 @@ class MultiDayEvent extends Event
         parent::__construct($event);
 
         $this->days = collect($this->event->days)
-            ->map(fn (array $day) => new Day($day, $this->isAllDay()));
+            ->map(fn (Values $day) => new Day($day->all(), $this->isAllDay()));
     }
 
     protected function rule(): RRuleInterface

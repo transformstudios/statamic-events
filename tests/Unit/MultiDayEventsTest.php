@@ -120,11 +120,11 @@ class MultiDayEventsTest extends TestCase
 
         $this->assertEquals(
             Carbon::parse('2019-11-23')->setTimeFromTimeString('19:00:00'),
-            $this->event->nextOccurrences()[0]->augmentedValue('start')
+            $this->event->nextOccurrences()[0]->start
         );
         $this->assertEquals(
             Carbon::parse('2019-11-23')->setTimeFromTimeString('21:00'),
-            $this->event->nextOccurrences()[0]->augmentedValue('end')
+            $this->event->nextOccurrences()[0]->end
         );
     }
 
@@ -134,7 +134,7 @@ class MultiDayEventsTest extends TestCase
         Carbon::setTestNow('2019-11-24 10:00');
         $this->assertEquals(
             Carbon::parse('2019-11-24')->setTimeFromTimeString('11:00:00'),
-            $this->event->nextOccurrences()[0]->augmentedValue('start')
+            $this->event->nextOccurrences()[0]->start
         );
     }
 

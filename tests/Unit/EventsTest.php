@@ -48,10 +48,10 @@ class EventsTest extends TestCase
         ];
         $this->assertCount(4, $occurrences);
 
-        $this->assertEquals($expectedStartDates[0], $occurrences[0]->augmentedValue('start'));
-        $this->assertEquals($expectedStartDates[1], $occurrences[1]->augmentedValue('start'));
-        $this->assertEquals($expectedStartDates[2], $occurrences[2]->augmentedValue('start'));
-        $this->assertEquals($expectedStartDates[3], $occurrences[3]->augmentedValue('start'));
+        $this->assertEquals($expectedStartDates[0], $occurrences[0]->start);
+        $this->assertEquals($expectedStartDates[1], $occurrences[1]->start);
+        $this->assertEquals($expectedStartDates[2], $occurrences[2]->start);
+        $this->assertEquals($expectedStartDates[3], $occurrences[3]->start);
     }
 
     /** @test */
