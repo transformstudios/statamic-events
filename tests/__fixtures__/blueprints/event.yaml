@@ -173,3 +173,12 @@ sections:
           width: 25
           show_when:
             recurrence: 'contains_any daily, weekly, monthly, every'
+      -
+        handle: categories
+        field:
+          type: terms
+          taxonomies:
+            - categories
+          display: Categories
+          mode: tags
+          width: 50

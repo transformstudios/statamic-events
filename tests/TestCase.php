@@ -7,6 +7,8 @@ use Statamic\Entries\Collection;
 use Statamic\Extend\Manifest;
 use Statamic\Facades\Blueprint as BlueprintFacade;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Providers\StatamicServiceProvider;
@@ -81,6 +83,9 @@ abstract class TestCase extends OrchestraTestCase
         $app['config']->set('statamic.editions.pro', true);
 
         Statamic::booted(function () {
+            $taxonomy = Taxonomy::make('categories')->save();
+            Term::make('one')->taxonomy('categories')->dataForLocale('default', [])->save();
+            Term::make('two')->taxonomy('categories')->dataForLocale('default', [])->save();
             $blueprintContents = YAML::parse(file_get_contents(__DIR__.'/__fixtures__/blueprints/event.yaml'));
             $blueprintFields = collect($blueprintContents['sections']['main']['fields'])
                 ->keyBy(fn ($item) =>  $item['handle'])
@@ -92,7 +97,9 @@ abstract class TestCase extends OrchestraTestCase
                 ->setHandle('event')
                 ->save();
 
-            $this->collection = CollectionFacade::make('events')->save();
+            $this->collection = CollectionFacade::make('events')
+                ->taxonomies(['categories'])
+                ->save();
         });
     }
 }
