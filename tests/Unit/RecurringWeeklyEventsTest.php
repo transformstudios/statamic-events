@@ -1,6 +1,6 @@
 <?php
 
-namespace TransformStudios\Events\Tests;
+namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
 use TransformStudios\Events\EventFactory;
