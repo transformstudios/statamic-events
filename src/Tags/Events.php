@@ -2,75 +2,35 @@
 
 namespace TransformStudios\Events\Tags;
 
-use Carbon\Carbon;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Spatie\CalendarLinks\Link;
+use Statamic\Entries\EntryCollection;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
-use Statamic\Tags\Collection\Collection as CollectionTag;
+use Statamic\Tags\Concerns\OutputsItems;
+use Statamic\Tags\Tags;
 use TransformStudios\Events\Calendar;
 use TransformStudios\Events\EventFactory;
-use TransformStudios\Events\Events as EventsActions;
+use TransformStudios\Events\Events as Generator;
 
-class Events extends CollectionTag
+class Events extends Tags
 {
-    /**
-     * @var Collection|Event
-     */
-    private $dates;
-    private EventsActions $events;
-    private $limit;
-    private bool $paginated = false;
-
-    private $paginationData;
-
-    public function __construct()
-    {
-        $this->dates = collect();
-        $this->events = new EventsActions;
-
-        Carbon::setWeekStartsAt(Carbon::SUNDAY);
-        Carbon::setWeekEndsAt(Carbon::SATURDAY);
-    }
+    use OutputsItems;
 
     public function between()
     {
-        $from = $this->params->pull('from');
-        $to = $this->params->pull('to');
-
-        $this->loadEvents($this->params->bool('collapse_multi_days', false));
-
-        if (! $from) {
-            Log::error('Missing `from` parameter in `events:between` tag');
-
-            return;
-        }
-
-        if (! $to) {
-            Log::error('Missing `to` parameter in `events:between` tag');
-
-            return;
-        }
-
-        $from = Carbon::parse($from)->startOfDay();
-        $to = Carbon::parse($to)->endOfDay();
+        $generator = Generator::fromCollection(handle: $this->params->get('collection'));
 
         if ($this->params->bool('paginate')) {
-            $this->limit = $this->params->int('limit', 1);
-
-            $this->offset = $this->params->int('offset', 0);
-
-            $this->setOffsetForPagination();
-            $this->paginateBetween($this->events->all($from, $to));
-
-            return $this->outputData();
+            $generator->pagination(perPage: $this->params->int('per_page'));
         }
 
-        $this->loadDates($from, $to, false);
-
-        return $this->outputData();
+        return $this->output($generator->between(
+            Carbon::parse($this->params->get('from', now()))->startOfDay(),
+            Carbon::parse($this->params->get('to'))->endOfDay()
+        ));
     }
 
     public function calendar(): array
@@ -102,19 +62,20 @@ class Events extends CollectionTag
         return $link->$type();
     }
 
-    public function in(): array
+    public function in()
     {
-        $this->loadEvents($this->params->bool('collapse_multi_days', false));
+        $generator = Generator::fromCollection(handle: $this->params->get('collection'));
 
-        $from = Carbon::now()->startOfDay();
-        $to = Carbon::now()->modify($this->params->get('next'))->endOfDay();
+        if ($this->params->bool('paginate')) {
+            $generator->pagination(perPage: $this->params->int('per_page'));
+        }
 
-        $this->loadDates($from, $to);
-
-        return array_values(array_merge(
-            $this->makeEmptyDates($from, $to),
-            $this->dates->toArray()
+        return $this->output($generator->between(
+            Carbon::now()->startOfDay(),
+            Carbon::now()->modify($this->params->get('next'))->endOfDay()
         ));
+
+        // $this->loadEvents($this->params->bool('collapse_multi_days', false));
     }
 
     public function nowOrParam(): string
@@ -143,24 +104,15 @@ class Events extends CollectionTag
         return $this->dates->toArray();
     }
 
-    public function upcoming(): array
+    public function upcoming(): EntryCollection|array
     {
-        $this->limit = $this->params->int('limit', 1);
-
-        $this->offset = $this->params->int('offset', 0);
-
-        $this->loadEvents($this->params->bool('collapse_multi_days', false));
+        $generator = Generator::fromCollection(handle: $this->params->get('collection'));
 
         if ($this->params->bool('paginate')) {
-            $this->setOffsetForPagination();
-            $this->paginate($this->events->upcoming($this->limit + 1, $this->offset));
-
-            return $this->outputData();
+            $generator->pagination(perPage: $this->params->int('per_page'));
         }
 
-        $this->dates = $this->events->upcoming($this->limit, $this->offset);
-
-        return $this->outputData();
+        return $this->output($generator->upcoming($this->params->int('limit')));
     }
 
     private function setOffsetForPagination(): void
