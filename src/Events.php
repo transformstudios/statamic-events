@@ -5,6 +5,7 @@ namespace TransformStudios\Events;
 use Illuminate\Support\Carbon;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
@@ -17,8 +18,9 @@ class Events
 
     private EntryCollection $entries;
     private array $filters = [];
-    private ?int $limit = null;
-    private ?EntryCollection $occurrences = null;
+    private ?int $page = null;
+    private ?int $perPage = null;
+    private ?string $site = null;
     private array $terms = [];
 
     public static function fromCollection(string $handle): self
@@ -37,9 +39,10 @@ class Events
         return $this;
     }
 
-    public function limit(int $limit): self
+    public function pagination(int $page = 1, int $perPage = 10): self
     {
-        $this->limit = $limit;
+        $this->page = $page;
+        $this->perPage = $perPage;
 
         return $this;
     }
@@ -58,25 +61,25 @@ class Events
         return $this;
     }
 
-    public function between(Carbon $from, Carbon $to): EntryCollection
+    public function between(Carbon $from, Carbon $to): EntryCollection|LengthAwarePaginator
     {
         return $this->output(type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->occurrencesBetween(from: $from, to: $to));
     }
 
-    public function upcoming(int $limit = 1): EntryCollection
+    public function upcoming(int $limit = 1): EntryCollection|LengthAwarePaginator
     {
         return $this->output(type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->nextOccurrences(limit: $limit));
     }
 
-    private function output(callable $type): EntryCollection
+    private function output(callable $type): EntryCollection|LengthAwarePaginator
     {
-        return $this
+        $occurrences = $this
             ->entries()
-            ->occurrences($type)
-            ->take($this->limit);
+            ->occurrences($type);
+
+        return $this->page ? $this->paginate($occurrences) : $occurrences;
     }
 
-    // gets the relevant entries, based on the filters etc
     private function entries(): self
     {
         $query = EntryFacade::query()
@@ -101,7 +104,17 @@ class Events
         return $this->entries
             // take each event and generate the occurences
             ->flatMap($generator)
-            ->sortBy(fn (Entry $occurrence) => $occurrence->augmentedValue('start'))
+            ->sortBy(fn (Entry $occurrence) => $occurrence->start)
             ->values();
+    }
+
+    private function paginate(EntryCollection $occurrences): LengthAwarePaginator
+    {
+        return new LengthAwarePaginator(
+            $occurrences->forPage($this->page, $this->perPage),
+            $occurrences->count(),
+            $this->perPage,
+            $this->page
+        );
     }
 }

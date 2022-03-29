@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Tests\Unit;
 
 use Illuminate\Support\Carbon;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\Events;
 use TransformStudios\Events\Tests\TestCase;
@@ -55,7 +56,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canLimitUpcomngOccurrences()
+    public function canPaginateUpcomingOccurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -75,15 +76,25 @@ class EventsTest extends TestCase
             ->upcoming(10);
 
         $this->assertCount(10, $occurrences);
-        $occurrences = Events::fromCollection(handle: 'events')
-            ->limit(2)
+        $paginator = Events::fromCollection(handle: 'events')
+            ->pagination(perPage: 2)
             ->upcoming(10);
 
-        $this->assertCount(2, $occurrences);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $paginator);
+        $this->assertCount(2, $occurrences = $paginator->items());
+        $this->assertEquals(now()->addDay()->setTimeFromTimeString('11:00'), $paginator->items()[1]->start);
+
+        $paginator = Events::fromCollection(handle: 'events')
+            ->pagination(perPage: 3, page: 3)
+            ->upcoming(10);
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $paginator);
+        $this->assertCount(3, $occurrences = $paginator->items());
+        $this->assertEquals(3, $paginator->currentPage());
     }
 
     /** @test */
-    public function canLimitOccurrencesBetween()
+    public function canPaginateOccurrencesBetween()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -103,11 +114,15 @@ class EventsTest extends TestCase
             ->between(now(), now()->addDays(9)->endOfDay());
 
         $this->assertCount(10, $occurrences);
-        $occurrences = Events::fromCollection(handle: 'events')
-            ->limit(2)
+        $paginator = Events::fromCollection(handle: 'events')
+            ->pagination(perPage: 2)
             ->between(now(), now()->addDays(9)->endOfDay());
 
-        $this->assertCount(2, $occurrences);
+        $this->assertInstanceOf(LengthAwarePaginator::class, $paginator);
+
+        $this->assertCount(2, $occurrences = $paginator->items());
+
+        $this->assertEquals(now()->addDay()->setTimeFromTimeString('11:00'), $paginator->items()[1]->start);
     }
 
     /** @test */
