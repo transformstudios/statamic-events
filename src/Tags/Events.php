@@ -2,13 +2,15 @@
 
 namespace TransformStudios\Events\Tags;
 
+use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Spatie\CalendarLinks\Link;
+use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Support\Arr;
 use Statamic\Tags\Concerns\OutputsItems;
 use Statamic\Tags\Tags;
-use TransformStudios\Events\Calendar;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events as Generator;
 
@@ -19,16 +21,27 @@ class Events extends Tags
     public function between(): EntryCollection|array
     {
         return $this->output($this->generator()->between(
-            Carbon::parse($this->params->get('from', now()))->startOfDay(),
-            Carbon::parse($this->params->get('to'))->endOfDay()
+            from: Carbon::parse($this->params->get('from', now()))->startOfDay(),
+            to: Carbon::parse($this->params->get('to'))->endOfDay()
         ));
     }
 
-    public function calendar(): array
+    public function calendar(): Collection
     {
-        $calendar = new Calendar($this->params->get('collection', config('events.events_collection')));
+        $month = $this->params->get('month', now()->englishMonth);
+        $year = $this->params->get('year', now()->year);
 
-        return array_values($calendar->month($this->params->get('month'), $this->params->get('year')));
+        $from = Carbon::parse($month.' '.$year)->startOfMonth();
+        $to = Carbon::parse($month.' '.$year)->endOfMonth();
+
+        $occurrences = $this
+            ->generator()
+            ->between(from: $from, to: $to)
+            ->groupBy(fn (Entry $occurrence) => $occurrence->start->toDateString())
+            ->map(fn (array $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences))
+            ->values();
+
+        return $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences));
     }
 
     public function downloadLink(): string
@@ -56,16 +69,14 @@ class Events extends Tags
     public function in(): EntryCollection|array
     {
         return $this->output($this->generator()->between(
-            Carbon::now()->startOfDay(),
-            Carbon::now()->modify($this->params->get('next'))->endOfDay()
+            from: now()->startOfDay(),
+            to: now()->modify($this->params->get('next'))->endOfDay()
         ));
-
-        // $this->loadEvents($this->params->bool('collapse_multi_days', false));
     }
 
     public function nowOrParam(): string
     {
-        $monthYear = request('month', Carbon::now()->englishMonth).' '.request('year', Carbon::now()->year);
+        $monthYear = request('month', now()->englishMonth).' '.request('year', now()->year);
 
         $month = Carbon::parse($monthYear);
 
@@ -73,46 +84,50 @@ class Events extends Tags
             $month->modify($modify);
         }
 
-        return $month->format($this->params->get('format'));
+        return $month->format(format: $this->params->get('format'));
     }
 
     public function today(): EntryCollection|array
     {
-        // $this->loadEvents($this->params->bool('collapse_multi_days', false));
-
-        return $this->output($this->generator()->between(
-            Carbon::now()->startOfDay(),
-            Carbon::now()->endOfDay()
-        ));
+        return $this->output($this->generator()->between(from: now()->startOfDay(), to: now()->endOfDay()));
     }
 
     public function upcoming(): EntryCollection|array
     {
-        return $this->output($this->generator()->upcoming($this->params->int('limit')));
+        return $this->output($this->generator()->upcoming(limit: $this->params->int('limit')));
     }
 
     private function generator(): Generator
     {
-        $generator = Generator::fromCollection(handle: $this->params->get('collection'));
-
-        if ($this->params->bool('paginate')) {
-            $generator->pagination(perPage: $this->params->int('per_page'));
-        }
-
-        return $generator;
+        return Generator::fromCollection(handle: $this->params->get('collection'))
+            ->when(
+                value: $this->params->bool('paginate'),
+                callback: fn (Generator $generator) =>  $generator->pagination(perPage: $this->params->int('per_page'))
+            );
     }
 
-    private function makeEmptyDates(Carbon| string $from, Carbon|string $to): array
+    private function day(string $date, array $occurrences): array
     {
-        $dates = [];
-        $currentDay = $from = Carbon::parse($from);
+        return [
+            'date' => $date,
+            'dates' => $occurrences,
+            'occurrences' => $occurrences,
+        ];
+    }
+
+    private function makeEmptyDates(CarbonInterface $from, CarbonInterface $to): Collection
+    {
+        $dates = collect();
+        $currentDay = $from->copy()->toMutable();
 
         foreach (range(0, Carbon::parse($to)->diffInDays($from)) as $ignore) {
             $date = $currentDay->toDateString();
-            $dates[$date] = [
+            $dates->put($date, [
                 'date' => $date,
                 'no_results' => true,
-            ];
+                'no_occurrences' => true,
+                'empty' => true,
+            ]);
             $currentDay->addDay();
         }
 

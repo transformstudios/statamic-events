@@ -2,19 +2,21 @@
 
 namespace TransformStudios\Events;
 
-use Illuminate\Support\Carbon;
+use Carbon\CarbonInterface;
+use Illuminate\Support\Traits\Conditionable;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Support\Arr;
 use Statamic\Tags\Concerns\QueriesConditions;
 
 class Events
 {
-    use QueriesConditions;
+    use Conditionable, QueriesConditions;
 
     private EntryCollection $entries;
     private array $filters = [];
@@ -61,21 +63,23 @@ class Events
         return $this;
     }
 
-    public function between(Carbon $from, Carbon $to): EntryCollection|LengthAwarePaginator
+    public function between(CarbonInterface $from, CarbonInterface $to): EntryCollection|LengthAwarePaginator
     {
-        return $this->output(type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->occurrencesBetween(from: $from, to: $to));
+        return $this->output(
+            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->occurrencesBetween(from: $from, to: $to)
+        );
     }
 
     public function upcoming(int $limit = 1): EntryCollection|LengthAwarePaginator
     {
-        return $this->output(type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->nextOccurrences(limit: $limit));
+        return $this->output(
+            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->nextOccurrences(limit: $limit)
+        );
     }
 
     private function output(callable $type): EntryCollection|LengthAwarePaginator
     {
-        $occurrences = $this
-            ->entries()
-            ->occurrences($type);
+        $occurrences = $this->entries()->occurrences($type);
 
         return $this->page ? $this->paginate($occurrences) : $occurrences;
     }
@@ -110,6 +114,11 @@ class Events
 
     private function paginate(EntryCollection $occurrences): LengthAwarePaginator
     {
+        /*
+                    fn (LengthAwarePaginator $paginator) => $paginator
+                ->setPath(URL::makeAbsolute(URL::getCurrent()))
+                ->appends(request()->all())
+        */
         return new LengthAwarePaginator(
             $occurrences->forPage($this->page, $this->perPage),
             $occurrences->count(),
