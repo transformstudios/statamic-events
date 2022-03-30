@@ -38,7 +38,7 @@ class Events extends Tags
             ->generator()
             ->between(from: $from, to: $to)
             ->groupBy(fn (Entry $occurrence) => $occurrence->start->toDateString())
-            ->map(fn (array $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences))
+            ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences))
             ->values();
 
         return $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences));
@@ -106,7 +106,7 @@ class Events extends Tags
             );
     }
 
-    private function day(string $date, array $occurrences): array
+    private function day(string $date, EntryCollection $occurrences): array
     {
         return [
             'date' => $date,
