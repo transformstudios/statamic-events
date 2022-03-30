@@ -7,7 +7,6 @@ use Statamic\Facades\Entry;
 use TransformStudios\Events\Tags\Events;
 use TransformStudios\Events\Tests\PreventSavingStacheItemsToDisk;
 use TransformStudios\Events\Tests\TestCase;
-use TransformStudios\Events\Types\RecurringEvent;
 
 class TagTest extends TestCase
 {
@@ -28,7 +27,7 @@ class TagTest extends TestCase
                 'start_date' => Carbon::now()->toDateString(),
                 'start_time' => '11:00',
                 'end_time' => '12:00',
-                'recurrence' => 'daily',
+                'recurrence' => 'weekly',
                 'categories' => ['one'],
             ])->save();
 
@@ -45,7 +44,7 @@ class TagTest extends TestCase
             ->setParameters([
                 'collection' => 'events',
                 'from' => Carbon::now(),
-                'to' => Carbon::now()->addDay(3),
+                'to' => Carbon::now()->addWeek(3),
             ]);
 
         $occurrences = $this->tag->between();
@@ -62,7 +61,7 @@ class TagTest extends TestCase
             ->setContext([])
             ->setParameters([
                 'collection' => 'events',
-                'to' => Carbon::now()->addDay(3),
+                'to' => Carbon::now()->addWeeks(3),
             ]);
 
         $occurrences = $this->tag->between();
@@ -70,22 +69,78 @@ class TagTest extends TestCase
         $this->assertCount(4, $occurrences);
     }
 
-        /** @test */
-        public function canGenerateInOccurrences()
-        {
-            Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+    /** @test */
+    public function canGenerateCalendarOccurrences()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
-            $this->tag
+        Entry::make()
+                ->blueprint($this->blueprint->handle())
+                ->collection('events')
+                ->slug('single-event')
+                ->data([
+                    'title' => 'Single Event',
+                    'start_date' => Carbon::now()->toDateString(),
+                    'start_time' => '13:00',
+                    'end_time' => '15:00',
+                ])->save();
+
+        $this->tag
                 ->setContext([])
                 ->setParameters([
                     'collection' => 'events',
-                    'next' => '3 days',
+                    'month' => now()->englishMonth,
+                    'year' => now()->year,
                 ]);
 
-            $occurrences = $this->tag->in();
+        $occurrences = $this->tag->calendar();
 
-            $this->assertCount(4, $occurrences);
-        }
+        $this->assertCount(now()->daysInMonth + 1, $occurrences);
+    }
+
+    /** @test */
+    public function canGenerateInOccurrences()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        $this->tag
+            ->setContext([])
+            ->setParameters([
+                'collection' => 'events',
+                'next' => '3 weeks',
+            ]);
+
+        $occurrences = $this->tag->in();
+
+        $this->assertCount(4, $occurrences);
+    }
+
+    /** @test */
+    public function canGenerateTodayOccurrences()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('single-event')
+            ->data([
+                'title' => 'Single Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '13:00',
+                'end_time' => '15:00',
+            ])->save();
+
+        $this->tag
+            ->setContext([])
+            ->setParameters([
+                'collection' => 'events',
+            ]);
+
+        $occurrences = $this->tag->today();
+
+        $this->assertCount(2, $occurrences);
+    }
 
     /** @test */
     public function canGenerateUpcomingOccurrences()
@@ -108,19 +163,6 @@ class TagTest extends TestCase
     public function canPaginateUpcomingOccurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
-
-        Entry::make()
-            ->blueprint($this->blueprint->handle())
-            ->collection('events')
-            ->slug('recurring-event')
-            ->data([
-                'title' => 'Recurring Event',
-                'start_date' => Carbon::now()->toDateString(),
-                'start_time' => '11:00',
-                'end_time' => '12:00',
-                'recurrence' => 'daily',
-                'categories' => ['one'],
-            ])->save();
 
         $this->tag
             ->setContext([])
