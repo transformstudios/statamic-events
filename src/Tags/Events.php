@@ -103,6 +103,9 @@ class Events extends Tags
             ->when(
                 value: $this->params->bool('paginate'),
                 callback: fn (Generator $generator) =>  $generator->pagination(perPage: $this->params->int('per_page'))
+            )->when(
+                value: $this->params->bool('collapse_multi_days'),
+                callback: fn (Generator $generator) =>  $generator->collapseMultiDays()
             );
     }
 

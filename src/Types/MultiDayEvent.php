@@ -16,7 +16,7 @@ class MultiDayEvent extends Event
 {
     private Collection $days;
 
-    public function __construct(Entry $event)
+    public function __construct(Entry $event, private bool $collapseMultiDays)
     {
         parent::__construct($event);
 
@@ -24,8 +24,17 @@ class MultiDayEvent extends Event
             ->map(fn (Values $day) => new Day($day->all(), $this->isAllDay()));
     }
 
-    protected function rule(): RRuleInterface
+    protected function rule(bool $collapseDays = false): RRuleInterface
     {
+        // if we're collapsing, then return an rrule instead of rset and use start of first day to end of last day
+        if ($this->collapseMultiDays) {
+            return new RRule([
+                'count' => 1,
+                'dtstart' => $this->end(),
+                'freq' => RRule::DAILY,
+            ]);
+        }
+
         return tap(
             new RSet(),
             fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([
@@ -38,18 +47,25 @@ class MultiDayEvent extends Event
 
     protected function supplement(CarbonInterface $date): Entry
     {
-        $day = $this->days->first(fn (Day $day) => $date->isSameDay($day->start()));
+        /** @var Day */
+        $day = $this->days->first(fn (Day $day, int $index) => $this->collapseMultiDays ? $index == 0 : $date->isSameDay($day->start()));
 
         return tap(
             unserialize(serialize($this->event)),
             fn (Entry $occurrence) => $occurrence
                 ->setSupplement('start', $day->start())
                 ->setSupplement('end', $day->end())
+                ->setSupplement('has_end_time', $day->hasEndTime())
         );
     }
 
     public function start(): CarbonImmutable
     {
         return $this->days->first()->start();
+    }
+
+    public function end(): CarbonImmutable
+    {
+        return $this->days->last()->end();
     }
 }

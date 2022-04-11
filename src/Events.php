@@ -18,6 +18,7 @@ class Events
 {
     use Conditionable, QueriesConditions;
 
+    private bool $collapseMultiDays = false;
     private EntryCollection $entries;
     private array $filters = [];
     private ?int $page = null;
@@ -32,6 +33,13 @@ class Events
 
     private function __construct(private string $collection)
     {
+    }
+
+    public function collapseMultiDays(): self
+    {
+        $this->collapseMultiDays = true;
+
+        return $this;
     }
 
     public function filter(string $fieldCondition, string $value): self
@@ -66,14 +74,14 @@ class Events
     public function between(CarbonInterface $from, CarbonInterface $to): EntryCollection|LengthAwarePaginator
     {
         return $this->output(
-            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->occurrencesBetween(from: $from, to: $to)
+            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry, collapseMultiDays: $this->collapseMultiDays)->occurrencesBetween(from: $from, to: $to)
         );
     }
 
     public function upcoming(int $limit = 1): EntryCollection|LengthAwarePaginator
     {
         return $this->output(
-            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry)->nextOccurrences(limit: $limit)
+            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry, collapseMultiDays: $this->collapseMultiDays)->nextOccurrences(limit: $limit)
         );
     }
 
