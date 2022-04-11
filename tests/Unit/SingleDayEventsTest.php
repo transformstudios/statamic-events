@@ -15,7 +15,6 @@ class SingleDayEventsTest extends TestCase
     public function canCreateSingleEvent()
     {
         $entry = Entry::make()
-            ->blueprint($this->blueprint)
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),
@@ -29,14 +28,12 @@ class SingleDayEventsTest extends TestCase
         $this->assertFalse($event->isRecurring());
         $this->assertFalse($event->isMultiDay());
         $this->assertTrue($event->hasEndTime());
-        $this->assertEquals(now()->setTimeFromTimeString('12:00'), $event->end());
     }
 
     /** @test */
     public function canCreateSingleAllDayEvent()
     {
         $entry = Entry::make()
-            ->blueprint($this->blueprint)
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),
@@ -55,7 +52,6 @@ class SingleDayEventsTest extends TestCase
         Carbon::setTestNow(now());
 
         $entry = Entry::make()
-            ->blueprint($this->blueprint)
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),
@@ -63,16 +59,16 @@ class SingleDayEventsTest extends TestCase
             ]);
 
         $event = EventFactory::createFromEntry($entry);
+        $nextOccurrences = $event->nextOccurrences();
 
-        $this->assertFalse($event->hasEndTime());
-        $this->assertEquals(now()->endOfDay(), $event->end());
+        $this->assertFalse($nextOccurrences[0]->has_end_time);
+        $this->assertEquals(now()->endOfDay()->setMicrosecond(0), $nextOccurrences[0]->end);
     }
 
     /** @test */
     public function emptyOccurrencesIfNowAfterEndDate()
     {
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint)
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),
@@ -94,7 +90,6 @@ class SingleDayEventsTest extends TestCase
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
 
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),
@@ -117,8 +112,7 @@ class SingleDayEventsTest extends TestCase
     public function canGenerateNextOccurrenceIfNowIsDuring()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
-        $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
+        $single = Entry::make()
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),
@@ -126,11 +120,40 @@ class SingleDayEventsTest extends TestCase
                 'end_time' => '12:00',
             ]);
 
+        $singleNoEndTime = Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->data([
+                'start_date' => $startDate->toDateString(),
+                'start_time' => '11:00',
+            ]);
+
         Carbon::setTestNow($startDate->addMinutes(10));
 
-        $event = EventFactory::createFromEntry($recurringEntry);
+        $event = EventFactory::createFromEntry($single);
+        $noEndTimeEvent = EventFactory::createFromEntry($singleNoEndTime);
         $nextOccurrences = $event->nextOccurrences();
 
         $this->assertEquals($startDate, $nextOccurrences[0]->start);
+        $this->assertEquals($startDate, $noEndTimeEvent->nextOccurrences()[0]->start);
+    }
+
+    /** @test */
+    public function canSupplementNoEndTime()
+    {
+        $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
+        $noEndTimeEntry = Entry::make()
+            ->collection('events')
+            ->data([
+                'start_date' => $startDate->toDateString(),
+                'start_time' => '11:00',
+            ]);
+
+        Carbon::setTestNow($startDate->addMinutes(10));
+
+        $event = EventFactory::createFromEntry($noEndTimeEntry);
+        $nextOccurrences = $event->nextOccurrences();
+
+        $this->assertFalse($nextOccurrences[0]->has_end_time);
     }
 }

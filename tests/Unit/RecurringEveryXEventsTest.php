@@ -15,7 +15,6 @@ class RecurringEveryXEventsTest extends TestCase
     public function canCreateEveryXEvent()
     {
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),
@@ -32,30 +31,9 @@ class RecurringEveryXEventsTest extends TestCase
     }
 
     /** @test */
-    public function endDateNullIfNoEndDate()
-    {
-        $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
-            ->collection('events')
-            ->data([
-                'start_date' => Carbon::now()->toDateString(),
-                'start_time' => '11:00',
-                'end_time' => '12:00',
-                'recurrence' => 'every',
-                'interval' => 2,
-                'period' => 'weeks',
-            ]);
-
-        $event = EventFactory::createFromEntry($recurringEntry);
-
-        $this->assertNull($event->end());
-    }
-
-    /** @test */
     public function noOccurencesWhenNowAfterEndDate()
     {
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),
@@ -80,7 +58,6 @@ class RecurringEveryXEventsTest extends TestCase
     {
         $startDate = Carbon::now()->addDay()->setTimeFromTimeString('11:00');
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),
@@ -110,7 +87,6 @@ class RecurringEveryXEventsTest extends TestCase
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),
@@ -134,7 +110,6 @@ class RecurringEveryXEventsTest extends TestCase
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
 
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),
@@ -164,7 +139,6 @@ class RecurringEveryXEventsTest extends TestCase
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
 
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),
@@ -188,7 +162,6 @@ class RecurringEveryXEventsTest extends TestCase
     public function canGenerateNextOccurrenceIfNow_after_weeks()
     {
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => '2021-01-18',
@@ -216,7 +189,6 @@ class RecurringEveryXEventsTest extends TestCase
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
 
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),
@@ -241,7 +213,6 @@ class RecurringEveryXEventsTest extends TestCase
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                     'start_date' => $startDate->toDateString(),
@@ -273,7 +244,6 @@ class RecurringEveryXEventsTest extends TestCase
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
 
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->addDay()->toDateString(),

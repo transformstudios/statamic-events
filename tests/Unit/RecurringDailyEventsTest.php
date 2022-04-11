@@ -38,7 +38,6 @@ class RecurringDailyEventsTest extends TestCase
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
 
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),
@@ -63,7 +62,6 @@ class RecurringDailyEventsTest extends TestCase
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),

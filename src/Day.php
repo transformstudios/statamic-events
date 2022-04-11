@@ -18,6 +18,11 @@ class Day
         $this->endTime = Arr::get($data, 'end_time');
     }
 
+    public function hasEndtime(): bool
+    {
+        return boolval($this->endTime);
+    }
+
     public function isAllDay(): bool
     {
         return $this->isAllDay;
@@ -30,6 +35,10 @@ class Day
 
     public function end(): CarbonImmutable
     {
-        return $this->isAllDay ? $this->date->endOfDay() : $this->date->setTimeFromTimeString($this->endTime);
+        if ($this->isAllDay || ! $this->endTime) {
+            return $this->date->endOfDay();
+        }
+
+        return $this->date->setTimeFromTimeString($this->endTime);
     }
 }

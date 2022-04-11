@@ -16,7 +16,6 @@ class EventsTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event')
             ->data([
@@ -29,7 +28,6 @@ class EventsTest extends TestCase
             ])->save();
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('single-event')
             ->data([
@@ -61,7 +59,6 @@ class EventsTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event')
             ->data([
@@ -99,7 +96,6 @@ class EventsTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event')
             ->data([
@@ -131,7 +127,6 @@ class EventsTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event')
             ->data([
@@ -167,7 +162,6 @@ class EventsTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event')
             ->data([
@@ -191,16 +185,15 @@ class EventsTest extends TestCase
             ])->save();
 
         Entry::make()
-                ->blueprint($this->blueprint->handle())
-                ->collection('events')
-                ->slug('other-event')
-                ->data([
-                    'title' => 'Other Event 2',
-                    'start_date' => Carbon::now()->toDateString(),
-                    'start_time' => '11:00',
-                    'end_time' => '12:00',
-                    'recurrence' => 'weekly',
-                ])->save();
+            ->collection('events')
+            ->slug('other-event')
+            ->data([
+                'title' => 'Other Event 2',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'weekly',
+            ])->save();
 
         $occurrences = Events::fromCollection(handle: 'events')
             ->filter('title:contains', 'Other')
@@ -216,7 +209,6 @@ class EventsTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event')
             ->data([
@@ -229,7 +221,6 @@ class EventsTest extends TestCase
             ])->save();
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('other-event')
             ->data([
