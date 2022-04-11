@@ -25,7 +25,7 @@ class RecurringEvent extends Event
 
     private function frequency(): int
     {
-        return match ($this->recurrence) {
+        return match ($this->recurrence->value()) {
             'daily' => RRule::DAILY,
             'weekly' => RRule::WEEKLY,
             'monthly' => RRule::MONTHLY,
@@ -37,7 +37,7 @@ class RecurringEvent extends Event
 
     private function periodToFrequency(): int
     {
-        return match ($this->period) {
+        return match ($this->period->value()) {
             'days' => RRule::DAILY,
             'weeks' => RRule::WEEKLY,
             'months' => RRule::MONTHLY,
