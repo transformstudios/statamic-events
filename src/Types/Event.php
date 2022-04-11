@@ -86,6 +86,4 @@ abstract class Event
         return CarbonImmutable::parse($this->start_date)
             ->setTimeFromTimeString($this->startTime());
     }
-
-    abstract public function end(): ?CarbonImmutable;
 }

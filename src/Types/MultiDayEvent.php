@@ -52,9 +52,4 @@ class MultiDayEvent extends Event
     {
         return $this->days->first()->start();
     }
-
-    public function end(): CarbonImmutable
-    {
-        return $this->days->last()->end();
-    }
 }

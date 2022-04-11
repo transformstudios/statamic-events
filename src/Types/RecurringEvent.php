@@ -2,21 +2,12 @@
 
 namespace TransformStudios\Events\Types;
 
-use Carbon\CarbonImmutable;
+use Illuminate\Support\Carbon;
 use RRule\RRule;
 use RRule\RRuleInterface;
 
 class RecurringEvent extends Event
 {
-    public function end(): ?CarbonImmutable
-    {
-        if (! $endDate = $this->end_date) {
-            return null;
-        }
-
-        return CarbonImmutable::parse($endDate)->setTimeFromTimeString($this->endTime());
-    }
-
     protected function rule(): RRuleInterface
     {
         $rule = [
@@ -25,8 +16,8 @@ class RecurringEvent extends Event
             'interval' => $this->interval ?? 1,
         ];
 
-        if ($end = $this->end()) {
-            $rule['until'] = $end->endOfDay();
+        if ($end = $this->end_date) {
+            $rule['until'] = Carbon::parse($end)->endOfDay();
         }
 
         return new RRule($rule);
