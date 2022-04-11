@@ -19,71 +19,67 @@ abstract class Event
 
     public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
     {
-        return $this->collect($this->rule()->getOccurrencesBetween($from, $to));
+        return $this->collect($this->rule()->getOccurrencesBetween(begin: $from, end: $to));
     }
 
     public function nextOccurrences(int $limit = 1): Collection
     {
-        return $this->collect($this->rule()->getOccurrencesAfter(now(), true, $limit));
+        return $this->collect($this->rule()->getOccurrencesAfter(date: now(), inclusive: true, limit: $limit));
     }
 
     private function collect(array $dates): Collection
     {
         return collect($dates)
-            ->map(fn (DateTimeInterface $date) => $this->supplement(CarbonImmutable::parse($date)));
+            ->map(fn (DateTimeInterface $date) => $this->supplement(date: CarbonImmutable::parse($date)));
     }
 
     protected function supplement(CarbonInterface $date): Entry
     {
-        $occurrence = unserialize(serialize($this->event))
-            ->setSupplement('start', $date->setTimeFromTimeString($this->startTime()));
-
-        if ($endTime = $this->end_time) {
-            $occurrence->setSupplement('end', $date->setTimeFromTimeString($endTime));
-        }
-
-        return $occurrence;
+        return unserialize(serialize($this->event))
+            ->setSupplement('start', $date->setTimeFromTimeString($this->startTime()))
+            ->setSupplement('end', $date->setTimeFromTimeString($this->endTime()))
+            ->setSupplement('has_end_time', $this->hasEndTime());
     }
 
     public function __get(string $key): mixed
     {
-        return $this->event->get($key);
+        return $this->event->$key;
     }
 
-    // Should these be somewhere else?
     public function hasEndTime(): bool
     {
-        return $this->event->get('end_time', false);
+        return boolval($this->event->end_time);
     }
 
     public function isAllDay(): bool
     {
-        return $this->event->get('all_day', false);
+        return boolval($this->event->all_day);
     }
 
     public function isMultiDay(): bool
     {
-        return $this->event->get('multi_day', false);
+        return boolval($this->event->multi_day);
     }
 
     public function isRecurring(): bool
     {
-        return $this->event->get('recurrence', false);
+        // this is a select field so you have to get its value
+        return boolval($this->event->recurrence?->value());
     }
 
     public function startTime(): string
     {
-        return $this->start_time ?? now()->startOfDay()->format('G:i');
+        return $this->event->start_time ?? now()->startOfDay()->toTimeString('second');
     }
 
     public function endTime(): string
     {
-        return $this->end_time ?? now()->endOfDay()->format('G:i');
+        return $this->event->end_time ?? now()->endOfDay()->toTimeString('second');
     }
 
     public function start(): CarbonImmutable
     {
-        return CarbonImmutable::parse($this->start_date)
+        return CarbonImmutable::parse($this->event->start_date)
             ->setTimeFromTimeString($this->startTime());
     }
 }
