@@ -36,7 +36,8 @@ class Day
     public function end(): CarbonImmutable
     {
         if ($this->isAllDay || ! $this->endTime) {
-            return $this->date->endOfDay();
+            // RRules can't have microseconds
+            return $this->date->endOfDay()->setMicrosecond(0);
         }
 
         return $this->date->setTimeFromTimeString($this->endTime);
