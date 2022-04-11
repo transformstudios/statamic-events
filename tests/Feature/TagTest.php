@@ -72,30 +72,47 @@ class TagTest extends TestCase
     /** @test */
     public function canGenerateCalendarOccurrences()
     {
-        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+        Carbon::setTestNow(now()->startOfYear()->setTimeFromTimeString('10:00'));
+
+        Entry::all()->each->delete();
 
         Entry::make()
-                ->blueprint($this->blueprint->handle())
-                ->collection('events')
-                ->slug('single-event')
-                ->data([
-                    'title' => 'Single Event',
-                    'start_date' => Carbon::now()->toDateString(),
-                    'start_time' => '13:00',
-                    'end_time' => '15:00',
-                ])->save();
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('single-event-start-of-month')
+            ->data([
+                'title' => 'Single Event - Start of Month',
+                'start_date' => Carbon::now()->startOfMonth()->toDateString(),
+                'start_time' => '13:00',
+                'end_time' => '15:00',
+            ])->save();
+
+        Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('recurring-event-start-of-month')
+            ->data([
+                'title' => 'Recurring Event - Start of Month',
+                'start_date' => Carbon::now()->startOfMonth()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'weekly',
+                'categories' => ['one'],
+            ])->save();
 
         $this->tag
-                ->setContext([])
-                ->setParameters([
-                    'collection' => 'events',
-                    'month' => now()->englishMonth,
-                    'year' => now()->year,
-                ]);
+            ->setContext([])
+            ->setParameters([
+                'collection' => 'events',
+                'month' => now()->englishMonth,
+                'year' => now()->year,
+            ]);
 
         $occurrences = $this->tag->calendar();
 
-        $this->assertCount(now()->daysInMonth + 1, $occurrences);
+        // k($occurrences[0]);
+
+        $this->assertCount(now()->daysInMonth, $occurrences);
     }
 
     /** @test */
