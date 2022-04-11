@@ -48,38 +48,38 @@ abstract class Event
 
     public function hasEndTime(): bool
     {
-        return boolval($this->event->end_time);
+        return boolval($this->end_time);
     }
 
     public function isAllDay(): bool
     {
-        return boolval($this->event->all_day);
+        return boolval($this->all_day);
     }
 
     public function isMultiDay(): bool
     {
-        return boolval($this->event->multi_day);
+        return boolval($this->multi_day);
     }
 
     public function isRecurring(): bool
     {
         // this is a select field so you have to get its value
-        return boolval($this->event->recurrence?->value());
+        return boolval($this->recurrence?->value());
     }
 
     public function startTime(): string
     {
-        return $this->event->start_time ?? now()->startOfDay()->toTimeString('second');
+        return $this->start_time ?? now()->startOfDay()->toTimeString('second');
     }
 
     public function endTime(): string
     {
-        return $this->event->end_time ?? now()->endOfDay()->toTimeString('second');
+        return $this->end_time ?? now()->endOfDay()->toTimeString('second');
     }
 
     public function start(): CarbonImmutable
     {
-        return CarbonImmutable::parse($this->event->start_date)
+        return CarbonImmutable::parse($this->start_date)
             ->setTimeFromTimeString($this->startTime());
     }
 }
