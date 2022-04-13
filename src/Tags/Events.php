@@ -108,7 +108,7 @@ class Events extends Tags
         return Generator::fromCollection(handle: $this->params->get('collection'))
             ->when(
                 value: $this->parseTerms(),
-                callback: fn (Generator $generator, array $terms) => $generator->terms($terms)
+                callback: fn (Generator $generator, array $terms) => $generator->terms(terms: $terms)
             )
             ->when(
                 value: $this->params->bool('paginate'),
@@ -183,6 +183,6 @@ class Events extends Tags
 
     private function getTermId(string $handle, Term|string $term): string
     {
-        return $term instanceof Term ? $term->id() : (string) Str::of($handle)->append('::', $term);
+        return $term instanceof Term ? $term->id() : Str::of($handle)->append('::', $term);
     }
 }
