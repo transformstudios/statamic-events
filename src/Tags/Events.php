@@ -6,9 +6,13 @@ use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Spatie\CalendarLinks\Link;
+use Statamic\Contracts\Query\Builder;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
+use Statamic\Facades\Compare;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns\OutputsItems;
 use Statamic\Tags\Tags;
 use TransformStudios\Events\EventFactory;
@@ -99,7 +103,13 @@ class Events extends Tags
 
     private function generator(): Generator
     {
+        // $this->queryFilters($generator);
+
         return Generator::fromCollection(handle: $this->params->get('collection'))
+            ->when(
+                value: $this->parseTerms(),
+                callback: fn (Generator $generator, array $terms) => $generator->terms($terms)
+            )
             ->when(
                 value: $this->params->bool('paginate'),
                 callback: fn (Generator $generator) =>  $generator->pagination(perPage: $this->params->int('per_page'))
@@ -135,5 +145,44 @@ class Events extends Tags
         }
 
         return $dates;
+    }
+
+    private function queryFilters(Generator $generator): void
+    {
+    }
+
+    private function parseTerms(): array
+    {
+        return collect($this->params)
+            ->filter(fn ($value, $key) => Str::startsWith($key, 'taxonomy:'))
+            ->flatMap(fn ($terms, $key) => $this->parseTermIds(key: $key, terms: $terms))
+            ->all();
+    }
+
+    private function parseTermIds(string $key, array|Builder|string $terms): array
+    {
+        [$ignore, $handle] = explode(':', $key);
+
+        return collect($this->explodeTerms($terms))
+            ->map(fn (Term|string $term) => $this->getTermId(handle: $handle, term: $term))
+            ->all();
+    }
+
+    private function explodeTerms(array|Builder|string $terms): array
+    {
+        if (is_string($terms)) {
+            return array_filter(explode('|', $terms));
+        }
+
+        if (Compare::isQueryBuilder($terms)) {
+            return $terms->get();
+        }
+
+        return $terms;
+    }
+
+    private function getTermId(string $handle, Term|string $term): string
+    {
+        return $term instanceof Term ? $term->id() : (string) Str::of($handle)->append('::', $term);
     }
 }
