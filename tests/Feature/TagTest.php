@@ -4,6 +4,7 @@ namespace TransformStudios\Events\Tests\Feature;
 
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Entry;
+use Statamic\Support\Arr;
 use TransformStudios\Events\Tags\Events;
 use TransformStudios\Events\Tests\PreventSavingStacheItemsToDisk;
 use TransformStudios\Events\Tests\TestCase;
@@ -72,7 +73,7 @@ class TagTest extends TestCase
     /** @test */
     public function canGenerateCalendarOccurrences()
     {
-        Carbon::setTestNow(now()->startOfYear()->setTimeFromTimeString('10:00'));
+        Carbon::setTestNow('jan 1, 2022 10:00');
 
         Entry::all()->each->delete();
 
@@ -110,9 +111,10 @@ class TagTest extends TestCase
 
         $occurrences = $this->tag->calendar();
 
-        // k($occurrences[0]);
-
-        // $this->assertCount(now()->daysInMonth, $occurrences);
+        $this->assertCount(42, $occurrences);
+        $this->assertCount(2, Arr::get($occurrences, '6.dates'));
+        $this->assertTrue(Arr::get($occurrences, '7.no_results'));
+        $this->assertCount(1, Arr::get($occurrences, '13.dates'));
     }
 
     /** @test */
