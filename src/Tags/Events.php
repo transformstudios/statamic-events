@@ -35,17 +35,16 @@ class Events extends Tags
         $month = $this->params->get('month', now()->englishMonth);
         $year = $this->params->get('year', now()->year);
 
-        $from = Carbon::parse($month.' '.$year)->startOfMonth();
-        $to = Carbon::parse($month.' '.$year)->endOfMonth();
+        $from = Carbon::parse($month.' '.$year)->startOfMonth()->startOfWeek();
+        $to = Carbon::parse($month.' '.$year)->endOfMonth()->endOfWeek();
 
         $occurrences = $this
             ->generator()
             ->between(from: $from, to: $to)
             ->groupBy(fn (Entry $occurrence) => $occurrence->start->toDateString())
-            ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences))
-            ->values();
+            ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
-        return $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences));
+        return $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
     }
 
     public function downloadLink(): string
@@ -103,8 +102,6 @@ class Events extends Tags
 
     private function generator(): Generator
     {
-        // $this->queryFilters($generator);
-
         return Generator::fromCollection(handle: $this->params->get('collection'))
             ->when(
                 value: $this->parseTerms(),
