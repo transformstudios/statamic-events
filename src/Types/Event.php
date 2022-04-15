@@ -7,6 +7,7 @@ use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Support\Collection;
 use RRule\RRuleInterface;
+use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
 
 abstract class Event
@@ -22,9 +23,30 @@ abstract class Event
         return $this->collect($this->rule()->getOccurrencesBetween(begin: $from, end: $to));
     }
 
+    public function occursOnDate(string|CarbonInterface $date): bool
+    {
+        $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
+
+        return ! empty($this->rule()->getOccurrencesBetween(begin: $immutableDate->startOfDay()->setMicrosecond(0), end: $immutableDate->endOfDay()->setMicrosecond(0)));
+    }
+
     public function nextOccurrences(int $limit = 1): Collection
     {
         return $this->collect($this->rule()->getOccurrencesAfter(date: now(), inclusive: true, limit: $limit));
+    }
+
+    public function toICalendarEvent(string|CarbonInterface $date): ?ICalendarEvent
+    {
+        if (! $this->occursOnDate($date)) {
+            return null;
+        }
+
+        $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
+
+        return ICalendarEvent::create($this->event->title)
+            ->uniqueIdentifier($this->event->id())
+            ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
+            ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
     }
 
     private function collect(array $dates): Collection

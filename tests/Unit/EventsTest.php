@@ -5,6 +5,7 @@ namespace TransformStudios\Events\Tests\Unit;
 use Illuminate\Support\Carbon;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Entry;
+use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
 use TransformStudios\Events\Tests\TestCase;
 
@@ -239,6 +240,65 @@ class EventsTest extends TestCase
         $this->assertCount(10, $occurrences);
     }
 
+    /** @test */
+    public function canDetermineOccursAtForSingleEvent()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        $entry = Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('single-event')
+            ->id('the-id')
+            ->data([
+                'title' => 'Single Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+            ]);
+
+        $event = EventFactory::createFromEntry($entry);
+
+        $this->assertTrue($event->occursOnDate(now()));
+    }
+
+    /** @test */
+    public function canDetermineOccursAtForMultidayEvent()
+    {
+        Carbon::setTestNow(now());
+
+        $entry = Entry::make()
+            ->slug('multi-day-event')
+            ->collection('events')
+            ->data([
+                'multi_day' => true,
+                'days' => [
+                    [
+                        'date' => now()->toDateString(),
+                        'start_time' => '19:00',
+                        'end_time' => '21:00',
+                    ],
+                    [
+                        'date' => now()->addDay()->toDateString(),
+                        'start_time' => '11:00',
+                        'end_time' => '15:00',
+                    ],
+                    [
+                        'date' => now()->addDays(2)->toDateString(),
+                        'start_time' => '11:00',
+                        'end_time' => '15:00',
+                    ],
+                ],
+            ]);
+
+        $event = EventFactory::createFromEntry($entry);
+
+        $this->assertFalse($event->occursOnDate(now()->subDay()));
+        $this->assertTrue($event->occursOnDate(now()));
+        $this->assertTrue($event->occursOnDate(now()->addDay()));
+        $this->assertTrue($event->occursOnDate(now()->addDays(2)));
+        $this->assertFalse($event->occursOnDate(now()->addDays(3)));
+    }
     // public function test_empty_collection_when_after_end()
     // {
     //     $events = new Events();

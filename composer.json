@@ -37,6 +37,7 @@
         "laravel/framework": "^8.83 || ^9.6",
         "rlanvin/php-rrule": "^2.3",
         "spatie/calendar-links": "1.*",
+        "spatie/icalendar-generator": "^2.3.3",
         "statamic/cms": "^3.3"
     },
     "require-dev": {

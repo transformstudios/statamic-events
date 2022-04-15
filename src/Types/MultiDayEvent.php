@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use RRule\RRule;
 use RRule\RRuleInterface;
 use RRule\RSet;
+use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
 use Statamic\Fields\Values;
 use TransformStudios\Events\Day;
@@ -47,8 +48,7 @@ class MultiDayEvent extends Event
 
     protected function supplement(CarbonInterface $date): Entry
     {
-        /** @var Day */
-        $day = $this->days->first(fn (Day $day, int $index) => $this->collapseMultiDays ? $index == 0 : $date->isSameDay($day->start()));
+        $day = $this->getDayFromDate($date);
 
         return tap(
             unserialize(serialize($this->event)),
@@ -67,5 +67,26 @@ class MultiDayEvent extends Event
     public function end(): CarbonImmutable
     {
         return $this->days->last()->end();
+    }
+
+    public function toICalendarEvent(string|CarbonInterface $date): ?ICalendarEvent
+    {
+        if (! $this->occursOnDate($date)) {
+            return null;
+        }
+
+        $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
+
+        $day = $this->getDayFromDate($immutableDate);
+
+        return ICalendarEvent::create($this->event->title)
+            ->uniqueIdentifier($this->event->id())
+            ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
+            ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
+    }
+
+    private function getDayFromDate(CarbonInterface $date): ?Day
+    {
+        return $this->days->first(fn (Day $day, int $index) => $this->collapseMultiDays ? $index == 0 : $date->isSameDay($day->start()));
     }
 }

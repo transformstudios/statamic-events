@@ -42,6 +42,13 @@ class Events
         return $this;
     }
 
+    public function event($id): self
+    {
+        $this->event = $id;
+
+        return $this;
+    }
+
     public function filter(string $fieldCondition, string $value): self
     {
         $this->filters[$fieldCondition] = $value;
@@ -71,7 +78,7 @@ class Events
         return $this;
     }
 
-    public function between(CarbonInterface $from, CarbonInterface $to): EntryCollection|LengthAwarePaginator
+    public function between(string|CarbonInterface $from, string|CarbonInterface $to): EntryCollection|LengthAwarePaginator
     {
         return $this->output(
             type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry, collapseMultiDays: $this->collapseMultiDays)->occurrencesBetween(from: $from, to: $to)

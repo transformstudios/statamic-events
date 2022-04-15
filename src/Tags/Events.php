@@ -5,17 +5,14 @@ namespace TransformStudios\Events\Tags;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Spatie\CalendarLinks\Link;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Compare;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\OutputsItems;
 use Statamic\Tags\Tags;
-use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events as Generator;
 
 class Events extends Tags
@@ -49,24 +46,14 @@ class Events extends Tags
 
     public function downloadLink(): string
     {
-        $event = EventFactory::createFromArray($this->context);
-
-        $from = $event->start();
-        $to = $event->end();
-
-        if ($event->isRecurring()) {
-            $from->setDateFrom(Carbon::parse($this->params->get('date')));
-            $to = $from->copy()->setTimeFromTimeString($event->endTime());
-        }
-
-        $title = Arr::get($this->context, 'title');
-        $location = Arr::get($this->context, 'location', '');
-
-        $type = $this->params->get('type', 'ics');
-
-        $link = Link::create($title, $from, $to, $event->isAllDay())->address($location);
-
-        return $link->$type();
+        return route(
+            'statamic.events.ics.show',
+            [
+                'collection' =>$this->params->get('collection'),
+                'date' =>$this->params->get('date'),
+                'event' =>  $this->params->get('event'),
+            ]
+        );
     }
 
     public function in(): EntryCollection|array
@@ -102,7 +89,7 @@ class Events extends Tags
 
     private function generator(): Generator
     {
-        return Generator::fromCollection(handle: $this->params->get('collection'))
+        return Generator::fromCollection(handle: $this->params->get('collection', 'events'))
             ->when(
                 value: $this->parseTerms(),
                 callback: fn (Generator $generator, array $terms) => $generator->terms(terms: $terms)

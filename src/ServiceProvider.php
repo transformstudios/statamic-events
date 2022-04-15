@@ -18,6 +18,10 @@ class ServiceProvider extends AddonServiceProvider
         IsStartOfWeek::class,
     ];
 
+    protected $routes = [
+        'actions' => __DIR__.'/../routes/actions.php',
+    ];
+
     protected $tags = [
         Events::class,
     ];
