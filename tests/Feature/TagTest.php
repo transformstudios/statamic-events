@@ -23,6 +23,7 @@ class TagTest extends TestCase
             ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event')
+            ->id('recurring-event')
             ->data([
                 'title' => 'Recurring Event',
                 'start_date' => Carbon::now()->toDateString(),
@@ -200,5 +201,40 @@ class TagTest extends TestCase
 
         $this->assertCount(2, $pagination['results']);
         $this->assertEquals(2, $pagination['total_results']);
+    }
+
+    /** @test */
+    public function canGenerateDateEventDownloadLink()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        $this->tag
+            ->setContext([])
+            ->setParameters([
+                'collection' => 'events',
+                'date' => now(),
+                'event' => 'recurring-event',
+            ]);
+
+        $url = $this->tag->downloadLink();
+
+        $this->assertEquals('http://localhost/!/events/ics?collection=events&date='.now()->toDateString().'&event=recurring-event', $url);
+    }
+
+    /** @test */
+    public function canGenerateEventDownloadLink()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        $this->tag
+            ->setContext([])
+            ->setParameters([
+                'collection' => 'events',
+                'event' => 'recurring-event',
+            ]);
+
+        $url = $this->tag->downloadLink();
+
+        $this->assertEquals('http://localhost/!/events/ics?collection=events&event=recurring-event', $url);
     }
 }
