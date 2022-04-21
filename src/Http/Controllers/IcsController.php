@@ -23,28 +23,33 @@ class IcsController extends Controller
 
     public function __invoke(Request $request)
     {
+        $handle = $request->get('collection', 'events');
         $date = $request->has('date') ? CarbonImmutable::parse($request->get('date')) : null;
-        $event = null;
         $eventId = $request->get('event');
 
         if ($date && $eventId) {
-            if (! $event = EventFactory::createFromEntry(EntryFacade::find($eventId))->toICalendarEvent($date)) {
-                throw ValidationException::withMessages(['event_date' => 'Event does not occur on '.$date->toDateString()]);
-            }
+            throw_unless(
+                $event = EventFactory::createFromEntry(EntryFacade::find($eventId))->toICalendarEvent($date),
+                ValidationException::withMessages(['event_date' => 'Event does not occur on '.$date->toDateString()])
+            );
+
+            return $this->downloadIcs($event);
         }
 
         if ($date) {
-            $event = Events::fromCollection($this->params->get('collection', 'events'))
+            $events = Events::fromCollection(handle: $handle)
                 ->between($date->startOfDay()->setMicrosecond(0), $date->endOfDay()->setMicrosecond(0))
                 ->map(fn (Entry $entry) => EventFactory::createFromEntry($entry)->toICalendarEvent($date))
                 ->all();
+
+            return $this->downloadIcs($events);
         }
 
         if ($eventId) {
-            $event = EventFactory::createFromEntry(EntryFacade::find($eventId))->toICalendarEvents();
+            return $this->downloadIcs(
+                EventFactory::createFromEntry(EntryFacade::find($eventId))->toICalendarEvents()
+            );
         }
-
-        return $this->downloadIcs($event);
     }
 
     private function downloadIcs(ICalendarEvent|array $event)
