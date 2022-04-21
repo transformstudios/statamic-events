@@ -12,21 +12,6 @@ use Spatie\IcalendarGenerator\ValueObjects\RRule as ICalendarRule;
 
 class RecurringEvent extends Event
 {
-    protected function rule(): RRuleInterface
-    {
-        $rule = [
-            'dtstart' => $this->start()->setTimeFromTimeString($this->endTime()),
-            'freq' => $this->frequency(),
-            'interval' => $this->interval(),
-        ];
-
-        if ($end = $this->end_date) {
-            $rule['until'] = Carbon::parse($end)->endOfDay();
-        }
-
-        return new RRule($rule);
-    }
-
     public function interval(): int
     {
         return $this->interval ?? 1;
@@ -46,6 +31,21 @@ class RecurringEvent extends Event
         ];
     }
 
+    protected function rule(): RRuleInterface
+    {
+        $rule = [
+            'dtstart' => $this->start()->setTimeFromTimeString($this->endTime()),
+            'freq' => $this->frequency(),
+            'interval' => $this->interval(),
+        ];
+
+        if ($end = $this->end_date) {
+            $rule['until'] = Carbon::parse($end)->endOfDay();
+        }
+
+        return new RRule($rule);
+    }
+
     private function end(): CarbonImmutable
     {
         return CarbonImmutable::parse($this->start_date)
@@ -61,6 +61,17 @@ class RecurringEvent extends Event
             'yearly' => Rrule::YEARLY,
             'every' => $this->periodToFrequency(),
             default => Rrule::DAILY
+        };
+    }
+
+    private function frequencyToRecurrence():RecurrenceFrequency
+    {
+        return match ($this->frequency()) {
+            Rrule::DAILY => RecurrenceFrequency::daily(),
+            Rrule::WEEKLY => RecurrenceFrequency::weekly(),
+            Rrule::MONTHLY => RecurrenceFrequency::monthly(),
+            Rrule::YEARLY => RecurrenceFrequency::yearly(),
+            default => RecurrenceFrequency::daily()
         };
     }
 
@@ -85,16 +96,5 @@ class RecurringEvent extends Event
         }
 
         return $rule;
-    }
-
-    private function frequencyToRecurrence():RecurrenceFrequency
-    {
-        return match ($this->frequency()) {
-            Rrule::DAILY => RecurrenceFrequency::daily(),
-            Rrule::WEEKLY => RecurrenceFrequency::weekly(),
-            Rrule::MONTHLY => RecurrenceFrequency::monthly(),
-            Rrule::YEARLY => RecurrenceFrequency::yearly(),
-            default => RecurrenceFrequency::daily()
-        };
     }
 }

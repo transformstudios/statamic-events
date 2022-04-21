@@ -34,10 +34,16 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__.'/../resources/fieldsets' => resource_path('fieldsets'),
         ], 'events-fieldsets');
 
-        // set weekstart/end
         $weekStartDay = Carbon::getTranslator()->trans(id: 'first_day_of_week', locale: Site::current()->locale());
 
-        Carbon::setWeekStartsAt($weekStartDay);
-        Carbon::setWeekEndsAt(($weekStartDay + 6) % 7);
+        /*
+         Using these deprecated methods because I couldn't figure out another way to
+         have the weekstart set based on the current locale.
+
+         When the next version of Carbon is released, it should be set properly: https://github.com/briannesbitt/Carbon/issues/2539#issuecomment-1037257768
+
+        */
+        Carbon::setWeekStartsAt(day: $weekStartDay);
+        Carbon::setWeekEndsAt(day: ($weekStartDay + 6) % 7);
     }
 }

@@ -88,6 +88,28 @@ class Events extends Tags
         return $this->output($this->generator()->upcoming(limit: $this->params->int('limit')));
     }
 
+    private function day(string $date, EntryCollection $occurrences): array
+    {
+        return [
+            'date' => $date,
+            'dates' => $occurrences,
+            'occurrences' => $occurrences,
+        ];
+    }
+
+    private function explodeTerms(array|Builder|string $terms): array
+    {
+        if (is_string($terms)) {
+            return array_filter(explode('|', $terms));
+        }
+
+        if (Compare::isQueryBuilder($terms)) {
+            return $terms->get();
+        }
+
+        return $terms;
+    }
+
     private function generator(): Generator
     {
         return Generator::fromCollection(handle: $this->params->get('collection', 'events'))
@@ -104,13 +126,9 @@ class Events extends Tags
             );
     }
 
-    private function day(string $date, EntryCollection $occurrences): array
+    private function getTermId(string $handle, Term|string $term): string
     {
-        return [
-            'date' => $date,
-            'dates' => $occurrences,
-            'occurrences' => $occurrences,
-        ];
+        return $term instanceof Term ? $term->id() : Str::of($handle)->append('::', $term);
     }
 
     private function makeEmptyDates(CarbonInterface $from, CarbonInterface $to): Collection
@@ -151,23 +169,5 @@ class Events extends Tags
         return collect($this->explodeTerms($terms))
             ->map(fn (Term|string $term) => $this->getTermId(handle: $handle, term: $term))
             ->all();
-    }
-
-    private function explodeTerms(array|Builder|string $terms): array
-    {
-        if (is_string($terms)) {
-            return array_filter(explode('|', $terms));
-        }
-
-        if (Compare::isQueryBuilder($terms)) {
-            return $terms->get();
-        }
-
-        return $terms;
-    }
-
-    private function getTermId(string $handle, Term|string $term): string
-    {
-        return $term instanceof Term ? $term->id() : Str::of($handle)->append('::', $term);
     }
 }

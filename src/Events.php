@@ -9,7 +9,6 @@ use Statamic\Entries\EntryCollection;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Support\Arr;
 use Statamic\Tags\Concerns\QueriesConditions;
@@ -94,9 +93,9 @@ class Events
 
     private function output(callable $type): EntryCollection|LengthAwarePaginator
     {
-        $occurrences = $this->entries()->occurrences($type);
+        $occurrences = $this->entries()->occurrences(generator: $type);
 
-        return $this->page ? $this->paginate($occurrences) : $occurrences;
+        return $this->page ? $this->paginate(occurrences: $occurrences) : $occurrences;
     }
 
     private function entries(): self
@@ -122,23 +121,18 @@ class Events
     {
         return $this->entries
             // take each event and generate the occurences
-            ->flatMap($generator)
+            ->flatMap(callback: $generator)
             ->sortBy(fn (Entry $occurrence) => $occurrence->start)
             ->values();
     }
 
     private function paginate(EntryCollection $occurrences): LengthAwarePaginator
     {
-        /*
-                    fn (LengthAwarePaginator $paginator) => $paginator
-                ->setPath(URL::makeAbsolute(URL::getCurrent()))
-                ->appends(request()->all())
-        */
         return new LengthAwarePaginator(
-            $occurrences->forPage($this->page, $this->perPage),
-            $occurrences->count(),
-            $this->perPage,
-            $this->page
+            items: $occurrences->forPage(page: $this->page, perPage: $this->perPage),
+            total: $occurrences->count(),
+            perPage: $this->perPage,
+            currentPage: $this->page
         );
     }
 }

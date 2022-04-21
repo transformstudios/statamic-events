@@ -12,11 +12,12 @@ class EventFactory
 {
     public static function createFromEntry(Entry $event, bool $collapseMultiDays = false): Event
     {
-        if ($event->value('multi_day')) {
+        if ($event->multi_day) {
             return new MultiDayEvent(event: $event, collapseMultiDays: $collapseMultiDays);
         }
 
-        if ($event->value('recurrence')) {
+        // this has to be `->value` because `recurrence` returns a `LabeledValue`.
+        if ($event->recurrence->value()) {
             return new RecurringEvent(event: $event);
         }
 
