@@ -14,6 +14,7 @@ use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
 
@@ -28,12 +29,13 @@ class IcsController extends Controller
         $eventId = $request->get('event');
 
         if ($date && $eventId) {
+            $event = EventFactory::createFromEntry(EntryFacade::find($eventId));
             throw_unless(
-                $event = EventFactory::createFromEntry(EntryFacade::find($eventId))->toICalendarEvent($date),
+                $iCalendarEvent = $event->toICalendarEvent($date),
                 ValidationException::withMessages(['event_date' => 'Event does not occur on '.$date->toDateString()])
             );
 
-            return $this->downloadIcs($event);
+            return $this->downloadIcs($iCalendarEvent, $event->title);
         }
 
         if ($date) {
@@ -52,7 +54,7 @@ class IcsController extends Controller
         }
     }
 
-    private function downloadIcs(ICalendarEvent|array $event)
+    private function downloadIcs(ICalendarEvent|array $event, string $title = 'events')
     {
         return response()->streamDownload(
             function () use ($event) {
@@ -60,7 +62,7 @@ class IcsController extends Controller
                 ->event(Arr::wrap($event))
                 ->get();
             },
-            'my-awesome-calendar.ics',
+            Str::slugify($title).'.ics',
             [
                 'Content-Type' => 'text/calendar; charset=utf-8',
             ]

@@ -38,7 +38,7 @@ class IcsControllerTest extends TestCase
             'event' => 'the-id',
         ]));
 
-        $response->assertDownload('my-awesome-calendar.ics');
+        $response->assertDownload('single-event.ics');
 
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
     }
@@ -65,7 +65,7 @@ class IcsControllerTest extends TestCase
             'date' => now()->toDateString(),
             'event' => 'the-recurring-id',
         ]));
-        $response->assertDownload('my-awesome-calendar.ics');
+        $response->assertDownload('recurring-event.ics');
 
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
 
@@ -85,6 +85,7 @@ class IcsControllerTest extends TestCase
             ->collection('events')
             ->id('the-multi-day-event')
             ->data([
+                'title' => 'Multi-day Event',
                 'multi_day' => true,
                 'days' => [
                     [
@@ -115,7 +116,7 @@ class IcsControllerTest extends TestCase
             'event' => 'the-multi-day-event',
         ]));
 
-        $response->assertDownload('my-awesome-calendar.ics');
+        $response->assertDownload('multi-day-event.ics');
 
         $this->assertStringContainsString('DTSTART:'.now()->addDay()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
     }
