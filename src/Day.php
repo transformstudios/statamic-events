@@ -3,7 +3,9 @@
 namespace TransformStudios\Events;
 
 use Carbon\CarbonImmutable;
+use Spatie\IcalendarGenerator\Components\Event;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Day
 {
@@ -41,5 +43,13 @@ class Day
         }
 
         return $this->date->setTimeFromTimeString($this->endTime);
+    }
+
+    public function toICalendarEvent(string $title, int $index = 0): Event
+    {
+        return Event::create($title)
+            ->uniqueIdentifier(Str::slug($title).'-'.$index)
+            ->startsAt($this->start())
+            ->endsAt($this->end());
     }
 }

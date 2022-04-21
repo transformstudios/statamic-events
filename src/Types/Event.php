@@ -49,6 +49,14 @@ abstract class Event
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
     }
 
+    /**
+     * @return ICalendarEvent[]
+     */
+    public function toICalendarEvents(): array
+    {
+        return [];
+    }
+
     private function collect(array $dates): Collection
     {
         return collect($dates)

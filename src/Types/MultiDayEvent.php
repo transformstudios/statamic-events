@@ -85,6 +85,16 @@ class MultiDayEvent extends Event
             ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
     }
 
+    /**
+     * @return ICalendarEvent[]
+     */
+    public function toICalendarEvents(): array
+    {
+        return collect($this->days)
+            ->map(fn (Day $day, int $index) => $day->toICalendarEvent($this->event->title, $index))
+            ->all();
+    }
+
     private function getDayFromDate(CarbonInterface $date): ?Day
     {
         return $this->days->first(fn (Day $day, int $index) => $this->collapseMultiDays ? $index == 0 : $date->isSameDay($day->start()));

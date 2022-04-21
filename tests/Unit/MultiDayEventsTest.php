@@ -144,6 +144,13 @@ class MultiDayEventsTest extends TestCase
         );
     }
 
+    /** @test */
+    public function canGenerateICalendar()
+    {
+        $events = $this->event->toICalendarEvents();
+
+        dd($events);
+    }
     /*
         public function test_can_generate_next_dates_when_before_start()
         {
