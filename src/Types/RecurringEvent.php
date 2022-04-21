@@ -17,7 +17,7 @@ class RecurringEvent extends Event
         $rule = [
             'dtstart' => $this->start()->setTimeFromTimeString($this->endTime()),
             'freq' => $this->frequency(),
-            'interval' => $this->interval ?? 1,
+            'interval' => $this->interval(),
         ];
 
         if ($end = $this->end_date) {
@@ -25,6 +25,11 @@ class RecurringEvent extends Event
         }
 
         return new RRule($rule);
+    }
+
+    public function interval(): int
+    {
+        return $this->interval ?? 1;
     }
 
     /**
@@ -73,8 +78,7 @@ class RecurringEvent extends Event
     private function spatieRule(): ICalendarRule
     {
         $rule = ICalendarRule::frequency($this->frequencyToRecurrence())
-            ->interval($this->interval)
-            ->starting($this->start()->setTimeFromTimeString($this->startTime()));
+            ->interval($this->interval());
 
         if ($end = $this->end_date) {
             $rule->until(Carbon::parse($end)->endOfDay());
