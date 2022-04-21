@@ -10,6 +10,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Compare;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\OutputsItems;
 use Statamic\Tags\Tags;
@@ -48,11 +49,11 @@ class Events extends Tags
     {
         return route(
             'statamic.events.ics.show',
-            [
-                'collection' =>$this->params->get('collection'),
-                'date' =>$this->params->get('date'),
+            Arr::removeNullValues([
+                'collection' =>$this->params->get('collection', 'events'),
+                'date' => $this->params->has('date') ? Carbon::parse($this->params->get('date'))->toDateString() : null,
                 'event' =>  $this->params->get('event'),
-            ]
+            ])
         );
     }
 
