@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use TransformStudios\Events\Http\Controllers\CalendarController;
+use TransformStudios\Events\Http\Controllers\IcsController;
 
-Route::name('events.')->middleware('auth')->group(function () {
-    Route::get('calendar/{id}', [CalendarController::class, '__invoke'])->name('calendar.get');
+Route::name('events.')->group(function () {
+    Route::get('ics', [IcsController::class, '__invoke'])->name('ics.show');
 });

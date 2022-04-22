@@ -2,132 +2,101 @@
 
 namespace TransformStudios\Events\Types;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use RRule\RRule;
+use RRule\RRuleInterface;
+use RRule\RSet;
+use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
+use Statamic\Entries\Entry;
+use Statamic\Fields\Values;
 use TransformStudios\Events\Day;
 
 class MultiDayEvent extends Event
 {
-    /** @var Collection */
-    private $days;
+    private Collection $days;
 
-    public function __construct($data)
+    public function __construct(Entry $event, private bool $collapseMultiDays)
     {
-        parent::__construct($data);
+        parent::__construct($event);
 
-        $isAllDay = $this->isAllDay();
-
-        $this->days = collect($this->raw($data, 'days', []))
-            ->map(function ($day, $ignore) use ($isAllDay) {
-                return new Day($day, $isAllDay);
-            });
+        $this->days = collect($this->event->days)
+            ->map(fn (Values $day) => new Day($day->all(), $this->isAllDay()));
     }
 
-    public function isMultiDay(): bool
+    public function end(): CarbonImmutable
     {
-        return true;
+        return $this->days->last()->end();
     }
 
-    public function start(): Carbon
+    public function start(): CarbonImmutable
     {
-        return $this->firstDay()->start();
+        return $this->days->first()->start();
     }
 
-    public function end(): Carbon
+    public function toICalendarEvent(string|CarbonInterface $date): ?ICalendarEvent
     {
-        return $this->lastDay()->end();
-    }
-
-    public function firstDay(): Day
-    {
-        return $this->days()->first();
-    }
-
-    public function lastDay(): Day
-    {
-        return $this->days()->last();
-    }
-
-    /**
-     * @param null|Carbon $after
-     */
-    public function upcomingDate($after = null): ?Day
-    {
-        if (is_null($after)) {
-            $after = Carbon::now();
-        }
-
-        $first = $this->firstDay();
-        $end = $this->lastDay()->end();
-
-        if ($this->asSingleDay) {
-            $first->endDate($end);
-        }
-
-        if ($after < $first->start() || ($this->asSingleDay && $after <= $end)) {
-            return $first;
-        }
-
-        if ($after > $end) {
+        if (! $this->occursOnDate($date)) {
             return null;
         }
 
-        return $this
-            ->days()
-            ->first(function ($day, $ignore) use ($after) {
-                return $after < $day->start();
-            });
+        $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
+
+        $day = $this->getDayFromDate($immutableDate);
+
+        return ICalendarEvent::create($this->event->title)
+            ->uniqueIdentifier($this->event->id())
+            ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
+            ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
     }
 
-    public function upcomingDates($limit = 2, $offset = 0): Collection
-    {
-        $total = $offset ? $limit * $offset : $limit;
-
-        $dates = collect();
-
-        $day = Day::now();
-
-        if ($this->asSingleDay) {
-            return collect([$this->upcomingDate(Carbon::now())]);
-        }
-
-        while (($day = $this->upcomingDate($day->start())) && $dates->count() <= $total) {
-            $dates->push($day);
-        }
-
-        return $dates->slice($offset, $limit)->values();
-    }
-
-    public function datesBetween($from, $to): Collection
-    {
-        $from = Carbon::parse($from);
-        $to = Carbon::parse($to);
-
-        if (($from->startOfDay() > $to->endOfDay()) ||
-            ($this->start()->isAfter($to)) ||
-            ($this->end()->isBefore($from))
-        ) {
-            return collect();
-        }
-
-        $days = collect();
-        $day = $this->upcomingDate($from);
-
-        while ($day && $day->start() < $to) {
-            $days->push($day);
-            $day = $this->upcomingDate($day->start());
-        }
-
-        return $days;
-    }
-
-    private function days()
+    /**
+     * @return ICalendarEvent[]
+     */
+    public function toICalendarEvents(): array
     {
         return collect($this->days)
-            ->sortBy(
-                function ($day) {
-                    return $day->start();
-                }
-            );
+            ->map(fn (Day $day, int $index) => $day->toICalendarEvent($this->event->title, $index))
+            ->all();
+    }
+
+    protected function rule(bool $collapseDays = false): RRuleInterface
+    {
+        // if we're collapsing, then return an rrule instead of rset and use start of first day to end of last day
+        if ($this->collapseMultiDays) {
+            return new RRule([
+                'count' => 1,
+                'dtstart' => $this->end(),
+                'freq' => RRule::DAILY,
+            ]);
+        }
+
+        return tap(
+            new RSet(),
+            fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([
+                'count' => 1,
+                'dtstart' => $day->end(),
+                'freq' => RRule::DAILY,
+            ]))
+        );
+    }
+
+    protected function supplement(CarbonInterface $date): Entry
+    {
+        $day = $this->getDayFromDate($date);
+
+        return tap(
+            unserialize(serialize($this->event)),
+            fn (Entry $occurrence) => $occurrence
+                ->setSupplement('start', $day->start())
+                ->setSupplement('end', $day->end())
+                ->setSupplement('has_end_time', $day->hasEndTime())
+        );
+    }
+
+    private function getDayFromDate(CarbonInterface $date): ?Day
+    {
+        return $this->days->first(fn (Day $day, int $index) => $this->collapseMultiDays ? $index == 0 : $date->isSameDay($day->start()));
     }
 }

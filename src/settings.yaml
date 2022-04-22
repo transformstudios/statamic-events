@@ -1,5 +1,0 @@
-fields:
-  events_collection:
-    type: collections
-    validate: required
-    max_items: 1

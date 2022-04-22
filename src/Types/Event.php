@@ -2,102 +2,114 @@
 
 namespace TransformStudios\Events\Types;
 
-use Carbon\Carbon;
-use Illuminate\Contracts\Support\Arrayable;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
+use DateTimeInterface;
 use Illuminate\Support\Collection;
-use Statamic\Fields\Value;
-use Statamic\Support\Arr;
-use TransformStudios\Events\Day;
+use RRule\RRuleInterface;
+use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
+use Statamic\Entries\Entry;
 
-abstract class Event implements Arrayable
+abstract class Event
 {
-    /** @var array */
-    protected $data;
+    abstract protected function rule(): RRuleInterface;
 
-    abstract public function upcomingDate($after = null): ?Day;
-
-    abstract public function upcomingDates($limit = 2, $offset = 0): Collection;
-
-    abstract public function datesBetween($from, $to): Collection;
-
-    public function __construct($data)
+    public function __construct(protected Entry $event)
     {
-        $this->data = $data;
     }
 
-    public function get($name, $default = null)
+    public function __get(string $key): mixed
     {
-        return $this->raw($this->data, $name, $default);
-    }
-
-    public function __get($name)
-    {
-        return $this->get($name);
-    }
-
-    public function __set($name, $value)
-    {
-        return Arr::set($this->data, $name, $value);
-    }
-
-    public function isAllDay(): bool
-    {
-        return $this->raw($this->data, 'all_day', false);
-    }
-
-    public function isMultiDay(): bool
-    {
-        return false;
-    }
-
-    public function isRecurring(): bool
-    {
-        return false;
-    }
-
-    public function startTime(): string
-    {
-        $time = Carbon::now()->startOfDay()->format('G:i');
-        if ($this->isAllDay()) {
-            return $time;
-        }
-
-        return $this->raw($this->data, 'start_time', $time);
+        return $this->event->$key;
     }
 
     public function endTime(): string
     {
-        $time = Carbon::now()->endOfDay()->format('G:i');
-        if ($this->isAllDay()) {
-            return $time;
+        return $this->end_time ?? now()->endOfDay();
+    }
+
+    public function hasEndTime(): bool
+    {
+        return boolval($this->end_time);
+    }
+
+    public function isAllDay(): bool
+    {
+        return boolval($this->all_day);
+    }
+
+    public function isMultiDay(): bool
+    {
+        return boolval($this->multi_day);
+    }
+
+    public function isRecurring(): bool
+    {
+        // this is a select field so you have to get its value
+        return boolval($this->recurrence?->value());
+    }
+
+    public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
+    {
+        return $this->collect($this->rule()->getOccurrencesBetween(begin: $from, end: $to));
+    }
+
+    public function occursOnDate(string|CarbonInterface $date): bool
+    {
+        $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
+
+        return ! empty($this->rule()->getOccurrencesBetween(begin: $immutableDate->startOfDay(), end: $immutableDate->endOfDay()));
+    }
+
+    public function nextOccurrences(int $limit = 1): Collection
+    {
+        return $this->collect($this->rule()->getOccurrencesAfter(date: now(), inclusive: true, limit: $limit));
+    }
+
+    public function startTime(): string
+    {
+        return $this->start_time ?? now()->startOfDay()->toTimeString('second');
+    }
+
+    public function start(): CarbonImmutable
+    {
+        return CarbonImmutable::parse($this->start_date)
+            ->setTimeFromTimeString($this->startTime());
+    }
+
+    public function toICalendarEvent(string|CarbonInterface $date): ?ICalendarEvent
+    {
+        if (! $this->occursOnDate($date)) {
+            return null;
         }
 
-        return $this->raw($this->data, 'end_time', $time);
+        $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
+
+        return ICalendarEvent::create($this->event->title)
+            ->uniqueIdentifier($this->event->id())
+            ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
+            ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
     }
 
-    public function start(): Carbon
+    /**
+     * @return ICalendarEvent[]
+     */
+    public function toICalendarEvents(): array
     {
-        return Carbon::parse($this->raw($this->data, 'start_date'))->setTimeFromTimeString($this->startTime());
+        return [];
     }
 
-    public function end(): ?Carbon
+    protected function supplement(CarbonInterface $date): Entry
     {
-        return Carbon::parse(Arr::get($this->data, 'start_date'))->setTimeFromTimeString($this->endTime());
+        return unserialize(serialize($this->event))
+            ->setSupplement('start', $date->setTimeFromTimeString($this->startTime()))
+            ->setSupplement('end', $date->setTimeFromTimeString($this->endTime()))
+            ->setSupplement('has_end_time', $this->hasEndTime());
     }
 
-    public function toArray(): array
+    private function collect(array $dates): Collection
     {
-        return $this->data;
-    }
-
-    protected function raw($data, $key, $default = null)
-    {
-        $value = Arr::get($data, $key, $default);
-
-        if ($value instanceof Value) {
-            return $value->raw() ?: $default;
-        }
-
-        return $value ?: $default;
+        return collect($dates)
+            ->map(fn (DateTimeInterface $date) => $this->supplement(date: CarbonImmutable::parse($date)));
     }
 }

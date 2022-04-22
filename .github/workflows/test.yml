@@ -10,16 +10,20 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest]
-        php: [8.0]
-        laravel: [8.*]
+        php: [8.0, 8.1]
+        laravel: [8.*, 9.*]
         dependency-version: [prefer-lowest, prefer-stable]
         include:
           - laravel: 8.*
+            framework: ^8.79.0
             testbench: 6.*
+          - laravel: 9.*
+            framework: ^9.0
+            testbench: 7.*
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v3
 
       - name: Cache dependencies
         uses: actions/cache@v2
@@ -36,8 +40,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-             composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-             composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+             composer require "laravel/framework:${{ matrix.framework }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+             composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
 
       - name: Execute tests
         run: vendor/bin/phpunit -c phpunit.xml

@@ -3,16 +3,36 @@
 namespace TransformStudios\Events\Tests;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Statamic\Entries\Collection;
 use Statamic\Extend\Manifest;
+use Statamic\Facades\Blueprint as BlueprintFacade;
+use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
+use Statamic\Facades\YAML;
+use Statamic\Fields\Blueprint;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use TransformStudios\Events\ServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
 {
-    protected function setUp(): void
+    use PreventSavingStacheItemsToDisk;
+
+    protected Collection $collection;
+    protected Blueprint $blueprint;
+
+    public function setup(): void
     {
-        parent::setUp();
+        parent::setup();
+        $this->preventSavingStacheItemsToDisk();
+    }
+
+    public function tearDown(): void
+    {
+        $this->deleteFakeStacheDirectory();
+
+        parent::tearDown();
     }
 
     protected function getPackageProviders($app)
@@ -37,13 +57,13 @@ abstract class TestCase extends OrchestraTestCase
         $app->make(Manifest::class)->manifest = [
             'transformstudios/events' => [
                 'id' => 'transformstudios/events',
-                'namespace' => 'TransformStudios\\Events\\',
+                'namespace' => 'TransformStudios\\Events',
             ],
         ];
 
-        Statamic::pushActionRoutes(function () {
-            return require_once realpath(__DIR__.'/../routes/actions.php');
-        });
+        // Statamic::pushActionRoutes(function () {
+        //     return require_once realpath(__DIR__.'/../routes/actions.php');
+        // });
     }
 
     protected function resolveApplicationConfiguration($app)
@@ -55,22 +75,31 @@ abstract class TestCase extends OrchestraTestCase
         foreach ($configs as $config) {
             $app['config']->set("statamic.$config", require __DIR__."/../vendor/statamic/cms/config/{$config}.php");
         }
-    }
 
-    public function tearDown() : void
-    {
+        // Setting the user repository to the default flat file system
+        $app['config']->set('statamic.users.repository', 'file');
 
-        // destroy $app
-        if ($this->app) {
-            $this->callBeforeApplicationDestroyedCallbacks();
+        // Assume the pro edition within tests
+        $app['config']->set('statamic.editions.pro', true);
 
-            // this is the issue.
-            // $this->app->flush();
+        Statamic::booted(function () {
+            $taxonomy = Taxonomy::make('categories')->save();
+            Term::make('one')->taxonomy('categories')->dataForLocale('default', [])->save();
+            Term::make('two')->taxonomy('categories')->dataForLocale('default', [])->save();
+            $blueprintContents = YAML::parse(file_get_contents(__DIR__.'/__fixtures__/blueprints/event.yaml'));
+            $blueprintFields = collect($blueprintContents['sections']['main']['fields'])
+                ->keyBy(fn ($item) =>  $item['handle'])
+                ->map(fn ($item) => $item['field'])
+                ->all();
 
-            $this->app = null;
-        }
+            $this->blueprint = BlueprintFacade::makeFromFields($blueprintFields)
+                ->setNamespace('collections.events')
+                ->setHandle('event')
+                ->save();
 
-        // call the parent teardown
-        parent::tearDown();
+            $this->collection = CollectionFacade::make('events')
+                ->taxonomies(['categories'])
+                ->save();
+        });
     }
 }
