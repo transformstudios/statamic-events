@@ -80,7 +80,14 @@ class Events extends Tags
 
     public function today(): EntryCollection|array
     {
-        return $this->output($this->generator()->between(from: now()->startOfDay(), to: now()->endOfDay()));
+        return $this->output(
+            $this
+                ->generator()
+                ->between(
+                    from: $this->params->bool(['ignore_finished', 'ignore_past']) ? now() : now()->startOfDay(),
+                    to: now()->endOfDay()
+                )
+        );
     }
 
     public function upcoming(): EntryCollection|array
@@ -118,8 +125,8 @@ class Events extends Tags
                 callback: fn (Generator $generator, array $terms) => $generator->terms(terms: $terms)
             )
             ->when(
-                value: $this->params->bool('paginate'),
-                callback: fn (Generator $generator) =>  $generator->pagination(perPage: $this->params->int('per_page'))
+                value: $perPage = $this->params->int('paginate'),
+                callback: fn (Generator $generator) =>  $generator->pagination(perPage: $perPage)
             )->when(
                 value: $this->params->bool('collapse_multi_days'),
                 callback: fn (Generator $generator) =>  $generator->collapseMultiDays()

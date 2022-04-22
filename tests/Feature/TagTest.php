@@ -138,7 +138,7 @@ class TagTest extends TestCase
     /** @test */
     public function canGenerateTodayOccurrences()
     {
-        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+        Carbon::setTestNow(now()->setTimeFromTimeString('12:01'));
 
         Entry::make()
             ->blueprint($this->blueprint->handle())
@@ -157,9 +157,16 @@ class TagTest extends TestCase
                 'collection' => 'events',
             ]);
 
-        $occurrences = $this->tag->today();
+        $this->assertCount(2, $this->tag->today());
 
-        $this->assertCount(2, $occurrences);
+        $this->tag
+            ->setContext([])
+            ->setParameters([
+                'collection' => 'events',
+                'ignore_finished' => true,
+            ]);
+
+        $this->assertCount(1, $this->tag->today());
     }
 
     /** @test */
@@ -188,8 +195,7 @@ class TagTest extends TestCase
             ->setContext([])
             ->setParameters([
                 'collection' => 'events',
-                'paginate' => true,
-                'per_page' => 2,
+                'paginate' => 2,
                 'limit' => 10,
             ]);
 
