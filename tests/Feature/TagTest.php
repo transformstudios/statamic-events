@@ -210,6 +210,37 @@ class TagTest extends TestCase
     }
 
     /** @test */
+    public function canGenerateUpcomingOccurrencesWithTaxonomyTerms()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('single-event')
+            ->id('single-event')
+            ->data([
+                'title' => 'Single Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '17:00',
+                'end_time' => '19:00',
+            ])->save();
+
+        $this->tag
+            ->setContext([])
+            ->setParameters([
+                'collection' => 'events',
+                'from' => Carbon::now()->toDateString(),
+                'to' => Carbon::now()->addDay()->toDateString(),
+                'taxonomy:categories' => 'one',
+            ]);
+
+        $occurrences = $this->tag->between();
+
+        $this->assertCount(1, $occurrences);
+    }
+
+    /** @test */
     public function canGenerateDateEventDownloadLink()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
