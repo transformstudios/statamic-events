@@ -125,8 +125,8 @@ class Events extends Tags
                 callback: fn (Generator $generator, array $terms) => $generator->terms(terms: $terms)
             )
             ->when(
-                value: $perPage = $this->params->int('paginate'),
-                callback: fn (Generator $generator) =>  $generator->pagination(perPage: $perPage)
+                value: $this->params->int('paginate'),
+                callback: fn (Generator $generator, int $perPage) =>  $generator->pagination(perPage: $perPage)
             )->when(
                 value: $this->params->bool('collapse_multi_days'),
                 callback: fn (Generator $generator) =>  $generator->collapseMultiDays()
