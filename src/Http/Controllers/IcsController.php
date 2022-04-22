@@ -40,7 +40,7 @@ class IcsController extends Controller
 
         if ($date) {
             $events = Events::fromCollection(handle: $handle)
-                ->between($date->startOfDay()->setMicrosecond(0), $date->endOfDay()->setMicrosecond(0))
+                ->between($date->startOfDay(), $date->endOfDay())
                 ->map(fn (Entry $entry) => EventFactory::createFromEntry($entry)->toICalendarEvent($date))
                 ->all();
 

@@ -18,7 +18,7 @@ class DayTest extends TestCase
 
         $day = new Day(data: $dayData);
 
-        $this->assertEquals(Carbon::parse('2019-11-23')->endOfDay()->setMicrosecond(0), $day->end());
+        $this->assertEquals(Carbon::parse('2019-11-23')->endOfDay(), $day->end());
     }
     /** @test */
     public function hasNoEndTimeWhenNoEndTime()

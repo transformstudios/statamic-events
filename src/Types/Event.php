@@ -25,7 +25,7 @@ abstract class Event
 
     public function endTime(): string
     {
-        return $this->end_time ?? now()->endOfDay()->toTimeString('second');
+        return $this->end_time ?? now()->endOfDay();
     }
 
     public function hasEndTime(): bool
@@ -58,7 +58,7 @@ abstract class Event
     {
         $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
 
-        return ! empty($this->rule()->getOccurrencesBetween(begin: $immutableDate->startOfDay()->setMicrosecond(0), end: $immutableDate->endOfDay()->setMicrosecond(0)));
+        return ! empty($this->rule()->getOccurrencesBetween(begin: $immutableDate->startOfDay(), end: $immutableDate->endOfDay()));
     }
 
     public function nextOccurrences(int $limit = 1): Collection
