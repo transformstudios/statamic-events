@@ -10,7 +10,7 @@ Table Of Contents:
 
 In your collection's blueprint, make sure you have fields like in our sample [fieldset](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml).
 
-You can also use our sample fieldset by publishing it `php artisan vendor:publish --tag=events-fieldsets`, then in your blueprint import the `Events` fieldset.
+You can also use our sample fieldset by publishing it with `php artisan vendor:publish --tag=events-fieldsets`, then in your blueprint import the `Events` fieldset.
 
 ## Templating
 
@@ -27,6 +27,7 @@ Please see the example [calendar](https://github.com/transformstudios/statamic-e
 
 ### Recurring Events
 
+* all the single day fields
 * `recurrence` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`, `every`
 * `interval` - **Optional** - required if `recurrence` is `every` and indicates the frequency of the event
 * `period` - **Optional** - required if `recurrence` is `every` and indicates the period of recurrence. One of `days`, `weeks`, `months`, `years`
@@ -36,6 +37,7 @@ Please see the example [calendar](https://github.com/transformstudios/statamic-e
 
 NOTE: the intention is that these days are consecutive.
 
+* all the single day fields
 * `multi_day` - boolean. When true, `start_date`, `start_time`, `end_time`, `recurrence`, `end_date` are not used
 * `days` - **Required** - array of days:
 
@@ -131,6 +133,7 @@ Tag pair that returns an entire month of dates, starting on the beginning of the
 This means, for example, that April 2022's calendar starts on March 27th and ends on May 7th.
 
 Parameters:
+* `collection` - optional - which collection has the events, defaults to 'events'
 * `month` - optional, defaults to current month
 * `year` - optional, defaults to the current year
 
