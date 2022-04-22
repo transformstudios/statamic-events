@@ -2,7 +2,6 @@ Table Of Contents:
 
 * [Upgrading](https://github.com/transformstudios/statamic-events/blob/master/UPGRADING.md)
 * [Fieldset](#fieldset)
-* [Templating](#templating)
 * [Fields](#fields)
 * [Usage](#usage)
 
@@ -11,10 +10,6 @@ Table Of Contents:
 In your collection's blueprint, make sure you have fields like in our sample [fieldset](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml).
 
 You can also use our sample fieldset by publishing it with `php artisan vendor:publish --tag=events-fieldsets`, then in your blueprint import the `Events` fieldset.
-
-## Templating
-
-Please see the example [calendar](https://github.com/transformstudios/statamic-events-v3/blob/master/calendar.html) for how to create a monthly calendar using the `{{ events:calendar }}` tag.
 
 ## Fields
 
@@ -65,6 +60,7 @@ days:
 Standard Entries are returned, with some extra data:
 
 **Additional Variables**
+
 * `start` - Carbon date/time of the occurrence start
 * `end` - Carbon date/time of the occurrence end. Note if it's an all date event this will be set to 11:59:59pm
 * `has_end_time` - Boolean that indicates if this occurrence has a set end time. In All Day events, this is `false`
@@ -110,6 +106,7 @@ Further filtering is coming.
 
 Tag pair that returns a range of dates.
 3 required params, `collection`, `from` & `to`.
+
 * `collection` - optional - which collection has the events, defaults to 'events'
 * `from` - optional, date to start from, defaults to 'now'
 * `to` - required, date to end at
@@ -133,6 +130,7 @@ Tag pair that returns an entire month of dates, starting on the beginning of the
 This means, for example, that April 2022's calendar starts on March 27th and ends on May 7th.
 
 Parameters:
+
 * `collection` - optional - which collection has the events, defaults to 'events'
 * `month` - optional, defaults to current month
 * `year` - optional, defaults to the current year
@@ -163,6 +161,7 @@ Full example [here](https://github.com/transformstudios/statamic-events/blob/mas
 ### In
 
 Tag pair that returns a range of dates 2 required params, `collection` & `next`
+
 * `collection` - optional - which collection has the events, defaults to 'events'
 * `next` - a period that is [parsable](https://www.php.net/manual/en/datetime.formats.relative.php) by DateTime. Examples include `'2 weeks'`, `'90 days'`
 
@@ -182,6 +181,7 @@ Tag pair that returns a range of dates 2 required params, `collection` & `next`
 ### Today
 
 Tag pair that returns occurrences today:
+
 * `collection` - optional - which collection has the events, defaults to 'events'
 * `ignore_past` - boolean, optional, defaults to `false`. When true only current or future occurrences are shown.
 
@@ -190,6 +190,7 @@ Data and templating like the `events:in` tag
 ### Upcoming
 
 Tag pair that returns the next X event dates.
+
 * `collection` - optional - which collection has the events, defaults to 'events'
 * `limit` - required, number of occurrences to return
 * `collapse_multi_days` - optional, only relevant on multi-day, all-day events. When `true`, multi-day events will only show up once in the event list.
