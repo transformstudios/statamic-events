@@ -34,6 +34,8 @@ class ServiceProvider extends AddonServiceProvider
             __DIR__.'/../resources/fieldsets' => resource_path('fieldsets'),
         ], 'events-fieldsets');
 
+        Carbon::setLocale(Site::current()->locale());
+
         $weekStartDay = Carbon::getTranslator()->trans(id: 'first_day_of_week', locale: Site::current()->locale());
 
         /*
