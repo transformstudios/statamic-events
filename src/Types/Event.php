@@ -25,7 +25,7 @@ abstract class Event
 
     public function endTime(): string
     {
-        return $this->end_time ?? now()->endOfDay();
+        return $this->end_time ?? now()->endOfDay()->toTimeString();
     }
 
     public function hasEndTime(): bool
