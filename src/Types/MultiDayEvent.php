@@ -25,6 +25,16 @@ class MultiDayEvent extends Event
             ->map(fn (Values $day) => new Day($day->all(), $this->isAllDay()));
     }
 
+    /**
+     * @template T of TransformStudios\Events\Day
+     *
+     * @return Collection<T>
+     */
+    public function days(): Collection
+    {
+        return $this->days;
+    }
+
     public function end(): CarbonImmutable
     {
         return $this->days->last()->end();
