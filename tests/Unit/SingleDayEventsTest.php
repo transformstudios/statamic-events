@@ -59,6 +59,8 @@ class SingleDayEventsTest extends TestCase
             ]);
 
         $event = EventFactory::createFromEntry($entry);
+
+        $this->assertEquals('23:59:59', $event->endTime());
         $nextOccurrences = $event->nextOccurrences();
 
         $this->assertFalse($nextOccurrences[0]->has_end_time);
