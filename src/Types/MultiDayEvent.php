@@ -99,6 +99,7 @@ class MultiDayEvent extends Event
         return tap(
             unserialize(serialize($this->event)),
             fn (Entry $occurrence) => $occurrence
+                ->setSupplement('collapse_multi_days', $occurrence->collapseMultiDays)
                 ->setSupplement('start', $day->start())
                 ->setSupplement('end', $day->end())
                 ->setSupplement('has_end_time', $day->hasEndTime())
