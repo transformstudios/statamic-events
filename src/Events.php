@@ -48,7 +48,7 @@ class Events
         return $this;
     }
 
-    public function filter(string $fieldCondition, string $value): self
+    public function filter(string $fieldCondition, $value): self
     {
         $this->filters[$fieldCondition] = $value;
 
