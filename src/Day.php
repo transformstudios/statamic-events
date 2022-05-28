@@ -27,21 +27,17 @@ class Day
 
     public function isAllDay(): bool
     {
-        return $this->isAllDay;
+        return empty($this->startTime) && empty($this->endTime);
     }
 
     public function start(): CarbonImmutable
     {
-        return $this->isAllDay ? $this->date->startOfDay() : $this->date->setTimeFromTimeString($this->startTime);
+        return $this->startTime ? $this->date->setTimeFromTimeString($this->startTime) : $this->date->startOfDay();
     }
 
     public function end(): CarbonImmutable
     {
-        if ($this->isAllDay || ! $this->endTime) {
-            return $this->date->endOfDay();
-        }
-
-        return $this->date->setTimeFromTimeString($this->endTime);
+        return $this->endTime ? $this->date->setTimeFromTimeString($this->endTime) : $this->date->endOfDay();
     }
 
     public function toICalendarEvent(string $title, int $index = 0): Event

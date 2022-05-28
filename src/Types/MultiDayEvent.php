@@ -25,6 +25,16 @@ class MultiDayEvent extends Event
             ->map(fn (Values $day) => new Day($day->all(), $this->isAllDay()));
     }
 
+    /**
+     * @template T of TransformStudios\Events\Day
+     *
+     * @return Collection<T>
+     */
+    public function days(): Collection
+    {
+        return $this->days;
+    }
+
     public function end(): CarbonImmutable
     {
         return $this->days->last()->end();
@@ -89,6 +99,7 @@ class MultiDayEvent extends Event
         return tap(
             unserialize(serialize($this->event)),
             fn (Entry $occurrence) => $occurrence
+                ->setSupplement('collapse_multi_days', $occurrence->collapseMultiDays)
                 ->setSupplement('start', $day->start())
                 ->setSupplement('end', $day->end())
                 ->setSupplement('has_end_time', $day->hasEndTime())
