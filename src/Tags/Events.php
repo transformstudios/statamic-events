@@ -163,9 +163,15 @@ class Events extends Tags
 
     private function parseTerms(): array
     {
-        return collect($this->params)
-            ->filter(fn ($value, $key) => Str::startsWith($key, 'taxonomy:'))
-            ->flatMap(fn ($terms, $key) => $this->parseTermIds(key: $key, terms: $terms))
+        $taxonomyParams = collect($this->params)
+            ->filter(fn ($value, $key) => Str::startsWith($key, 'taxonomy:'));
+
+        if ($taxonomyParams->filter()->isEmpty()) {
+            return [];
+        }
+
+        return $taxonomyParams
+            ->flatMap(fn ($terms, $key) => $this->parseTermIds($key, $terms))
             ->all();
     }
 
