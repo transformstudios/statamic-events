@@ -2,6 +2,24 @@
 
 All notable changes will be documented here.
 
+## 4.0.4 - 2022-06-08
+
+- fix start/end week modifiers to be correct
+
+## 4.0.3 - 2022-05-27
+
+- all day logic was incorrect
+- add `collapse_multi_days` to the supplemental data
+- filter values can be different types
+
+## 4.0.2 - 2022-05-26
+
+- proper single day event end time
+
+## 4.0.1 - 2022-05-23
+
+- set the carbon locale from the current site
+
 ## 4.0 - 2022-04-22
 
 - major refactor
