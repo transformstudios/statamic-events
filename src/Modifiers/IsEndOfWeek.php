@@ -9,6 +9,6 @@ class IsEndOfWeek extends Modifier
 {
     public function index($value, $params, $context)
     {
-        return Carbon::parse($value)->isSameDay(now()->endOfWeek());
+        return Carbon::parse($value)->dayOfWeek == now()->endOfWeek()->dayOfWeek;
     }
 }
