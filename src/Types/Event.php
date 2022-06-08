@@ -99,7 +99,7 @@ abstract class Event
         return [];
     }
 
-    protected function supplement(CarbonInterface $date): Entry
+    protected function supplement(CarbonInterface $date): ?Entry
     {
         return unserialize(serialize($this->event))
             ->setSupplement('start', $date->setTimeFromTimeString($this->startTime()))
@@ -110,6 +110,7 @@ abstract class Event
     private function collect(array $dates): Collection
     {
         return collect($dates)
-            ->map(fn (DateTimeInterface $date) => $this->supplement(date: CarbonImmutable::parse($date)));
+            ->map(fn (DateTimeInterface $date) => $this->supplement(date: CarbonImmutable::parse($date)))
+            ->filter();
     }
 }

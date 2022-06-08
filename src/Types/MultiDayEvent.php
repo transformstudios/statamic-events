@@ -92,9 +92,11 @@ class MultiDayEvent extends Event
         );
     }
 
-    protected function supplement(CarbonInterface $date): Entry
+    protected function supplement(CarbonInterface $date): ?Entry
     {
-        $day = $this->getDayFromDate($date);
+        if (! $day = $this->getDayFromDate($date)) {
+            return null;
+        }
 
         return tap(
             unserialize(serialize($this->event)),
