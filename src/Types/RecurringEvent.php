@@ -64,7 +64,7 @@ class RecurringEvent extends Event
         };
     }
 
-    private function frequencyToRecurrence():RecurrenceFrequency
+    private function frequencyToRecurrence(): RecurrenceFrequency
     {
         return match ($this->frequency()) {
             Rrule::DAILY => RecurrenceFrequency::daily(),

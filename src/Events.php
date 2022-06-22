@@ -15,7 +15,8 @@ use Statamic\Tags\Concerns\QueriesConditions;
 
 class Events
 {
-    use Conditionable, QueriesConditions;
+    use Conditionable;
+    use QueriesConditions;
 
     private bool $collapseMultiDays = false;
     private EntryCollection $entries;
