@@ -20,7 +20,9 @@ use TransformStudios\Events\Events;
 
 class IcsController extends Controller
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    use AuthorizesRequests;
+    use DispatchesJobs;
+    use ValidatesRequests;
 
     public function __invoke(Request $request)
     {
@@ -58,9 +60,7 @@ class IcsController extends Controller
     {
         return response()->streamDownload(
             function () use ($event) {
-                echo Calendar::create()
-                ->event(Arr::wrap($event))
-                ->get();
+                echo Calendar::create()->event(Arr::wrap($event))->get();
             },
             Str::slugify($title).'.ics',
             [

@@ -1,6 +1,10 @@
 # Changelog
 
-All notable changes will be documented here.
+
+## 4.0.5 - 2022-06-08
+
+- handle empty taxonomy param
+- handle multi-day days edge case
 
 ## 4.0.4 - 2022-06-08
 
