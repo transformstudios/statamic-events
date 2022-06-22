@@ -96,7 +96,9 @@ abstract class Event
      */
     public function toICalendarEvents(): array
     {
-        return [];
+        return [
+            $this->toICalendarEvent($this->start())
+        ];
     }
 
     protected function supplement(CarbonInterface $date): ?Entry
