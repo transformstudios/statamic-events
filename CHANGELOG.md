@@ -1,6 +1,5 @@
 # Changelog
 
-All notable changes will be documented here.
 
 ## 4.0.5 - 2022-06-08
 
