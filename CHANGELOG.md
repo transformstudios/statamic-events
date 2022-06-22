@@ -1,5 +1,12 @@
 # Changelog
 
+## v4.0.6 - 2022-06-22
+
+### Changes
+
+### 🐛 Fixed
+
+- Fix iCal downloads for single day events @edalzell (#41)
 
 ## 4.0.5 - 2022-06-08
 
@@ -58,6 +65,6 @@
 
 ## 3.0 - 2021-11-04
 
-* support PHP8+, Laravel 8+ & Statamic 3.2+
-* default download is `ics`
-* add `no_results` into `upcoming` tag data
+- support PHP8+, Laravel 8+ & Statamic 3.2+
+- default download is `ics`
+- add `no_results` into `upcoming` tag data
