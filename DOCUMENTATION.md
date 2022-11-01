@@ -220,7 +220,7 @@ To give the file a name, use the `download` attribute.
 ```
 <a
     download="event-{{ date format='Ymd' }}.ics"
-    href="{{ events:download_link
+    href="{{ events:download_link event="some-id" }}
     start_date="{{ get:date }}" {{# getting the date from the `date` query param #}}
     type="google"
 }}">Google</a>
