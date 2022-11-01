@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.0.7 - 2022-11-01
+
+### 🐛 Fixed
+
+- Remove unused config file [@edalzell](https://github.com/edalzell) (#47)
+- Typo in docs [@edalzell](https://github.com/edalzell) (#46)
+
+### 🔧 Improved
+
+- 🔄 Synced file(s) with edalzell/.github [@edalzell](https://github.com/edalzell) (#44)
+- 🔄 Synced file(s) with edalzell/.github [@edalzell](https://github.com/edalzell) (#43)
+- 🔄 Synced file(s) with edalzell/.github [@edalzell](https://github.com/edalzell) (#42)
+
 ## v4.0.6 - 2022-06-22
 
 ### Changes
