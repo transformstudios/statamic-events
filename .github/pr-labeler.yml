@@ -1,4 +1,0 @@
-chore: 'chore/*'
-feature: ['feature/*', 'feat/*']
-fix: ['bug/*', 'fix/*', 'hotfix/*']
-improvement: ['change/*', 'improve/*', 'improvement']
