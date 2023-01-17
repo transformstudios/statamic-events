@@ -109,9 +109,9 @@ class IcsControllerTest extends TestCase
             ])->save();
 
         $this->get(route('statamic.events.ics.show', [
-                'date' => now()->addDays(3)->toDateString(),
-                'event' => 'the-multi-day-event',
-            ]))->assertSessionHasErrors('event_date');
+            'date' => now()->addDays(3)->toDateString(),
+            'event' => 'the-multi-day-event',
+        ]))->assertSessionHasErrors('event_date');
 
         $response = $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),
