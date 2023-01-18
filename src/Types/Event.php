@@ -85,10 +85,16 @@ abstract class Event
 
         $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
 
-        return ICalendarEvent::create($this->event->title)
+        $iCalEvent = ICalendarEvent::create($this->event->title)
             ->uniqueIdentifier($this->event->id())
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
+
+        if ($location = $this->event->location) {
+            $iCalEvent->address($location);
+        }
+
+        return $iCalEvent;
     }
 
     /**
@@ -97,7 +103,7 @@ abstract class Event
     public function toICalendarEvents(): array
     {
         return [
-            $this->toICalendarEvent($this->start())
+            $this->toICalendarEvent($this->start()),
         ];
     }
 

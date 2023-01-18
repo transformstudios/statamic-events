@@ -25,6 +25,7 @@ class IcsControllerTest extends TestCase
                 'start_date' => Carbon::now()->toDateString(),
                 'start_time' => '11:00',
                 'end_time' => '12:00',
+                'location' => 'The Location',
             ])->save();
     }
 
@@ -41,6 +42,7 @@ class IcsControllerTest extends TestCase
         $response->assertDownload('single-event.ics');
 
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
+        $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
     }
 
     /** @test */
@@ -107,9 +109,9 @@ class IcsControllerTest extends TestCase
             ])->save();
 
         $this->get(route('statamic.events.ics.show', [
-                'date' => now()->addDays(3)->toDateString(),
-                'event' => 'the-multi-day-event',
-            ]))->assertSessionHasErrors('event_date');
+            'date' => now()->addDays(3)->toDateString(),
+            'event' => 'the-multi-day-event',
+        ]))->assertSessionHasErrors('event_date');
 
         $response = $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),

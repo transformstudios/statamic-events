@@ -206,22 +206,21 @@ Tag pair that returns the next X event dates.
 
 ### Download Links
 
-Single Tag returns a url to the event data and add it to your calendar. Tag presumes you are in an events context, i.e. your events entry
+Single Tag returns a url to the event data and add it to your calendar.
 
 Parameters:
 
-* `date` - required if a recurring event
-* `type` - supported options are: `google`, `yahoo`, `webOutlook`, `ics`. Defaults to `ics`
+* `collection` - required if `date` but not `event` is passed in. Defaults to `events`.
+* `date` - if `event` is included, download the ICS for the event on that date, otherwise download all events on that day
+* `event` - download all occurrences of the event, unless `date` is include (see above)
 
-To give the file a name, use the `download` attribute.
+The download will be the slugified title, unless there are multiple events, in which case it will be `events`.
 
 *Example*:
 
 ```
 <a
     download="event-{{ date format='Ymd' }}.ics"
-    href="{{ events:download_link event="some-id" }}
-    start_date="{{ get:date }}" {{# getting the date from the `date` query param #}}
-    type="google"
-}}">Google</a>
+    href="{{ events:download_link event="some-id" date="{{ get:date }}" {{# getting the date from the `date` query param #}}
+}}">Download to your calendar</a>
 ```
