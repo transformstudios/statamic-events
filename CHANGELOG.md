@@ -1,5 +1,15 @@
 # Changelog
 
+## v4.1.0 - 2023-01-18
+
+### 🚀 New
+
+- Add location to ics [@edalzell](https://github.com/edalzell) (#50)
+
+### 🔧 Improved
+
+- 🔄 Synced file(s) with edalzell/.github [@edalzell](https://github.com/edalzell) (#48)
+
 ## v4.0.7 - 2022-11-01
 
 ### 🐛 Fixed
