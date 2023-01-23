@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Support\Collection;
+use Ramsey\Uuid\Uuid;
 use RRule\RRuleInterface;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
@@ -110,6 +111,7 @@ abstract class Event
     protected function supplement(CarbonInterface $date): ?Entry
     {
         return unserialize(serialize($this->event))
+            ->id(Uuid::uuid4()->toString())
             ->setSupplement('start', $date->setTimeFromTimeString($this->startTime()))
             ->setSupplement('end', $date->setTimeFromTimeString($this->endTime()))
             ->setSupplement('has_end_time', $this->hasEndTime());

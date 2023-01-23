@@ -5,6 +5,7 @@ namespace TransformStudios\Events\Types;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use Ramsey\Uuid\Uuid;
 use RRule\RRule;
 use RRule\RRuleInterface;
 use RRule\RSet;
@@ -101,6 +102,7 @@ class MultiDayEvent extends Event
         return tap(
             unserialize(serialize($this->event)),
             fn (Entry $occurrence) => $occurrence
+                ->id(Uuid::uuid4()->toString())
                 ->setSupplement('collapse_multi_days', $occurrence->collapseMultiDays)
                 ->setSupplement('start', $day->start())
                 ->setSupplement('end', $day->end())
