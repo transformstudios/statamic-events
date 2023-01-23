@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.1.1 - 2023-01-23
+
+### 🐛 Fixed
+
+- Add the `id` due to Statamic runtime parser issue [@edalzell](https://github.com/edalzell) (#51)
+
 ## v4.1.0 - 2023-01-18
 
 ### 🚀 New
