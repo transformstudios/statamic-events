@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.1.2 - 2023-02-03
+
+### 🐛 Fixed
+
+- Don't set `id` [@edalzell](https://github.com/edalzell) (#53)
+
 ## v4.1.1 - 2023-01-23
 
 ### 🐛 Fixed
