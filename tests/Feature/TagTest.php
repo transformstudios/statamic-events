@@ -187,6 +187,36 @@ class TagTest extends TestCase
     }
 
     /** @test */
+    public function canGenerateUpcomingLimitedOccurrences()
+    {
+        Entry::make()
+        ->blueprint($this->blueprint->handle())
+        ->collection('events')
+        ->slug('another-recurring-event')
+        ->id('another-recurring-event')
+        ->data([
+            'title' => 'Recurring Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'daily',
+        ])->save();
+
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        $this->tag
+            ->setContext([])
+            ->setParameters([
+                'collection' => 'events',
+                'limit' => 3,
+            ]);
+
+        $occurrences = $this->tag->upcoming();
+
+        $this->assertCount(3, $occurrences);
+    }
+
+    /** @test */
     public function canPaginateUpcomingOccurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));

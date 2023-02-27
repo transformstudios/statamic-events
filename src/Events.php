@@ -19,11 +19,17 @@ class Events
     use QueriesConditions;
 
     private bool $collapseMultiDays = false;
+
     private EntryCollection $entries;
+
     private array $filters = [];
+
     private ?int $page = null;
+
     private ?int $perPage = null;
+
     private ?string $site = null;
+
     private array $terms = [];
 
     public static function fromCollection(string $handle): self
