@@ -50,9 +50,9 @@ class Events extends Tags
         return route(
             'statamic.events.ics.show',
             Arr::removeNullValues([
-                'collection' =>$this->params->get('collection', 'events'),
+                'collection' => $this->params->get('collection', 'events'),
                 'date' => $this->params->has('date') ? Carbon::parse($this->params->get('date'))->toDateString() : null,
-                'event' =>  $this->params->get('event'),
+                'event' => $this->params->get('event'),
             ])
         );
     }
@@ -133,10 +133,10 @@ class Events extends Tags
             )
             ->when(
                 value: $this->params->int('paginate'),
-                callback: fn (Generator $generator, int $perPage) =>  $generator->pagination(perPage: $perPage)
+                callback: fn (Generator $generator, int $perPage) => $generator->pagination(perPage: $perPage)
             )->when(
                 value: $this->params->bool('collapse_multi_days'),
-                callback: fn (Generator $generator) =>  $generator->collapseMultiDays()
+                callback: fn (Generator $generator) => $generator->collapseMultiDays()
             );
     }
 
