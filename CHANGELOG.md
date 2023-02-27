@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.1.3 - 2023-02-27
+
+### 🐛 Fixed
+
+- Fix `limit` on `upcoming` tag. [@edalzell](https://github.com/edalzell) (#56)
+
 ## v4.1.2 - 2023-02-03
 
 ### 🐛 Fixed
