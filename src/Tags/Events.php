@@ -92,7 +92,14 @@ class Events extends Tags
 
     public function upcoming(): EntryCollection|array
     {
-        return $this->output($this->generator()->upcoming(limit: $this->params->int('limit')));
+        $limit = $this->params->int('limit');
+        $occurrences = $this->generator()->upcoming($limit);
+
+        if ($this->params->has('paginate')) {
+            return $this->output($occurrences);
+        }
+
+        return $this->output($occurrences->take($limit));
     }
 
     private function day(string $date, EntryCollection $occurrences): array
