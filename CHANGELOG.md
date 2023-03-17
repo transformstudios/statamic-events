@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.1.4 - 2023-03-17
+
+### 🐛 Fixed
+
+- Fix Multi-day, all-day events [@edalzell](https://github.com/edalzell) (#57)
+
 ## v4.1.3 - 2023-02-27
 
 ### 🐛 Fixed
