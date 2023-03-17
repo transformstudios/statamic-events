@@ -9,15 +9,25 @@ use Statamic\Support\Str;
 
 class Day
 {
+    private bool $isAllDay;
+
     private ?string $startTime;
+
     private ?string $endTime;
+
     private CarbonImmutable $date;
 
-    public function __construct(array $data, private bool $isAllDay = false)
+    public function __construct(array $data, bool $isAllDay = false)
     {
         $this->date = CarbonImmutable::parse(Arr::get($data, 'date'));
         $this->startTime = Arr::get($data, 'start_time');
         $this->endTime = Arr::get($data, 'end_time');
+
+        if (! $isAllDay && $this->isAllDay()) {
+            $this->isAllDay = true;
+        } else {
+            $this->isAllDay = $isAllDay;
+        }
     }
 
     public function hasEndtime(): bool
