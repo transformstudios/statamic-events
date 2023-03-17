@@ -86,8 +86,8 @@ class MultiDayEvent extends Event
             new RSet(),
             fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([
                 'count' => 1,
-                'dtstart' => $day->end(),
-                'freq' => RRule::DAILY,
+                'dtstart' => $day->end()->subSecond(),
+                'freq' => RRule::SECONDLY,
             ]))
         );
     }
