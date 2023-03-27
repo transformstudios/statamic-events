@@ -126,12 +126,15 @@ class Events extends Tags
 
     private function generator(): Generator
     {
-        return Generator::fromCollection(handle: $this->params->get('collection', 'events'))
+        $generator = $this->params->has('event') ?
+            Generator::fromEntry($this->params->get('event')) :
+            Generator::fromCollection($this->params->get('collection', 'events'));
+
+        return $generator
             ->when(
                 value: $this->parseTerms(),
                 callback: fn (Generator $generator, array $terms) => $generator->terms(terms: $terms)
-            )
-            ->when(
+            )->when(
                 value: $this->params->int('paginate'),
                 callback: fn (Generator $generator, int $perPage) => $generator->pagination(perPage: $perPage)
             )->when(
