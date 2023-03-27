@@ -20,7 +20,11 @@ class Events
 
     private bool $collapseMultiDays = false;
 
+    private ?string $collection = null;
+
     private EntryCollection $entries;
+
+    private ?string $event = null;
 
     private array $filters = [];
 
@@ -34,16 +38,28 @@ class Events
 
     public static function fromCollection(string $handle): self
     {
-        return new static(collection: $handle);
+        return tap(new static())->collection($handle);
     }
 
-    private function __construct(private string $collection)
+    public static function fromEntry(string $id): self
+    {
+        return tap(new static())->event($id);
+    }
+
+    private function __construct()
     {
     }
 
     public function collapseMultiDays(): self
     {
         $this->collapseMultiDays = true;
+
+        return $this;
+    }
+
+    public function collection(string $handle): self
+    {
+        $this->collection = $handle;
 
         return $this;
     }
@@ -108,8 +124,11 @@ class Events
     private function entries(): self
     {
         $query = EntryFacade::query()
-            ->where('collection', $this->collection)
-            ->where('site', $this->site ?? Site::current()->handle())
+            ->when(
+                $this->event,
+                fn (EntryQueryBuilder $query, $id) => $query->where('id', $id),
+                fn (EntryQueryBuilder $query) => $query->where('collection', $this->collection)
+            )->where('site', $this->site ?? Site::current()->handle())
             ->where('status', 'published')
             ->when($this->terms, fn (EntryQueryBuilder $query, $terms) => $query->whereTaxonomyIn($terms));
 
