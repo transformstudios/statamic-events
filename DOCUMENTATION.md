@@ -55,7 +55,7 @@ days:
 
 ## Usage
 
-### Query Tags (Between, In, Today, Upcoming)
+### Tags (Between, Calendar, Download Link, In, Today, Upcoming)
 
 Standard Entries are returned, with some extra data:
 
@@ -192,7 +192,7 @@ Data and templating like the `events:in` tag
 Tag pair that returns the next X event dates.
 
 * `collection` - optional - which collection has the events, defaults to 'events'
-* `event` - optional - if used it gets occurrences from the given event only and ignores `collection` parameter
+* `event` - optional - if used, it gets occurrences from the given event only, and ignores `collection` parameter
 * `limit` - required, number of occurrences to return
 * `collapse_multi_days` - optional, only relevant on multi-day, all-day events. When `true`, multi-day events will only show up once in the event list.
 
