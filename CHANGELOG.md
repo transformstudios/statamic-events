@@ -1,5 +1,11 @@
 # Changelog
 
+## v4.2.0 - 2023-03-27
+
+### 🚀 New
+
+- Occurrences of single event [@edalzell](https://github.com/edalzell) (#58)
+
 ## v4.1.4 - 2023-03-17
 
 ### 🐛 Fixed
