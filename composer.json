@@ -34,7 +34,7 @@
     },
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^9.0 || ^10.11",
+        "laravel/framework": "^9.6 || ^10.11",
         "rlanvin/php-rrule": "^2.3.1",
         "spatie/calendar-links": "^1.0",
         "spatie/icalendar-generator": "^2.3.3",
