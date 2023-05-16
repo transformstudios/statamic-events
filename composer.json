@@ -34,7 +34,7 @@
     },
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^10.11",
+        "laravel/framework": "^9.0 || ^10.11",
         "rlanvin/php-rrule": "^2.3.1",
         "spatie/calendar-links": "^1.0",
         "spatie/icalendar-generator": "^2.3.3",
@@ -42,9 +42,9 @@
     },
     "require-dev": {
         "mockery/mockery": "^1.3.1",
-        "nunomaduro/collision": "^7.0",
-        "phpunit/phpunit": "^10.0",
-        "orchestra/testbench": "^8.0",
+        "nunomaduro/collision": "^6.0 || ^7.0",
+        "phpunit/phpunit": "^9.0 || ^10.0",
+        "orchestra/testbench": "^7.0 || ^8.0",
         "spatie/test-time": "^1.2"
     },
     "config": {
