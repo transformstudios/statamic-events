@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.0 - 2023-05-16
+
+### 🚀 New
+
+- Update to require latest versions of all the things [@edalzell](https://github.com/edalzell) (#60)
+
 ## v4.2.0 - 2023-03-27
 
 ### 🚀 New
