@@ -133,4 +133,14 @@ class IcsControllerTest extends TestCase
             'event' => 'the-id',
         ]))->assertSessionHasErrors('event_date');
     }
+    /** @test */
+    public function throwsValidationErrorWhenEventDoesNotExist()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        $response = $this->get(route('statamic.events.ics.show', [
+            'date' => now()->addDay()->toDateString(),
+            'event' => 'does-not-exist',
+        ]))->assertSessionHasErrors('event_date');
+    }
 }
