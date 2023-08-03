@@ -128,17 +128,18 @@ class IcsControllerTest extends TestCase
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
-        $response = $this->get(route('statamic.events.ics.show', [
+        $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),
             'event' => 'the-id',
         ]))->assertSessionHasErrors('event_date');
     }
+
     /** @test */
-    public function throwsValidationErrorWhenEventDoesNotExist()
+    public function throws404ErrorWhenEventDoesNotExist()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
-        $response = $this->get(route('statamic.events.ics.show', [
+        $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),
             'event' => 'does-not-exist',
         ]))->assertStatus(404);
