@@ -30,8 +30,10 @@ class IcsController extends Controller
         $date = $request->has('date') ? CarbonImmutable::parse($request->get('date')) : null;
         $eventId = $request->get('event');
 
-        if ($date && $eventId) {
-            $event = EventFactory::createFromEntry(EntryFacade::find($eventId));
+        abort_if(! is_null($eventId) && is_null($entry = EntryFacade::find($eventId)), 404);
+
+        if ($date && $entry) {
+            $event = EventFactory::createFromEntry($entry);
             throw_unless(
                 $iCalendarEvent = $event->toICalendarEvent($date),
                 ValidationException::withMessages(['event_date' => 'Event does not occur on '.$date->toDateString()])
@@ -49,9 +51,9 @@ class IcsController extends Controller
             return $this->downloadIcs($events);
         }
 
-        if ($eventId) {
+        if ($entry) {
             return $this->downloadIcs(
-                EventFactory::createFromEntry(EntryFacade::find($eventId))->toICalendarEvents()
+                EventFactory::createFromEntry($entry)->toICalendarEvents()
             );
         }
     }
