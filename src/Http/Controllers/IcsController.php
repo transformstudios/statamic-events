@@ -8,7 +8,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Validation\ValidationException;
 use Spatie\IcalendarGenerator\Components\Calendar;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
@@ -34,10 +33,7 @@ class IcsController extends Controller
 
         if ($date && $entry) {
             $event = EventFactory::createFromEntry($entry);
-            throw_unless(
-                $iCalendarEvent = $event->toICalendarEvent($date),
-                ValidationException::withMessages(['event_date' => 'Event does not occur on '.$date->toDateString()])
-            );
+            abort_unless($iCalendarEvent = $event->toICalendarEvent($date), 404);
 
             return $this->downloadIcs($iCalendarEvent, $event->title);
         }
