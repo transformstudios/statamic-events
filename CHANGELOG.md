@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.0.1 - 2023-08-04
+
+### 🐛 Fixed
+
+- Return 404 when event doesn't exist [@edalzell](https://github.com/edalzell) (#62)
+
 ## v5.0 - 2023-05-16
 
 ### 🚀 New
