@@ -8,7 +8,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Validation\ValidationException;
 use Spatie\IcalendarGenerator\Components\Calendar;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
@@ -30,12 +29,11 @@ class IcsController extends Controller
         $date = $request->has('date') ? CarbonImmutable::parse($request->get('date')) : null;
         $eventId = $request->get('event');
 
-        if ($date && $eventId) {
-            $event = EventFactory::createFromEntry(EntryFacade::find($eventId));
-            throw_unless(
-                $iCalendarEvent = $event->toICalendarEvent($date),
-                ValidationException::withMessages(['event_date' => 'Event does not occur on '.$date->toDateString()])
-            );
+        abort_if(! is_null($eventId) && is_null($entry = EntryFacade::find($eventId)), 404);
+
+        if ($date && $entry) {
+            $event = EventFactory::createFromEntry($entry);
+            abort_unless($iCalendarEvent = $event->toICalendarEvent($date), 404);
 
             return $this->downloadIcs($iCalendarEvent, $event->title);
         }
@@ -49,9 +47,9 @@ class IcsController extends Controller
             return $this->downloadIcs($events);
         }
 
-        if ($eventId) {
+        if ($entry) {
             return $this->downloadIcs(
-                EventFactory::createFromEntry(EntryFacade::find($eventId))->toICalendarEvents()
+                EventFactory::createFromEntry($entry)->toICalendarEvents()
             );
         }
     }

@@ -37,9 +37,7 @@ class IcsControllerTest extends TestCase
         $response = $this->get(route('statamic.events.ics.show', [
             'date' => now()->toDateString(),
             'event' => 'the-id',
-        ]));
-
-        $response->assertDownload('single-event.ics');
+        ]))->assertDownload('single-event.ics');
 
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
         $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
@@ -66,15 +64,14 @@ class IcsControllerTest extends TestCase
         $response = $this->get(route('statamic.events.ics.show', [
             'date' => now()->toDateString(),
             'event' => 'the-recurring-id',
-        ]));
-        $response->assertDownload('recurring-event.ics');
+        ]))->assertDownload('recurring-event.ics');
 
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
 
         $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),
             'event' => 'the-recurring-id',
-        ]))->assertSessionHasErrors('event_date');
+        ]))->assertStatus(404);
     }
 
     /** @test */
@@ -111,26 +108,35 @@ class IcsControllerTest extends TestCase
         $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDays(3)->toDateString(),
             'event' => 'the-multi-day-event',
-        ]))->assertSessionHasErrors('event_date');
+        ]))->assertStatus(404);
 
         $response = $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),
             'event' => 'the-multi-day-event',
-        ]));
-
-        $response->assertDownload('multi-day-event.ics');
+        ]))->assertDownload('multi-day-event.ics');
 
         $this->assertStringContainsString('DTSTART:'.now()->addDay()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
     }
 
     /** @test */
-    public function throwsValidationErrorWhenEventDoesNotOccurOnDate()
+    public function throws404ErrorWhenEventDoesNotOccurOnDate()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
-        $response = $this->get(route('statamic.events.ics.show', [
+        $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),
             'event' => 'the-id',
-        ]))->assertSessionHasErrors('event_date');
+        ]))->assertStatus(404);
+    }
+
+    /** @test */
+    public function throws404ErrorWhenEventDoesNotExist()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        $this->get(route('statamic.events.ics.show', [
+            'date' => now()->addDay()->toDateString(),
+            'event' => 'does-not-exist',
+        ]))->assertStatus(404);
     }
 }
