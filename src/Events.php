@@ -158,7 +158,10 @@ class Events
             items: $occurrences->forPage(page: $this->page, perPage: $this->perPage),
             total: $occurrences->count(),
             perPage: $this->perPage,
-            currentPage: $this->page
+            currentPage: $this->page,
+            options: [
+                'path' => request()->url(),
+            ]
         );
     }
 }
