@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Tests\Feature;
 
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry;
 use Statamic\Support\Arr;
 use TransformStudios\Events\Tags\Events;
@@ -190,17 +191,17 @@ class TagTest extends TestCase
     public function canGenerateUpcomingLimitedOccurrences()
     {
         Entry::make()
-        ->blueprint($this->blueprint->handle())
-        ->collection('events')
-        ->slug('another-recurring-event')
-        ->id('another-recurring-event')
-        ->data([
-            'title' => 'Recurring Event',
-            'start_date' => Carbon::now()->toDateString(),
-            'start_time' => '11:00',
-            'end_time' => '12:00',
-            'recurrence' => 'daily',
-        ])->save();
+            ->blueprint($this->blueprint->handle())
+            ->collection('events')
+            ->slug('another-recurring-event')
+            ->id('another-recurring-event')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+            ])->save();
 
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -229,6 +230,10 @@ class TagTest extends TestCase
                 'limit' => 10,
             ]);
 
+        Cascade::partialMock()->shouldReceive('get')
+            ->with('uri')
+            ->andReturn('/events');
+
         $pagination = $this->tag->upcoming();
 
         $this->assertArrayHasKey('results', $pagination);
@@ -237,6 +242,7 @@ class TagTest extends TestCase
 
         $this->assertCount(2, $pagination['results']);
         $this->assertEquals(2, $pagination['total_results']);
+        $this->assertEquals('/events?page=2', $pagination['paginate']['next_page']);
     }
 
     /** @test */
