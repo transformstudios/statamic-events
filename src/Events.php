@@ -7,6 +7,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
@@ -158,7 +159,10 @@ class Events
             items: $occurrences->forPage(page: $this->page, perPage: $this->perPage),
             total: $occurrences->count(),
             perPage: $this->perPage,
-            currentPage: $this->page
+            currentPage: $this->page,
+            options: [
+                'path' => Cascade::get('uri'),
+            ]
         );
     }
 }
