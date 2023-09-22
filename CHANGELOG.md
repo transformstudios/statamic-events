@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.0.2 - 2023-09-22
+
+### 🐛 Fixed
+
+- Fix pagination [@edalzell](https://github.com/edalzell) (#64)
+
 ## v5.0.1 - 2023-08-04
 
 ### 🐛 Fixed
