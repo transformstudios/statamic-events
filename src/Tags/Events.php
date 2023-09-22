@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Tags;
 
 use Carbon\CarbonInterface;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Query\Builder;
@@ -136,7 +137,10 @@ class Events extends Tags
                 callback: fn (Generator $generator, array $terms) => $generator->terms(terms: $terms)
             )->when(
                 value: $this->params->int('paginate'),
-                callback: fn (Generator $generator, int $perPage) => $generator->pagination(perPage: $perPage)
+                callback: fn (Generator $generator, int $perPage) => $generator->pagination(
+                    page: Paginator::resolveCurrentPage(),
+                    perPage: $perPage
+                )
             )->when(
                 value: $this->params->bool('collapse_multi_days'),
                 callback: fn (Generator $generator) => $generator->collapseMultiDays()
