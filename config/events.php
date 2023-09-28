@@ -1,5 +1,3 @@
 <?php
 
-return [
-    'timezone' => null,
-];
+return [];
