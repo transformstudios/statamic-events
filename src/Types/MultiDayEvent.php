@@ -51,8 +51,7 @@ class MultiDayEvent extends Event
             return null;
         }
 
-        $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
-
+        $immutableDate = $this->toCarbonImmutable($date);
         $day = $this->getDayFromDate($immutableDate);
 
         return ICalendarEvent::create($this->event->title)
@@ -77,7 +76,7 @@ class MultiDayEvent extends Event
         if ($this->collapseMultiDays) {
             return new RRule([
                 'count' => 1,
-                'dtstart' => $this->end(),
+                'dtstart' => $this->end()->timezone($this->timezone['timezone']),
                 'freq' => RRule::DAILY,
             ]);
         }
@@ -86,7 +85,7 @@ class MultiDayEvent extends Event
             new RSet(),
             fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([
                 'count' => 1,
-                'dtstart' => $day->end()->subSecond(),
+                'dtstart' => $day->end()->subSecond()->timezone($this->timezone['timezone']),
                 'freq' => RRule::SECONDLY,
             ]))
         );

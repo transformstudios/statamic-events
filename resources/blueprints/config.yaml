@@ -1,0 +1,6 @@
+timezone:
+  display: Default Timezone
+  type: timezones
+  max_items: 1
+  mode: typeahead
+  default: UTC
