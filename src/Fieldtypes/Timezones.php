@@ -11,7 +11,10 @@ class Timezones extends Relationship
     protected function augmentValue($key)
     {
         if (is_null($augmented = $this->timezone($key))) {
-            return ['abbreviation' => $key];
+            return [
+                'abbreviation' => $key,
+                'timezone' => $key,
+            ];
         }
 
         return $augmented;
