@@ -22,11 +22,13 @@ class RecurringEvent extends Event
      */
     public function toICalendarEvents(): array
     {
+        $timezone = $this->timezone['timezone'];
+
         return [
             ICalendarEvent::create($this->event->title)
                 ->uniqueIdentifier($this->event->id())
-                ->startsAt($this->start())
-                ->endsAt($this->end())
+                ->startsAt($this->start()->timezone($timezone))
+                ->endsAt($this->end()->timezone($timezone))
                 ->rrule($this->spatieRule()),
         ];
     }

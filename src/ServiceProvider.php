@@ -2,9 +2,13 @@
 
 namespace TransformStudios\Events;
 
+use Edalzell\Forma\Forma;
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Providers\AddonServiceProvider;
+use TransformStudios\Events\Fieldtypes\Timezones;
 use TransformStudios\Events\Modifiers\InMonth;
 use TransformStudios\Events\Modifiers\IsEndOfWeek;
 use TransformStudios\Events\Modifiers\IsStartOfWeek;
@@ -12,6 +16,10 @@ use TransformStudios\Events\Tags\Events;
 
 class ServiceProvider extends AddonServiceProvider
 {
+    protected $fieldtypes = [
+        Timezones::class,
+    ];
+
     protected $modifiers = [
         InMonth::class,
         IsEndOfWeek::class,
@@ -30,10 +38,15 @@ class ServiceProvider extends AddonServiceProvider
     {
         parent::boot();
 
-        $this->publishes([
-            __DIR__.'/../resources/fieldsets' => resource_path('fieldsets'),
-        ], 'events-fieldsets');
+        Forma::add('transformstudios/events');
 
+        $this
+            ->bootCarbon()
+            ->bootFields();
+    }
+
+    private function bootCarbon(): self
+    {
         Carbon::setLocale(Site::current()->locale());
 
         $weekStartDay = Carbon::getTranslator()->trans(id: 'first_day_of_week', locale: Site::current()->locale());
@@ -47,5 +60,27 @@ class ServiceProvider extends AddonServiceProvider
         */
         Carbon::setWeekStartsAt(day: $weekStartDay);
         Carbon::setWeekEndsAt(day: ($weekStartDay + 6) % 7);
+
+        return $this;
+    }
+
+    private function bootFields(): self
+    {
+        Collection::computed('events', 'timezone', function ($entry, $value) {
+            if ($value) {
+                return $value;
+            }
+
+            $timezone = config('events.timezone', config('app.timezone'));
+
+            return Blueprint::find('collections/events/event')
+                ->field('timezone')
+                ->setValue($timezone)
+                ->augment()
+                ->value()
+                ->value();
+        });
+
+        return $this;
     }
 }

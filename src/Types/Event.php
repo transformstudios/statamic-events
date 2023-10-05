@@ -2,6 +2,7 @@
 
 namespace TransformStudios\Events\Types;
 
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
@@ -83,7 +84,7 @@ abstract class Event
             return null;
         }
 
-        $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
+        $immutableDate = $this->toCarbonImmutable($date);
 
         $iCalEvent = ICalendarEvent::create($this->event->title)
             ->uniqueIdentifier($this->event->id())
@@ -113,6 +114,13 @@ abstract class Event
             ->setSupplement('start', $date->setTimeFromTimeString($this->startTime()))
             ->setSupplement('end', $date->setTimeFromTimeString($this->endTime()))
             ->setSupplement('has_end_time', $this->hasEndTime());
+    }
+
+    protected function toCarbonImmutable(string|CarbonInterface $date): CarbonImmutable
+    {
+        $carbon = is_string($date) ? Carbon::parse($date) : $date;
+
+        return $carbon->timezone($this->timezone['timezone'])->toImmutable();
     }
 
     private function collect(array $dates): Collection

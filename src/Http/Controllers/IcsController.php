@@ -33,6 +33,7 @@ class IcsController extends Controller
 
         if ($date && $entry) {
             $event = EventFactory::createFromEntry($entry);
+
             abort_unless($iCalendarEvent = $event->toICalendarEvent($date), 404);
 
             return $this->downloadIcs($iCalendarEvent, $event->title);

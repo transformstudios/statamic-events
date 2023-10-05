@@ -1,10 +1,14 @@
 Table Of Contents:
 
 * [Upgrading](https://github.com/transformstudios/statamic-events/blob/master/UPGRADING.md)
+* [Configuration](#configuration)
 * [Fieldset](#fieldset)
 * [Fields](#fields)
 * [Usage](#usage)
 
+## Configuration
+
+If you'd like to have a different event timezone default than the app default (usually UTC), publish the config file (`php artisan vendor:publish --tag=events-config`), then update it via the CP. This is used on individual events that do not have a timezone set (see Fieldset below).
 ## Fieldset
 
 In your collection's blueprint, make sure you have fields like in our sample [fieldset](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml).

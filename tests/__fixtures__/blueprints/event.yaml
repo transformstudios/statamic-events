@@ -64,13 +64,6 @@ sections:
       -
         handle: timezone
         field:
-          options:
-            pdt: PDT
-            pst: PST
-            cdt: CDT
-            cst: CST
-            edt: EDT
-            est: EST
           multiple: false
           max_items: 1
           clearable: false
@@ -79,7 +72,7 @@ sections:
           push_tags: false
           cast_booleans: false
           display: Timezone
-          type: select
+          type: timezones
           icon: select
           listable: hidden
           instructions_position: above

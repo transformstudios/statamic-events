@@ -20,7 +20,7 @@ fields:
       allow_time: false
       require_time: false
       input_format: M/D/YYYY
-      width: 33
+      width: 25
       display: 'Start Date'
       if:
         multi_day: 'equals false'
@@ -28,7 +28,7 @@ fields:
     handle: start_time
     field:
       type: time
-      width: 33
+      width: 25
       display: 'Start Time'
       if:
         multi_day: 'equals false'
@@ -37,11 +37,27 @@ fields:
     handle: end_time
     field:
       type: time
-      width: 33
+      width: 25
       display: 'End Time'
       if:
         multi_day: 'equals false'
         all_day: 'equals false'
+  -
+    handle: timezone
+    field:
+      max_items: 1
+      clearable: false
+      searchable: true
+      taggable: false
+      push_tags: false
+      cast_booleans: false
+      display: Timezone
+      type: timezones
+      icon: select
+      listable: hidden
+      instructions_position: above
+      mode: typeahead
+      width: 25
   -
     handle: days
     field:
