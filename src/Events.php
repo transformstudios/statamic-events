@@ -10,7 +10,6 @@ use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
-use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Support\Arr;
 use Statamic\Tags\Concerns\QueriesConditions;
 
@@ -127,11 +126,11 @@ class Events
         $query = EntryFacade::query()
             ->when(
                 $this->event,
-                fn (EntryQueryBuilder $query, $id) => $query->where('id', $id),
-                fn (EntryQueryBuilder $query) => $query->where('collection', $this->collection)
+                fn ($query, $id) => $query->where('id', $id),
+                fn ($query) => $query->where('collection', $this->collection)
             )->where('site', $this->site ?? Site::current()->handle())
             ->where('status', 'published')
-            ->when($this->terms, fn (EntryQueryBuilder $query, $terms) => $query->whereTaxonomyIn($terms));
+            ->when($this->terms, fn ($query, $terms) => $query->whereTaxonomyIn($terms));
 
         collect($this->filters)->each(function ($value, $fieldCondition) use ($query) {
             [$field, $condition] = explode(':', $fieldCondition);
