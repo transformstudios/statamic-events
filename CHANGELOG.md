@@ -1,5 +1,13 @@
 # Changelog
 
+## v5.0.3 - 2023-10-05
+
+### 🐛 Fixed
+
+- Add Timezone support [@edalzell](https://github.com/edalzell) (#67)
+- Remove EntryQueryBuilder type declarations in Entry query [@DwainsWorld](https://github.com/DwainsWorld) (#65)
+- Update Statamic version constraint for the Cascade class [@edalzell](https://github.com/edalzell) (#66)
+
 ## v5.0.2 - 2023-09-22
 
 ### 🐛 Fixed
