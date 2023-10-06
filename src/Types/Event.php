@@ -75,7 +75,15 @@ abstract class Event
     public function start(): CarbonImmutable
     {
         return CarbonImmutable::parse($this->start_date)
+            ->shiftTimezone($this->timezone['timezone'])
             ->setTimeFromTimeString($this->startTime());
+    }
+
+    public function end(): CarbonImmutable
+    {
+        return CarbonImmutable::parse($this->start_date)
+            ->shiftTimezone($this->timezone['timezone'])
+            ->setTimeFromTimeString($this->endTime());
     }
 
     public function toICalendarEvent(string|CarbonInterface $date): ?ICalendarEvent
@@ -87,6 +95,7 @@ abstract class Event
         $immutableDate = $this->toCarbonImmutable($date);
 
         $iCalEvent = ICalendarEvent::create($this->event->title)
+            ->withoutTimezone()
             ->uniqueIdentifier($this->event->id())
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
@@ -120,13 +129,14 @@ abstract class Event
     {
         $carbon = is_string($date) ? Carbon::parse($date) : $date;
 
-        return $carbon->timezone($this->timezone['timezone'])->toImmutable();
+        return $carbon->shiftTimezone($this->timezone['timezone'])->toImmutable();
     }
 
     private function collect(array $dates): Collection
     {
         return collect($dates)
-            ->map(fn (DateTimeInterface $date) => $this->supplement(date: CarbonImmutable::parse($date)))
-            ->filter();
+            ->map(fn (DateTimeInterface $date) => $this->supplement(
+                date: CarbonImmutable::parse($date, $this->timezone['timezone'])
+            ))->filter();
     }
 }

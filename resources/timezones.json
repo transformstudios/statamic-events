@@ -6,47 +6,47 @@
     },
     {
         "timezone": "America/Glace_Bay",
-        "abbreviation": "ADT",
+        "abbreviation": "AST",
         "name": "Atlantic Standard Time"
     },
     {
         "timezone": "America/Goose_Bay",
-        "abbreviation": "ADT",
+        "abbreviation": "AST",
         "name": "Atlantic Standard Time"
     },
     {
         "timezone": "America/Halifax",
-        "abbreviation": "ADT",
+        "abbreviation": "AST",
         "name": "Atlantic Standard Time"
     },
     {
         "timezone": "America/Moncton",
-        "abbreviation": "ADT",
+        "abbreviation": "AST",
         "name": "Atlantic Standard Time"
     },
     {
         "timezone": "America/Thule",
-        "abbreviation": "ADT",
+        "abbreviation": "AST",
         "name": "Atlantic Standard Time"
     },
     {
         "timezone": "Atlantic/Bermuda",
-        "abbreviation": "ADT",
+        "abbreviation": "AST",
         "name": "Atlantic Standard Time"
     },
     {
         "timezone": "America/Scoresbysund",
-        "abbreviation": "ADT",
+        "abbreviation": "AST",
         "name": "Azores Standard Time"
     },
     {
         "timezone": "Atlantic/Azores",
-        "abbreviation": "ADT",
+        "abbreviation": "AST",
         "name": "Azores Standard Time"
     },
     {
         "timezone": "Asia/Baku",
-        "abbreviation": "ADT",
+        "abbreviation": "AST",
         "name": "Azerbaijan Standard Time"
     },
     {
@@ -61,27 +61,27 @@
     },
     {
         "timezone": "America/Anchorage",
-        "abbreviation": "AKDT",
+        "abbreviation": "AKST",
         "name": "Alaskan Standard Time"
     },
     {
         "timezone": "America/Juneau",
-        "abbreviation": "AKDT",
+        "abbreviation": "AKST",
         "name": "Alaskan Standard Time"
     },
     {
         "timezone": "America/Nome",
-        "abbreviation": "AKDT",
+        "abbreviation": "AKST",
         "name": "Alaskan Standard Time"
     },
     {
         "timezone": "America/Sitka",
-        "abbreviation": "AKDT",
+        "abbreviation": "AKST",
         "name": "Alaskan Standard Time"
     },
     {
         "timezone": "America/Yakutat",
-        "abbreviation": "AKDT",
+        "abbreviation": "AKST",
         "name": "Alaskan Standard Time"
     },
     {
@@ -451,57 +451,57 @@
     },
     {
         "timezone": "Europe/Belgrade",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central Europe Standard Time"
     },
     {
         "timezone": "Europe/Bratislava",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central Europe Standard Time"
     },
     {
         "timezone": "Europe/Budapest",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central Europe Standard Time"
     },
     {
         "timezone": "Europe/Ljubljana",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central Europe Standard Time"
     },
     {
         "timezone": "Europe/Podgorica",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central Europe Standard Time"
     },
     {
         "timezone": "Europe/Prague",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central Europe Standard Time"
     },
     {
         "timezone": "Europe/Tirane",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central Europe Standard Time"
     },
     {
         "timezone": "Europe/Sarajevo",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central European Standard Time"
     },
     {
         "timezone": "Europe/Skopje",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central European Standard Time"
     },
     {
         "timezone": "Europe/Warsaw",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central European Standard Time"
     },
     {
         "timezone": "Europe/Zagreb",
-        "abbreviation": "CEDT",
+        "abbreviation": "CEST",
         "name": "Central European Standard Time"
     },
     {
@@ -656,72 +656,72 @@
     },
     {
         "timezone": "Asia/Nicosia",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Athens",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Bucharest",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Chisinau",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Helsinki",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Kyiv",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Mariehamn",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Nicosia",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Riga",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Sofia",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Tallinn",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Uzhgorod",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Vilnius",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
         "timezone": "Europe/Zaporozhye",
-        "abbreviation": "EEDT",
+        "abbreviation": "EEST",
         "name": "E. Europe Standard Time"
     },
     {
@@ -816,47 +816,47 @@
     },
     {
         "timezone": "Europe/Helsinki",
-        "abbreviation": "FDT",
+        "abbreviation": "FST",
         "name": "FLE Standard Time"
     },
     {
         "timezone": "Europe/Kyiv",
-        "abbreviation": "FDT",
+        "abbreviation": "FST",
         "name": "FLE Standard Time"
     },
     {
         "timezone": "Europe/Mariehamn",
-        "abbreviation": "FDT",
+        "abbreviation": "FST",
         "name": "FLE Standard Time"
     },
     {
         "timezone": "Europe/Riga",
-        "abbreviation": "FDT",
+        "abbreviation": "FST",
         "name": "FLE Standard Time"
     },
     {
         "timezone": "Europe/Sofia",
-        "abbreviation": "FDT",
+        "abbreviation": "FST",
         "name": "FLE Standard Time"
     },
     {
         "timezone": "Europe/Tallinn",
-        "abbreviation": "FDT",
+        "abbreviation": "FST",
         "name": "FLE Standard Time"
     },
     {
         "timezone": "Europe/Uzhgorod",
-        "abbreviation": "FDT",
+        "abbreviation": "FST",
         "name": "FLE Standard Time"
     },
     {
         "timezone": "Europe/Vilnius",
-        "abbreviation": "FDT",
+        "abbreviation": "FST",
         "name": "FLE Standard Time"
     },
     {
         "timezone": "Europe/Zaporozhye",
-        "abbreviation": "FDT",
+        "abbreviation": "FST",
         "name": "FLE Standard Time"
     },
     {
@@ -866,52 +866,52 @@
     },
     {
         "timezone": "America/Godthab",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "Greenland Standard Time"
     },
     {
         "timezone": "Atlantic/Canary",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "GMT Standard Time"
     },
     {
         "timezone": "Atlantic/Faeroe",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "GMT Standard Time"
     },
     {
         "timezone": "Atlantic/Madeira",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "GMT Standard Time"
     },
     {
         "timezone": "Europe/Dublin",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "GMT Standard Time"
     },
     {
         "timezone": "Europe/Lisbon",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "GMT Standard Time"
     },
     {
         "timezone": "Asia/Nicosia",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "GTB Standard Time"
     },
     {
         "timezone": "Europe/Athens",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "GTB Standard Time"
     },
     {
         "timezone": "Europe/Bucharest",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "GTB Standard Time"
     },
     {
         "timezone": "Europe/Chisinau",
-        "abbreviation": "GDT",
+        "abbreviation": "GST",
         "name": "GTB Standard Time"
     },
     {
@@ -1041,7 +1041,7 @@
     },
     {
         "timezone": "Asia/Tehran",
-        "abbreviation": "IDT",
+        "abbreviation": "IRST",
         "name": "Iran Standard Time"
     },
     {
@@ -1056,7 +1056,7 @@
     },
     {
         "timezone": "Asia/Jerusalem",
-        "abbreviation": "JDT",
+        "abbreviation": "IST",
         "name": "Israel Standard Time"
     },
     {
@@ -1091,7 +1091,7 @@
     },
     {
         "timezone": "Asia/Kamchatka",
-        "abbreviation": "KDT",
+        "abbreviation": "KST",
         "name": "Kamchatka Standard Time"
     },
     {
@@ -1116,67 +1116,67 @@
     },
     {
         "timezone": "America/Chihuahua",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time (Mexico)"
     },
     {
         "timezone": "America/Mazatlan",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time (Mexico)"
     },
     {
         "timezone": "America/Boise",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time"
     },
     {
         "timezone": "America/Cambridge_Bay",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time"
     },
     {
         "timezone": "America/Denver",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time"
     },
     {
         "timezone": "America/Edmonton",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time"
     },
     {
         "timezone": "America/Inuvik",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time"
     },
     {
         "timezone": "America/Ojinaga",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time"
     },
     {
         "timezone": "America/Yellowknife",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time"
     },
     {
-        "timezone": "MST7MDT",
-        "abbreviation": "MDT",
+        "timezone": "MST7MST",
+        "abbreviation": "MST",
         "name": "Mountain Standard Time"
     },
     {
         "timezone": "Africa/Casablanca",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Morocco Standard Time"
     },
     {
         "timezone": "Africa/El_Aaiun",
-        "abbreviation": "MDT",
+        "abbreviation": "MST",
         "name": "Morocco Standard Time"
     },
     {
         "timezone": "Asia/Beirut",
-        "abbreviation": "MEDT",
+        "abbreviation": "MEST",
         "name": "Middle East Standard Time"
     },
     {
@@ -1316,7 +1316,7 @@
     },
     {
         "timezone": "America/St_Johns",
-        "abbreviation": "NDT",
+        "abbreviation": "NST",
         "name": "Newfoundland Standard Time"
     },
     {
@@ -1341,7 +1341,7 @@
     },
     {
         "timezone": "America/Santa_Isabel",
-        "abbreviation": "PDT",
+        "abbreviation": "PST",
         "name": "Pacific Standard Time (Mexico)"
     },
     {
@@ -1386,27 +1386,27 @@
     },
     {
         "timezone": "Africa/Ceuta",
-        "abbreviation": "RDT",
+        "abbreviation": "RST",
         "name": "Romance Standard Time"
     },
     {
         "timezone": "Europe/Brussels",
-        "abbreviation": "RDT",
+        "abbreviation": "RST",
         "name": "Romance Standard Time"
     },
     {
         "timezone": "Europe/Copenhagen",
-        "abbreviation": "RDT",
+        "abbreviation": "RST",
         "name": "Romance Standard Time"
     },
     {
         "timezone": "Europe/Madrid",
-        "abbreviation": "RDT",
+        "abbreviation": "RST",
         "name": "Romance Standard Time"
     },
     {
         "timezone": "Europe/Paris",
-        "abbreviation": "RDT",
+        "abbreviation": "RST",
         "name": "Romance Standard Time"
     },
     {
@@ -1536,7 +1536,7 @@
     },
     {
         "timezone": "Asia/Damascus",
-        "abbreviation": "SDT",
+        "abbreviation": "SST",
         "name": "Syria Standard Time"
     },
     {
@@ -1806,7 +1806,7 @@
     },
     {
         "timezone": "Europe/Istanbul",
-        "abbreviation": "TDT",
+        "abbreviation": "TST",
         "name": "Turkey Standard Time"
     },
     {
@@ -1921,17 +1921,17 @@
     },
     {
         "timezone": "America/Indiana/Marengo",
-        "abbreviation": "UEDT",
+        "abbreviation": "UEST",
         "name": "US Eastern Standard Time"
     },
     {
         "timezone": "America/Indiana/Vevay",
-        "abbreviation": "UEDT",
+        "abbreviation": "UEST",
         "name": "US Eastern Standard Time"
     },
     {
         "timezone": "America/Indianapolis",
-        "abbreviation": "UEDT",
+        "abbreviation": "UEST",
         "name": "US Eastern Standard Time"
     },
     {
@@ -2151,87 +2151,87 @@
     },
     {
         "timezone": "Arctic/Longyearbyen",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Amsterdam",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Andorra",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Berlin",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Busingen",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Gibraltar",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Luxembourg",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Malta",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Monaco",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Oslo",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Rome",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/San_Marino",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Stockholm",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Vaduz",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Vatican",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Vienna",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {
         "timezone": "Europe/Zurich",
-        "abbreviation": "WEDT",
+        "abbreviation": "WEST",
         "name": "W. Europe Standard Time"
     },
     {

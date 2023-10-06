@@ -4,6 +4,7 @@ namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use Carbon\CarbonTimeZone;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Tests\TestCase;
@@ -20,6 +21,7 @@ class SingleDayEventsTest extends TestCase
                 'start_date' => Carbon::now()->toDateString(),
                 'start_time' => '11:00',
                 'end_time' => '12:00',
+                'timezone' => 'America/Vancouver',
             ]);
 
         $event = EventFactory::createFromEntry($entry);
@@ -28,6 +30,8 @@ class SingleDayEventsTest extends TestCase
         $this->assertFalse($event->isRecurring());
         $this->assertFalse($event->isMultiDay());
         $this->assertTrue($event->hasEndTime());
+        $this->assertEquals(new CarbonTimeZone('America/Vancouver'), $event->start()->timezone);
+        $this->assertEquals(new CarbonTimeZone('America/Vancouver'), $event->end()->timezone);
     }
 
     /** @test */

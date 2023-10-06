@@ -2,7 +2,6 @@
 
 namespace TransformStudios\Events\Types;
 
-use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
 use RRule\RRule;
 use RRule\RRuleInterface;
@@ -27,8 +26,8 @@ class RecurringEvent extends Event
         return [
             ICalendarEvent::create($this->event->title)
                 ->uniqueIdentifier($this->event->id())
-                ->startsAt($this->start()->timezone($timezone))
-                ->endsAt($this->end()->timezone($timezone))
+                ->startsAt($this->start())
+                ->endsAt($this->end())
                 ->rrule($this->spatieRule()),
         ];
     }
@@ -36,7 +35,7 @@ class RecurringEvent extends Event
     protected function rule(): RRuleInterface
     {
         $rule = [
-            'dtstart' => $this->start()->setTimeFromTimeString($this->endTime()),
+            'dtstart' => $this->end(),
             'freq' => $this->frequency(),
             'interval' => $this->interval(),
         ];
@@ -46,12 +45,6 @@ class RecurringEvent extends Event
         }
 
         return new RRule($rule);
-    }
-
-    private function end(): CarbonImmutable
-    {
-        return CarbonImmutable::parse($this->start_date)
-            ->setTimeFromTimeString($this->endTime());
     }
 
     private function frequency(): int

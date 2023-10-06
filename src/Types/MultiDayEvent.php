@@ -22,7 +22,11 @@ class MultiDayEvent extends Event
         parent::__construct($event);
 
         $this->days = collect($this->event->days)
-            ->map(fn (Values $day) => new Day($day->all(), $this->isAllDay()));
+            ->map(fn (Values $day) => new Day(
+                $day->all(),
+                $this->timezone['timezone'],
+                $this->isAllDay()
+            ));
     }
 
     /**
@@ -76,7 +80,7 @@ class MultiDayEvent extends Event
         if ($this->collapseMultiDays) {
             return new RRule([
                 'count' => 1,
-                'dtstart' => $this->end()->timezone($this->timezone['timezone']),
+                'dtstart' => $this->end(),
                 'freq' => RRule::DAILY,
             ]);
         }
@@ -85,7 +89,7 @@ class MultiDayEvent extends Event
             new RSet(),
             fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([
                 'count' => 1,
-                'dtstart' => $day->end()->subSecond()->timezone($this->timezone['timezone']),
+                'dtstart' => $day->end()->subSecond(),
                 'freq' => RRule::SECONDLY,
             ]))
         );
