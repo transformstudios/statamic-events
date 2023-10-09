@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.0.4 - 2023-10-09
+
+### 🐛 Fixed
+
+- Fix timezones even more [@edalzell](https://github.com/edalzell) (#68)
+
 ## v5.0.3 - 2023-10-05
 
 ### 🐛 Fixed
