@@ -17,9 +17,9 @@ class Day
 
     private CarbonImmutable $date;
 
-    public function __construct(array $data, bool $isAllDay = false)
+    public function __construct(array $data, string $timezone, bool $isAllDay = false)
     {
-        $this->date = CarbonImmutable::parse(Arr::get($data, 'date'));
+        $this->date = CarbonImmutable::parse(Arr::get($data, 'date'))->shiftTimezone($timezone);
         $this->startTime = Arr::get($data, 'start_time');
         $this->endTime = Arr::get($data, 'end_time');
 
