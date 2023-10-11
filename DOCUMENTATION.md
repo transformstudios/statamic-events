@@ -10,7 +10,7 @@ Table Of Contents:
 
 If you'd like to have a different event timezone default than the app default (usually UTC), publish the config file (`php artisan vendor:publish --tag=events-config`), then update it via the CP. This is used on individual events that do not have a timezone set (see Fieldset below).
 
-The default collection for your events is `events`, if you use a different one, publish the config file (`php artisan vendor:publish --tag=events-config`) and set `collection` to the handle of your events collection.
+The default collection for your events is `events`, if you use a different one, publish the config file and then update it via the CP.
 
 ## Fieldset
 
