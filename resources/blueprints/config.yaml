@@ -8,7 +8,7 @@ collection:
   max_items: 1
   mode: select
   type: collections
-  display: 'Event Collection'
+  display: 'Events Collection'
   icon: collections
   localizable: false
   listable: hidden
