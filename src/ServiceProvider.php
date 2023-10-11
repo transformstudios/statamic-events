@@ -8,6 +8,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Support\Arr;
+use TransformStudios\Events\Exceptions\FieldNotFoundException;
 use TransformStudios\Events\Fieldtypes\Timezones;
 use TransformStudios\Events\Modifiers\InMonth;
 use TransformStudios\Events\Modifiers\IsEndOfWeek;
@@ -77,8 +78,11 @@ class ServiceProvider extends AddonServiceProvider
 
             $blueprint = Arr::first($collection->entryBlueprints());
 
-            return $blueprint
-                ->field('timezone')
+            if (is_null($tzField = $blueprint->field('timezone'))) {
+                throw new FieldNotFoundException('timezone');
+            }
+
+            return $tzField
                 ->setValue($timezone)
                 ->augment()
                 ->value()
