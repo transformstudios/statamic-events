@@ -57,7 +57,7 @@ fields:
       listable: hidden
       instructions_position: above
       mode: typeahead
-      width: 25
+      width: 50
   -
     handle: days
     field:

@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Fieldtypes;
 
 use Statamic\Fieldtypes\Relationship;
+use Statamic\Support\Arr;
 
 class Timezones extends Relationship
 {
@@ -24,6 +25,15 @@ class Timezones extends Relationship
     {
         return collect($this->timezones())
             ->map(fn (array $zone) => $this->toItemArray($zone['timezone']));
+    }
+
+    public function preProcess($data)
+    {
+        if (is_array($data)) {
+            return [Arr::get($data, 'timezone')];
+        }
+
+        return Arr::wrap($data);
     }
 
     protected function toItemArray($key)
