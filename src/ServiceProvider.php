@@ -4,10 +4,10 @@ namespace TransformStudios\Events;
 
 use Edalzell\Forma\Forma;
 use Illuminate\Support\Carbon;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Providers\AddonServiceProvider;
+use Statamic\Support\Arr;
 use TransformStudios\Events\Fieldtypes\Timezones;
 use TransformStudios\Events\Modifiers\InMonth;
 use TransformStudios\Events\Modifiers\IsEndOfWeek;
@@ -73,7 +73,11 @@ class ServiceProvider extends AddonServiceProvider
 
             $timezone = config('events.timezone', config('app.timezone'));
 
-            return Blueprint::find('collections/events/event')
+            $collection = Collection::findByHandle(config('events.collection', 'events'));
+
+            $blueprint = Arr::first($collection->entryBlueprints());
+
+            return $blueprint
                 ->field('timezone')
                 ->setValue($timezone)
                 ->augment()
