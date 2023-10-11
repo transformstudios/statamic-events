@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.0.5 - 2023-10-11
+
+### 🐛 Fixed
+
+- Use first blueprint [@edalzell](https://github.com/edalzell) (#70)
+
 ## v5.0.4 - 2023-10-09
 
 ### 🐛 Fixed
