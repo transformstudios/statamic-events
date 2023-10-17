@@ -241,6 +241,40 @@ class EventsTest extends TestCase
     }
 
     /** @test */
+    public function canFilterByFilterEvents()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->collection('events')
+            ->slug('recurring-event')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+            ])->save();
+
+        Entry::make()
+            ->collection('events')
+            ->slug('other-event')
+            ->data([
+                'title' => 'Other Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+            ])->save();
+
+        $occurrences = Events::fromCollection(handle: 'events')
+            ->filter('title:contains', 'Recurring')
+            ->between(now(), now()->addDays(9)->endOfDay());
+
+        $this->assertCount(10, $occurrences);
+    }
+
+    /** @test */
     public function canDetermineOccursAtForSingleEvent()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));

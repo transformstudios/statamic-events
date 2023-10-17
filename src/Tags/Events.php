@@ -136,6 +136,9 @@ class Events extends Tags
                 value: $this->parseTerms(),
                 callback: fn (Generator $generator, array $terms) => $generator->terms(terms: $terms)
             )->when(
+                value: $this->parseFilters(),
+                callback: fn (Generator $generator, array $filters) => $generator->filters(filters: $filters)
+            )->when(
                 value: $this->params->int('paginate'),
                 callback: fn (Generator $generator, int $perPage) => $generator->pagination(
                     page: Paginator::resolveCurrentPage(),
@@ -171,8 +174,11 @@ class Events extends Tags
         return $dates;
     }
 
-    private function queryFilters(Generator $generator): void
+    private function parseFilters(): array
     {
+        return collect($this->params)
+            ->filter(fn ($value, $key) => Str::contains($key, ':') && ! Str::startsWith($key, 'taxonomy:'))
+            ->all();
     }
 
     private function parseTerms(): array
