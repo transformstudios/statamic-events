@@ -71,6 +71,15 @@ class Events
         return $this;
     }
 
+    public function filters(array $filters): self
+    {
+        foreach ($filters as $fieldCondition => $value) {
+            $this->filter($fieldCondition, $value);
+        }
+
+        return $this;
+    }
+
     public function filter(string $fieldCondition, $value): self
     {
         $this->filters[$fieldCondition] = $value;
