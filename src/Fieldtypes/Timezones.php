@@ -36,6 +36,19 @@ class Timezones extends Relationship
         return Arr::wrap($data);
     }
 
+    public function preProcessIndex($key)
+    {
+        if (is_null($key)) {
+            return null;
+        }
+
+        if (is_null($augmented = $this->timezone($key))) {
+            return $key;
+        }
+
+        return $augmented['timezone'];
+    }
+
     protected function toItemArray($key)
     {
         if (is_null($key)) {
