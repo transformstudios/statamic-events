@@ -3,7 +3,6 @@
 namespace TransformStudios\Events\Tags;
 
 use Carbon\CarbonInterface;
-use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -35,8 +34,8 @@ class Events extends Tags
         $month = $this->params->get('month', now()->englishMonth);
         $year = $this->params->get('year', now()->year);
 
-        $from = $this->parseDate($month.' '.$year)->startOfMonth()->startOfWeek();
-        $to = $this->parseDate($month.' '.$year)->endOfMonth()->endOfWeek();
+        $from = parse_date($month.' '.$year)->startOfMonth()->startOfWeek();
+        $to = parse_date($month.' '.$year)->endOfMonth()->endOfWeek();
 
         $occurrences = $this
             ->generator()
@@ -146,22 +145,6 @@ class Events extends Tags
                 value: $this->params->bool('collapse_multi_days'),
                 callback: fn (Generator $generator) => $generator->collapseMultiDays()
             );
-    }
-
-    /**
-     * @throws \Carbon\Exceptions\InvalidFormatException
-     */
-    private function parseDate(string $date): CarbonInterface
-    {
-        $date = null;
-
-        try {
-            $date = Carbon::parse($date);
-        } catch (InvalidFormatException $e) {
-            $date = now();
-        }
-
-        return $date;
     }
 
     private function getTermId(string $handle, Term|string $term): string
