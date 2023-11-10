@@ -10,7 +10,7 @@ class InMonth extends Modifier
 {
     public function index($value, $params, $context)
     {
-        $month = Carbon::parse(
+        $month = parse_date(
             Arr::get($context, 'get.month', Carbon::now()->englishMonth).
             ' '.
             Arr::get($context, 'get.year', Carbon::now()->year)
