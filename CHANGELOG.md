@@ -1,5 +1,17 @@
 # Changelog
 
+## v5.1 - 2023-11-10
+
+### 🚀 New
+
+- Expose filtering to Tag [@DwainsWorld](https://github.com/DwainsWorld) (#71)
+
+### 🐛 Fixed
+
+- Add `preProcessIndex` [@edalzell](https://github.com/edalzell) (#72)
+- Handle bad params and porrly formatted dates [@edalzell](https://github.com/edalzell) (#73)
+- Prevent error about missing `$entry` [@edalzell](https://github.com/edalzell) (#74)
+
 ## v5.0.5 - 2023-10-11
 
 ### 🐛 Fixed
