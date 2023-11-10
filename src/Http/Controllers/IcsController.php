@@ -28,6 +28,7 @@ class IcsController extends Controller
         $handle = $request->get('collection', 'events');
         $date = $request->has('date') ? CarbonImmutable::parse($request->get('date')) : null;
         $eventId = $request->get('event');
+        $entry = null;
 
         abort_if(! is_null($eventId) && is_null($entry = EntryFacade::find($eventId)), 404);
 
