@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.1.1 - 2023-11-22
+
+### 🐛 Fixed
+
+- Fix date parsing [@edalzell](https://github.com/edalzell) (#75)
+
 ## v5.1 - 2023-11-10
 
 ### 🚀 New
