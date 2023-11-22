@@ -10,8 +10,6 @@ if (! function_exists('parse_date')) {
      */
     function parse_date(string $date): CarbonInterface
     {
-        $date = null;
-
         try {
             $date = Carbon::parse($date);
         } catch (InvalidFormatException $e) {
