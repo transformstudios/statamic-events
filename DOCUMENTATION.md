@@ -107,7 +107,9 @@ Currently only simple taxonomy filtering is supported, using the same syntax as 
 {{ /events:between }}
 ```
 
-Further filtering is coming.
+**Sorting**
+
+By default the occurrenes are sorted in ascending order, to get them in descending order, use `sort="desc"` on any of the tags.
 
 ### Between Tag
 
