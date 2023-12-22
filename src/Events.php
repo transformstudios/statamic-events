@@ -34,6 +34,8 @@ class Events
 
     private ?string $site = null;
 
+    private string $sort = 'asc';
+
     private array $terms = [];
 
     public static function fromCollection(string $handle): self
@@ -102,6 +104,13 @@ class Events
         return $this;
     }
 
+    public function sort(string $direction): self
+    {
+        $this->sort = $direction;
+
+        return $this;
+    }
+
     public function terms(string|array $terms): self
     {
         $this->terms = Arr::wrap($terms);
@@ -157,7 +166,7 @@ class Events
         return $this->entries
             // take each event and generate the occurences
             ->flatMap(callback: $generator)
-            ->sortBy(fn (Entry $occurrence) => $occurrence->start)
+            ->sortBy(callback: fn (Entry $occurrence) => $occurrence->start, descending: $this->sort === 'desc')
             ->values();
     }
 
