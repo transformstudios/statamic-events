@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.2.0 - 2023-12-22
+
+### 🚀 New
+
+- Ability to sort occurrences [@edalzell](https://github.com/edalzell) (#77)
+
 ## v5.1.1 - 2023-11-22
 
 ### 🐛 Fixed
