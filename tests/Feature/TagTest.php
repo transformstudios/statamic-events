@@ -341,4 +341,22 @@ class TagTest extends TestCase
 
         $this->assertEquals('http://localhost/!/events/ics?collection=events&event=recurring-event', $url);
     }
+
+    /** @test */
+    public function canSortOccurrencesDesc()
+    {
+
+        $this->tag
+            ->setContext([])
+            ->setParameters([
+                'collection' => 'events',
+                'limit' => 3,
+                'sort' => 'desc',
+            ]);
+
+        $occurrences = $this->tag->upcoming();
+
+        $this->assertTrue($occurrences[0]->start->isAfter($occurrences[1]->start));
+        $this->assertTrue($occurrences[1]->start->isAfter($occurrences[2]->start));
+    }
 }
