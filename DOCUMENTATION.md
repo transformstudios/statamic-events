@@ -16,7 +16,7 @@ The default collection for your events is `events`, if you use a different one, 
 
 In your collection's blueprint, make sure you have fields like in our sample [fieldset](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml).
 
-You can also use our sample fieldset by publishing it with `php artisan vendor:publish --tag=events-fieldsets`, then in your blueprint import the `Events` fieldset.
+You can also use our sample fieldset by importing `events::event`.
 
 ## Fields
 
@@ -34,10 +34,9 @@ You can also use our sample fieldset by publishing it with `php artisan vendor:p
 * `interval` - **Optional** - required if `recurrence` is `every` and indicates the frequency of the event
 * `period` - **Optional** - required if `recurrence` is `every` and indicates the period of recurrence. One of `days`, `weeks`, `months`, `years`
 * `end_date` - **Optional** - when is the last event. If `recurrence` is set and this is not, the event goes on forever
+* `exclude_dates` - **Optional** - a grid of `date`s that should NOT be included in the list of occurrences
 
 ### Multi-Day Events:
-
-NOTE: the intention is that these days are consecutive.
 
 * all the single day fields
 * `multi_day` - boolean. When true, `start_date`, `start_time`, `end_time`, `recurrence`, `end_date` are not used

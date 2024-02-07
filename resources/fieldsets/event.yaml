@@ -53,7 +53,6 @@ fields:
       cast_booleans: false
       display: Timezone
       type: timezones
-      icon: select
       listable: hidden
       instructions_position: above
       mode: typeahead
@@ -154,3 +153,38 @@ fields:
       rows: 1
       if:
         recurrence: 'contains_any daily, weekly, monthly, every'
+  -
+    handle: exclude_dates
+    field:
+      fields:
+        -
+          handle: date
+          field:
+            mode: single
+            inline: false
+            full_width: false
+            columns: 1
+            rows: 1
+            time_enabled: false
+            time_seconds_enabled: false
+            type: date
+            display: Date
+            listable: hidden
+            instructions_position: above
+            visibility: visible
+            replicator_preview: true
+            hide_display: false
+      mode: table
+      reorderable: false
+      fullscreen: false
+      type: grid
+      display: Exclusions
+      listable: hidden
+      instructions_position: above
+      visibility: visible
+      replicator_preview: true
+      hide_display: false
+      if:
+        multi_day: 'equals false'
+        recurrence: 'contains_any daily, weekly, monthly, every'
+      add_row: 'Add Excluded Date'
