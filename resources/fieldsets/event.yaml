@@ -1,47 +1,30 @@
 title: Event
 fields:
   -
-    handle: all_day
+    handle: recurrence
     field:
-      type: toggle
-      width: 25
-      display: 'All Day?'
-  -
-    handle: multi_day
-    field:
-      type: toggle
-      width: 25
-      display: 'Multi-Day?'
-  -
-    handle: start_date
-    field:
-      type: date
-      allow_blank: false
-      allow_time: false
-      require_time: false
-      input_format: M/D/YYYY
-      width: 25
-      display: 'Start Date'
-      if:
-        multi_day: 'equals false'
-  -
-    handle: start_time
-    field:
-      type: time
-      width: 25
-      display: 'Start Time'
-      if:
-        multi_day: 'equals false'
-        all_day: 'equals false'
-  -
-    handle: end_time
-    field:
-      type: time
-      width: 25
-      display: 'End Time'
-      if:
-        multi_day: 'equals false'
-        all_day: 'equals false'
+      type: select
+      options:
+        none: None
+        daily: Daily
+        weekly: Weekly
+        monthly: Monthly
+        every: Every
+        multi_day: Multi-Day
+      width: 33
+      display: Recurrence
+      default: none
+      instructions_position: above
+      listable: hidden
+      visibility: visible
+      replicator_preview: true
+      taggable: false
+      push_tags: false
+      multiple: false
+      clearable: false
+      searchable: true
+      cast_booleans: false
+      hide_display: false
   -
     handle: timezone
     field:
@@ -53,10 +36,129 @@ fields:
       cast_booleans: false
       display: Timezone
       type: timezones
+      icon: select
       listable: hidden
       instructions_position: above
       mode: typeahead
+      width: 33
+  -
+    handle: all_day
+    field:
+      type: toggle
+      width: 33
+      display: 'All Day?'
+      instructions_position: above
+      listable: hidden
+      visibility: visible
+      replicator_preview: true
+      default: false
+      hide_display: false
+      unless:
+        recurrence: 'equals multi_day'
+  -
+    handle: interval
+    field:
+      type: integer
       width: 50
+      display: Interval
+      if:
+        recurrence: 'equals every'
+  -
+    handle: period
+    field:
+      type: select
+      options:
+        days: Days
+        weeks: Weeks
+        years: Years
+      display: Period
+      width: 50
+      if:
+        recurrence: 'equals every'
+  -
+    handle: start_date
+    field:
+      type: date
+      allow_blank: false
+      allow_time: false
+      require_time: false
+      input_format: M/D/YYYY
+      width: 50
+      display: 'Start Date'
+      instructions_position: above
+      listable: hidden
+      visibility: visible
+      replicator_preview: true
+      mode: single
+      inline: true
+      full_width: true
+      columns: 1
+      rows: 1
+      time_enabled: false
+      time_seconds_enabled: false
+      hide_display: false
+      unless_any:
+        multi_day: 'equals true'
+        recurrence: 'equals multi_day'
+  -
+    handle: end_date
+    field:
+      type: date
+      allow_blank: true
+      allow_time: false
+      require_time: false
+      input_format: M/D/YYYY
+      display: 'End Date'
+      width: 50
+      listable: hidden
+      mode: single
+      time_enabled: false
+      time_required: false
+      full_width: true
+      inline: true
+      columns: 1
+      rows: 1
+      instructions_position: above
+      visibility: visible
+      replicator_preview: true
+      time_seconds_enabled: false
+      hide_display: false
+      if:
+        recurrence: 'contains_any daily, weekly, monthly, every'
+  -
+    handle: start_time
+    field:
+      type: time
+      width: 25
+      display: 'Start Time'
+      instructions: 'Input in [24-hour format](https://en.wikipedia.org/wiki/24-hour_clock)'
+      instructions_position: above
+      listable: hidden
+      visibility: visible
+      replicator_preview: true
+      seconds_enabled: false
+      hide_display: false
+      unless_any:
+        multi_day: 'equals true'
+        all_day: 'equals true'
+        recurrence: 'equals multi_day'
+  -
+    handle: end_time
+    field:
+      type: time
+      width: 25
+      display: 'End Time'
+      instructions: 'Input in [24-hour format](https://en.wikipedia.org/wiki/24-hour_clock)'
+      instructions_position: above
+      listable: hidden
+      visibility: visible
+      replicator_preview: true
+      seconds_enabled: false
+      hide_display: false
+      unless_any:
+        multi_day: 'equals true'
+        all_day: 'equals true'
+        recurrence: 'equals multi_day'
   -
     handle: days
     field:
@@ -71,120 +173,80 @@ fields:
             allow_time: false
             require_time: false
             input_format: M/D/YYYY
-            width: 33
+            width: 25
             display: Date
         -
           handle: start_time
           field:
             type: time
-            width: 33
+            width: 25
             display: 'Start Time'
+            instructions: 'Input in 24-hour format (ie 2:00 PM will be entered as 14:00)'
+            instructions_position: above
+            listable: hidden
+            visibility: visible
+            replicator_preview: true
+            seconds_enabled: false
+            hide_display: false
+            unless:
+              all_day: 'equals true'
         -
           handle: end_time
           field:
             type: time
-            width: 33
+            width: 25
             display: 'End Time'
-      display: Days
+            instructions: 'Input in 24-hour format (ie 2:00 PM will be entered as 14:00)'
+            instructions_position: above
+            listable: hidden
+            visibility: visible
+            replicator_preview: true
+            seconds_enabled: false
+            hide_display: false
+            unless:
+              all_day: 'equals true'
+        -
+          handle: all_day
+          field: 'events::event.all_day'
+          config:
+            width: 25
+      display: 'Event Days'
       add_row: 'Add Day'
       listable: hidden
       reorderable: true
-      if:
+      instructions_position: above
+      visibility: visible
+      replicator_preview: true
+      min_rows: 1
+      fullscreen: true
+      hide_display: false
+      if_any:
         multi_day: 'equals true'
-  -
-    handle: recurrence_section
-    field:
-      type: section
-      display: Recurrence
-      if:
-        multi_day: 'equals false'
-  -
-    handle: recurrence
-    field:
-      type: select
-      options:
-        0: None
-        daily: Daily
-        weekly: Weekly
-        monthly: Monthly
-        every: Every
-      width: 25
-      display: 'Recurrence Type'
-      default: false
-      if:
-        multi_day: 'equals false'
-  -
-    handle: interval
-    field:
-      type: integer
-      width: 25
-      display: Interval
-      if:
-        recurrence: 'equals every'
-  -
-    handle: period
-    field:
-      type: select
-      options:
-        days: Days
-        weeks: Weeks
-        years: Years
-      display: Period
-      width: 25
-      if:
-        recurrence: 'equals every'
-  -
-    handle: end_date
-    field:
-      type: date
-      allow_blank: true
-      allow_time: false
-      require_time: false
-      input_format: M/D/YYYY
-      display: 'End Date'
-      width: 25
-      listable: hidden
-      mode: single
-      time_enabled: false
-      time_required: false
-      full_width: false
-      inline: false
-      columns: 1
-      rows: 1
-      if:
-        recurrence: 'contains_any daily, weekly, monthly, every'
+        recurrence: 'equals multi_day'
   -
     handle: exclude_dates
     field:
+      type: grid
+      mode: table
       fields:
         -
           handle: date
           field:
-            mode: single
-            inline: false
-            full_width: false
-            columns: 1
-            rows: 1
-            time_enabled: false
-            time_seconds_enabled: false
             type: date
+            allow_blank: false
+            allow_time: false
+            require_time: false
+            input_format: M/D/YYYY
             display: Date
-            listable: hidden
-            instructions_position: above
-            visibility: visible
-            replicator_preview: true
-            hide_display: false
-      mode: table
-      reorderable: false
-      fullscreen: false
-      type: grid
-      display: Exclusions
+      display: 'Exclude Days'
+      add_row: 'Add Day'
       listable: hidden
+      reorderable: true
       instructions_position: above
       visibility: visible
       replicator_preview: true
+      min_rows: 1
+      fullscreen: true
       hide_display: false
-      if:
-        multi_day: 'equals false'
-        recurrence: 'contains_any daily, weekly, monthly, every'
-      add_row: 'Add Excluded Date'
+      if_any:
+        recurrence: 'contains_any monthly, daily, weekly, every'
