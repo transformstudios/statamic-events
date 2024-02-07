@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Tests\TestCase;
@@ -25,12 +26,11 @@ class MultiDayEventsTest extends TestCase
 
         Carbon::setTestNowAndTimezone(now(), 'America/Vancouver');
 
-
         $entry = Entry::make()
             ->slug('multi-day-event')
             ->collection('events')
             ->data([
-                'multi_day' => true,
+                'recurrence' => 'multi_day',
                 'days' => [
                     [
                         'date' => '2019-11-23',
@@ -57,7 +57,7 @@ class MultiDayEventsTest extends TestCase
             ->collection('events')
             ->slug('no-end-time')
             ->data([
-                'multi_day' => true,
+                'recurrence' => 'multi_day',
                 'days' => [
                     [
                         'date' => '2019-11-23',
@@ -76,7 +76,7 @@ class MultiDayEventsTest extends TestCase
         $allDayEntry = Entry::make()
             ->collection('events')
             ->data([
-                'multi_day' => true,
+                'recurrence' => 'multi_day',
                 'days' => [
                     [
                         'date' => '2019-11-20',
