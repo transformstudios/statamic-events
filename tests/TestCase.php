@@ -97,6 +97,6 @@ abstract class TestCase extends OrchestraTestCase
             $this->collection = CollectionFacade::make('events')
                 ->taxonomies(['categories'])
                 ->save();
-        })
+        });
     }
 }
