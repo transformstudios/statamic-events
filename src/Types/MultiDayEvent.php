@@ -25,7 +25,7 @@ class MultiDayEvent extends Event
             ->map(fn (Values $day) => new Day(
                 $day->all(),
                 $this->timezone['timezone'],
-                $this->isAllDay()
+                $day->all_day || $this->isAllDay(),
             ));
     }
 

@@ -41,7 +41,7 @@ abstract class Event
 
     public function isMultiDay(): bool
     {
-        return boolval($this->multi_day);
+        return boolval($this->multi_day) || $this->recurrence?->value() === 'multi_day';
     }
 
     public function isRecurring(): bool
