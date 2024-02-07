@@ -10,6 +10,7 @@ use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
+use Statamic\Fields\Values;
 use Statamic\Support\Arr;
 use Statamic\Tags\Concerns\QueriesConditions;
 
@@ -166,7 +167,9 @@ class Events
         return $this->entries
             // take each event and generate the occurences
             ->flatMap(callback: $generator)
-            ->sortBy(callback: fn (Entry $occurrence) => $occurrence->start, descending: $this->sort === 'desc')
+            ->reject(fn (Entry $occurrence) => collect($occurrence->exclude_dates)
+                ->contains(fn (Values $dateRow) => $dateRow->date->isSameDay($occurrence->start))
+            )->sortBy(callback: fn (Entry $occurrence) => $occurrence->start, descending: $this->sort === 'desc')
             ->values();
     }
 
