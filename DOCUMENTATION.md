@@ -34,7 +34,7 @@ You can also use our sample fieldset by importing `events::event`.
 * `interval` - **Optional** - required if `recurrence` is `every` and indicates the frequency of the event
 * `period` - **Optional** - required if `recurrence` is `every` and indicates the period of recurrence. One of `days`, `weeks`, `months`, `years`
 * `end_date` - **Optional** - when is the last event. If `recurrence` is set and this is not, the event goes on forever
-* exclude_dates - **Optional** - a grid of `date`s that should NOT be included in the list of occurrences
+* `exclude_dates` - **Optional** - a grid of `date`s that should NOT be included in the list of occurrences
 
 ### Multi-Day Events:
 
