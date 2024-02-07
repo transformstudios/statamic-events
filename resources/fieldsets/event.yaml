@@ -186,4 +186,5 @@ fields:
       hide_display: false
       if:
         multi_day: 'equals false'
+        recurrence: 'contains_any daily, weekly, monthly, every'
       add_row: 'Add Excluded Date'
