@@ -333,47 +333,27 @@ class EventsTest extends TestCase
         $this->assertTrue($event->occursOnDate(now()->addDays(2)));
         $this->assertFalse($event->occursOnDate(now()->addDays(3)));
     }
-    // public function test_empty_collection_when_after_end()
-    // {
-    //     $events = new Events();
 
-    //     $events->add($this->event);
+    /** @test */
+    public function canExcludeDates()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
-    //     Carbon::setTestNow(Carbon::parse('2019-11-26'));
+        Entry::make()
+            ->collection('events')
+            ->slug('recurring-event')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+                'exclude_dates' => [['date' => Carbon::now()->addDay()->toDateString()]],
+            ])->save();
 
-    //     $nextDates = $events->upcoming(2);
+        $occurrences = Events::fromCollection(handle: 'events')
+            ->between(now(), now()->addDays(9)->endOfDay());
 
-    //     $this->assertCount(0, $nextDates);
-    // }
-
-    // public function test_event_pagination()
-    // {
-    //     $events = new Events();
-
-    //     $events->add($this->event);
-    //     $events->add($this->allDayEvent);
-
-    //     Carbon::setTestNow(Carbon::parse('2019-11-19'));
-
-    //     $nextDates = $this->event->upcomingDates(2, 1);
-
-    //     $this->assertCount(2, $nextDates);
-
-    //     $this->assertEquals(Carbon::parse('2019-11-24 11:00'), $nextDates[0]->start());
-    //     $this->assertEquals(Carbon::parse('2019-11-25 11:00'), $nextDates[1]->start());
-
-    //     $nextDates = $events->upcoming(2, 2);
-
-    //     $this->assertCount(2, $nextDates);
-
-    //     $this->assertEquals(
-    //         Carbon::parse('2019-11-23 19:00'),
-    //         Carbon::parse($nextDates[0]->start_date.' '.$nextDates[0]->start_time)
-    //     );
-
-    //     $this->assertEquals(
-    //         Carbon::parse('2019-11-24 11:00'),
-    //         Carbon::parse($nextDates[1]->start_date.' '.$nextDates[1]->start_time)
-    //     );
-    // }
+        $this->assertCount(9, $occurrences);
+    }
 }
