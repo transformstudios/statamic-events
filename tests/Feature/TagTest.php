@@ -21,7 +21,6 @@ class TagTest extends TestCase
         parent::setUp();
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event')
             ->id('recurring-event')
@@ -80,7 +79,6 @@ class TagTest extends TestCase
         Entry::all()->each->delete();
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('single-event-start-of-month')
             ->data([
@@ -91,7 +89,6 @@ class TagTest extends TestCase
             ])->save();
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event-start-of-month')
             ->data([
@@ -142,7 +139,6 @@ class TagTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('12:01'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('single-event')
             ->data([
@@ -191,7 +187,6 @@ class TagTest extends TestCase
     public function canGenerateUpcomingLimitedOccurrences()
     {
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('another-recurring-event')
             ->id('another-recurring-event')
@@ -251,7 +246,6 @@ class TagTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('single-event')
             ->id('single-event')
@@ -282,7 +276,6 @@ class TagTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('single-event')
             ->id('single-event')

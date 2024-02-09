@@ -16,7 +16,6 @@ class IcsControllerTest extends TestCase
         parent::setUp();
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('single-event')
             ->id('the-id')
@@ -49,7 +48,6 @@ class IcsControllerTest extends TestCase
         Carbon::setTestNow(now()->addDay()->setTimeFromTimeString('10:00'));
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('recurring-event')
             ->id('the-recurring-id')

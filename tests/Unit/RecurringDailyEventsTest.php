@@ -14,7 +14,6 @@ class RecurringDailyEventsTest extends TestCase
     public function nullNextDateIfNowAfterEndDate()
     {
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),

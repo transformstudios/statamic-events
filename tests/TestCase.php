@@ -5,15 +5,12 @@ namespace TransformStudios\Events\Tests;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Statamic\Entries\Collection;
 use Statamic\Extend\Manifest;
-use Statamic\Facades\Blueprint as BlueprintFacade;
 use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
-use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
-use Statamic\Fields\FieldsetRepository;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use TransformStudios\Events\ServiceProvider;
@@ -85,6 +82,7 @@ abstract class TestCase extends OrchestraTestCase
 
         // Assume the pro edition within tests
         $app['config']->set('statamic.editions.pro', true);
+        $app['config']->set('events.timezone', 'UTC');
 
         Statamic::booted(function () {
             Fieldset::addNamespace('events', __DIR__.'/../resources/fieldsets');

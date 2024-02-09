@@ -127,7 +127,6 @@ class SingleDayEventsTest extends TestCase
             ]);
 
         $singleNoEndTime = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => $startDate->toDateString(),

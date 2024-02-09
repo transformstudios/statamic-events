@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Tests\TestCase;
+use TransformStudios\Events\Types\MultiDayEvent;
 use TransformStudios\Events\Types\RecurringEvent;
 
 class RecurringEventsTest extends TestCase
@@ -14,7 +15,6 @@ class RecurringEventsTest extends TestCase
     public function canCreateRecurringEvent()
     {
         $recurringEntry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->data([
                 'start_date' => Carbon::now()->toDateString(),
@@ -28,19 +28,21 @@ class RecurringEventsTest extends TestCase
         $this->assertTrue($event->isRecurring());
         $this->assertFalse($event->isMultiDay());
     }
+    /** @test */
+    public function wontCreateRecurringEventWhenMultiDay()
+    {
+        $recurringEntry = Entry::make()
+            ->collection('events')
+            ->data([
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'recurrence' => 'multi_day',
+            ]);
 
-    // public function test_get_end_date_null_if_no_end_date()
-    // {
-    //     $event = [
-    //         'start_date' => Carbon::now()->toDateString(),
-    //         'start_time' => '11:00',
-    //         'recurrence' => 'daily',
-    //         'all_day' => true,
-    //     ];
+        $event = EventFactory::createFromEntry($recurringEntry);
 
-    //     $event = EventFactory::createFromArray($event);
-
-    //     $this->assertNull($event->endDate());
-    //     $this->assertNull($event->end());
-    // }
+        $this->assertTrue($event instanceof MultiDayEvent);
+        $this->assertFalse($event->isRecurring());
+        $this->assertTrue($event->isMultiDay());
+    }
 }

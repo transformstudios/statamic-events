@@ -47,7 +47,10 @@ abstract class Event
     public function isRecurring(): bool
     {
         // this is a select field so you have to get its value
-        return boolval($this->recurrence?->value());
+        return match ($this->recurrence?->value()) {
+            'daily', 'weekly', 'monthly', 'yearly' => true,
+            default => false,
+        };
     }
 
     public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
