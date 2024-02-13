@@ -245,7 +245,6 @@ fields:
       instructions_position: above
       visibility: visible
       replicator_preview: true
-      min_rows: 1
       fullscreen: true
       hide_display: false
       if_any:
