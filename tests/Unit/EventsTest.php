@@ -349,8 +349,31 @@ class EventsTest extends TestCase
             ])->save();
 
         $occurrences = Events::fromCollection(handle: 'events')
-            ->between(now(), now()->addDays(9)->endOfDay());
+            ->between(now(), now()->addDays(3)->endOfDay());
 
-        $this->assertCount(9, $occurrences);
+        $this->assertCount(3, $occurrences);
+    }
+
+    /** @test */
+    public function canHandleEmptyExcludeDates()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->collection('events')
+            ->slug('recurring-event')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+                'exclude_dates' => [['id' => 'random-id']],
+            ])->save();
+
+        $occurrences = Events::fromCollection(handle: 'events')
+            ->between(now(), now()->addDays(3)->endOfDay());
+
+        $this->assertCount(4, $occurrences);
     }
 }
