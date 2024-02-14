@@ -1,5 +1,16 @@
 # Changelog
 
+## v5.3.0 - 2024-02-14
+
+### 🚀 New
+
+- Re-organize fieldset fields [@edalzell](https://github.com/edalzell) (#83)
+- Add ability to exclude dates from recurring events [@edalzell](https://github.com/edalzell) (#80)
+
+### 🐛 Fixed
+
+- Fix `end` timezone on recurring events that don't have an `end_time` set [@edalzell](https://github.com/edalzell) (#82)
+
 ## v5.2.0 - 2023-12-22
 
 ### 🚀 New
