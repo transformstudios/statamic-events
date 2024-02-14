@@ -28,14 +28,14 @@ class EventsTest extends TestCase
                 'recurrence' => 'daily',
             ])->save();
 
-        Entry::make()
+        $event = tap(Entry::make()
             ->collection('events')
             ->slug('single-event')
             ->data([
                 'title' => 'Single Event',
                 'start_date' => Carbon::now()->toDateString(),
                 'start_time' => '13:00',
-            ])->save();
+            ]))->save();
 
         $occurrences = Events::fromCollection(handle: 'events')
             ->between(now(), now()->addDays(2)->endOfDay());
@@ -139,7 +139,6 @@ class EventsTest extends TestCase
             ])->save();
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('other-event')
             ->data([
@@ -174,7 +173,6 @@ class EventsTest extends TestCase
             ])->save();
 
         Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('other-event')
             ->data([
@@ -280,7 +278,6 @@ class EventsTest extends TestCase
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
         $entry = Entry::make()
-            ->blueprint($this->blueprint->handle())
             ->collection('events')
             ->slug('single-event')
             ->id('the-id')
@@ -352,8 +349,31 @@ class EventsTest extends TestCase
             ])->save();
 
         $occurrences = Events::fromCollection(handle: 'events')
-            ->between(now(), now()->addDays(9)->endOfDay());
+            ->between(now(), now()->addDays(3)->endOfDay());
 
-        $this->assertCount(9, $occurrences);
+        $this->assertCount(3, $occurrences);
+    }
+
+    /** @test */
+    public function canHandleEmptyExcludeDates()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->collection('events')
+            ->slug('recurring-event')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+                'exclude_dates' => [['id' => 'random-id']],
+            ])->save();
+
+        $occurrences = Events::fromCollection(handle: 'events')
+            ->between(now(), now()->addDays(3)->endOfDay());
+
+        $this->assertCount(4, $occurrences);
     }
 }

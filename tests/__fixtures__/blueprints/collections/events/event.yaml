@@ -1,0 +1,16 @@
+title: Event
+sections:
+  main:
+    display: Main
+    fields:
+      -
+        import: events::event
+      -
+        handle: categories
+        field:
+          type: terms
+          taxonomies:
+            - categories
+          display: Categories
+          mode: tags
+          width: 50

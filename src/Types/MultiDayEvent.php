@@ -25,7 +25,7 @@ class MultiDayEvent extends Event
             ->map(fn (Values $day) => new Day(
                 $day->all(),
                 $this->timezone['timezone'],
-                $this->isAllDay()
+                $day->all_day || $this->isAllDay(),
             ));
     }
 
@@ -115,6 +115,7 @@ class MultiDayEvent extends Event
         return tap(
             unserialize(serialize($this->event)),
             fn (Entry $occurrence) => $occurrence
+                ->setSupplement('all_day', $day->isAllDay())
                 ->setSupplement('collapse_multi_days', $this->collapseMultiDays)
                 ->setSupplement('start', $day->start())
                 ->setSupplement('end', $day->end())

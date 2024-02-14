@@ -168,6 +168,7 @@ class Events
             // take each event and generate the occurences
             ->flatMap(callback: $generator)
             ->reject(fn (Entry $occurrence) => collect($occurrence->exclude_dates)
+                ->filter(fn (Values $dateRow) => $dateRow->date)
                 ->contains(fn (Values $dateRow) => $dateRow->date->isSameDay($occurrence->start))
             )->sortBy(callback: fn (Entry $occurrence) => $occurrence->start, descending: $this->sort === 'desc')
             ->values();

@@ -23,7 +23,7 @@ class Day
         $this->startTime = Arr::get($data, 'start_time');
         $this->endTime = Arr::get($data, 'end_time');
 
-        if (! $isAllDay && $this->isAllDay()) {
+        if (! $isAllDay && (empty($this->startTime) && empty($this->endTime))) {
             $this->isAllDay = true;
         } else {
             $this->isAllDay = $isAllDay;
@@ -37,7 +37,7 @@ class Day
 
     public function isAllDay(): bool
     {
-        return empty($this->startTime) && empty($this->endTime);
+        return $this->isAllDay;
     }
 
     public function start(): CarbonImmutable

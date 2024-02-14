@@ -5,12 +5,12 @@ namespace TransformStudios\Events\Tests;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Statamic\Entries\Collection;
 use Statamic\Extend\Manifest;
-use Statamic\Facades\Blueprint as BlueprintFacade;
 use Statamic\Facades\Collection as CollectionFacade;
+use Statamic\Facades\Fieldset;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
-use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\BlueprintRepository;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 use TransformStudios\Events\ServiceProvider;
@@ -20,6 +20,7 @@ abstract class TestCase extends OrchestraTestCase
     use PreventSavingStacheItemsToDisk;
 
     protected Collection $collection;
+
     protected Blueprint $blueprint;
 
     public function setup(): void
@@ -81,21 +82,15 @@ abstract class TestCase extends OrchestraTestCase
 
         // Assume the pro edition within tests
         $app['config']->set('statamic.editions.pro', true);
+        $app['config']->set('events.timezone', 'UTC');
 
         Statamic::booted(function () {
-            $taxonomy = Taxonomy::make('categories')->save();
+            Fieldset::addNamespace('events', __DIR__.'/../resources/fieldsets');
+            app()->extend(BlueprintRepository::class, fn ($repo) => $repo->setDirectory(__DIR__.'/__fixtures__/blueprints'));
+
+            Taxonomy::make('categories')->save();
             Term::make('one')->taxonomy('categories')->dataForLocale('default', [])->save();
             Term::make('two')->taxonomy('categories')->dataForLocale('default', [])->save();
-            $blueprintContents = YAML::parse(file_get_contents(__DIR__.'/__fixtures__/blueprints/event.yaml'));
-            $blueprintFields = collect($blueprintContents['sections']['main']['fields'])
-                ->keyBy(fn ($item) =>  $item['handle'])
-                ->map(fn ($item) => $item['field'])
-                ->all();
-
-            $this->blueprint = BlueprintFacade::makeFromFields($blueprintFields)
-                ->setNamespace('collections.events')
-                ->setHandle('event')
-                ->save();
 
             $this->collection = CollectionFacade::make('events')
                 ->taxonomies(['categories'])
