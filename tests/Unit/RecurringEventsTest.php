@@ -43,4 +43,25 @@ class RecurringEventsTest extends TestCase
     //     $this->assertNull($event->endDate());
     //     $this->assertNull($event->end());
     // }
+
+    /** @test */
+    public function canShowLastOccurrenceWhenNoEndTime()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        $recurringEntry = tap(Entry::make()
+            ->collection('events')
+            ->data([
+                'start_date' => Carbon::now()->addDays(1)->toDateString(),
+                'start_time' => '22:00',
+                'recurrence' => 'daily',
+                'end_date' => Carbon::now()->addDays(2)->toDateString(),
+                'timezone' => 'America/Chicago',
+            ]))->save();
+
+        $occurrences = Events::fromCollection(handle: 'events')
+            ->between(Carbon::now(), Carbon::now()->addDays(5)->endOfDay());
+
+        $this->assertCount(2, $occurrences);
+    }
 }
