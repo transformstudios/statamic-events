@@ -41,7 +41,7 @@ class RecurringEvent extends Event
         ];
 
         if ($end = $this->end_date) {
-            $rule['until'] = Carbon::parse($end)->endOfDay();
+            $rule['until'] = Carbon::parse($end)->shiftTimezone($this->timezone['timezone'])->endOfDay();
         }
 
         return new RRule($rule);
