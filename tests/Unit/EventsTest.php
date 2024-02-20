@@ -376,4 +376,34 @@ class EventsTest extends TestCase
 
         $this->assertCount(4, $occurrences);
     }
+
+    /** @test */
+    public function canFilterOurEventsWithNoStartDate()
+    {
+        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->collection('events')
+            ->slug('single-event')
+            ->data([
+                'title' => 'Single Event',
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+            ])->save();
+        Entry::make()
+            ->collection('events')
+            ->slug('legacy-multi-day-event')
+            ->data([
+                'title' => 'Legacy Multi-day Event',
+                'multi_day' => true,
+                'days' => [
+                    ['date' => 'bad-date'],
+                ],
+            ])->save();
+
+        $occurrences = Events::fromCollection(handle: 'events')
+            ->upcoming(5);
+
+        $this->assertEmpty($occurrences);
+    }
 }
