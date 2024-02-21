@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.3.3 - 2024-02-21
+
+### 🐛 Fixed
+
+- Explicitly set `multi_day` [@edalzell](https://github.com/edalzell) (#86)
+
 ## v5.3.2 - 2024-02-21
 
 ### 🐛 Fixed
