@@ -67,6 +67,14 @@ class ServiceProvider extends AddonServiceProvider
 
     private function bootFields(): self
     {
+        Collection::computed('events', 'recurrence', function ($entry, $value) {
+            if ($value) {
+                return $value;
+            }
+
+            return $entry->multi_day ? 'multi_day' : 'none';
+        });
+
         Collection::computed('events', 'timezone', function ($entry, $value) {
             if ($value) {
                 return $value;

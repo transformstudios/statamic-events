@@ -400,6 +400,13 @@ class EventsTest extends TestCase
                     ['date' => 'bad-date'],
                 ],
             ])->save();
+        Entry::make()
+            ->collection('events')
+            ->slug('legacy-multi-day-event-2')
+            ->data([
+                'title' => 'Legacy Multi-day Event',
+                'multi_day' => true,
+            ])->save();
 
         $occurrences = Events::fromCollection(handle: 'events')
             ->upcoming(5);
