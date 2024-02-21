@@ -123,7 +123,7 @@ abstract class Event
     protected function supplement(CarbonInterface $date): ?Entry
     {
         return unserialize(serialize($this->event))
-            ->setSupplement('multi_day', true)
+            ->setSupplement('multi_day', false)
             ->setSupplement('start', $date->setTimeFromTimeString($this->startTime()))
             ->setSupplement('end', $date->setTimeFromTimeString($this->endTime()))
             ->setSupplement('has_end_time', $this->hasEndTime());
