@@ -17,7 +17,7 @@ class EventFactory
         }
 
         // this has to be `->value` because `recurrence` returns a `LabeledValue`.
-        if ($event->recurrence->value()) {
+        if (in_array($event->recurrence->value(), ['daily', 'weekly', 'monthly', 'every'])) {
             return new RecurringEvent($event);
         }
 

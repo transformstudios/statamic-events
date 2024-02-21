@@ -3,6 +3,7 @@
 namespace TransformStudios\Events;
 
 use Carbon\CarbonInterface;
+use Exception;
 use Illuminate\Support\Traits\Conditionable;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
@@ -165,13 +166,29 @@ class Events
     private function occurrences(callable $generator): EntryCollection
     {
         return $this->entries
-            // take each event and generate the occurences
+            ->filter(fn (Entry $occurrence) => $this->hasStartDate($occurrence))
+            // take each event and generate the occurrences
             ->flatMap(callback: $generator)
             ->reject(fn (Entry $occurrence) => collect($occurrence->exclude_dates)
                 ->filter(fn (Values $dateRow) => $dateRow->date)
                 ->contains(fn (Values $dateRow) => $dateRow->date->isSameDay($occurrence->start))
             )->sortBy(callback: fn (Entry $occurrence) => $occurrence->start, descending: $this->sort === 'desc')
             ->values();
+    }
+
+    private function hasStartDate(Entry $occurrence): bool
+    {
+        if ($occurrence->multi_day || $occurrence->get('recurrence') === 'multi_day') {
+            try {
+                $days = collect($occurrence->days);
+
+                return $days->isNotEmpty() && $days->every(fn (Values $day) => $day->date);
+            } catch (Exception $e) {
+                return false;
+            }
+        }
+
+        return $occurrence->has('start_date');
     }
 
     private function paginate(EntryCollection $occurrences): LengthAwarePaginator
