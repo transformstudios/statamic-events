@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.3.2 - 2024-02-21
+
+### 🐛 Fixed
+
+- Better handling of legacy multi-day events [@edalzell](https://github.com/edalzell) (#85)
+
 ## v5.3.1 - 2024-02-21
 
 ### 🐛 Fixed
