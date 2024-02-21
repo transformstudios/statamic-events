@@ -9,6 +9,7 @@ use TransformStudios\Events\Events;
 use TransformStudios\Events\Tests\TestCase;
 use TransformStudios\Events\Types\MultiDayEvent;
 use TransformStudios\Events\Types\RecurringEvent;
+use TransformStudios\Events\Types\SingleDayEvent;
 
 class RecurringEventsTest extends TestCase
 {
@@ -43,9 +44,9 @@ class RecurringEventsTest extends TestCase
 
         $event = EventFactory::createFromEntry($recurringEntry);
 
-        $this->assertTrue($event instanceof MultiDayEvent);
+        $this->assertTrue($event instanceof SingleDayEvent);
         $this->assertFalse($event->isRecurring());
-        $this->assertTrue($event->isMultiDay());
+        $this->assertFalse($event->isMultiDay());
     }
 
     /** @test */

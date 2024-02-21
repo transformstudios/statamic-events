@@ -12,15 +12,21 @@ class EventFactory
 {
     public static function createFromEntry(Entry $event, bool $collapseMultiDays = false): Event
     {
-        if ($event->multi_day || $event->recurrence->value() === 'multi_day') {
-            return new MultiDayEvent($event, $collapseMultiDays);
+        $eventType = static::getTypeClass($event);
+
+        return new $eventType($event, $collapseMultiDays);
+    }
+
+    public static function getTypeClass(Entry $event): string
+    {
+        if (in_array($event->get('recurrence'), ['daily', 'weekly', 'monthly', 'every'])) {
+            return RecurringEvent::class;
         }
 
-        // this has to be `->value` because `recurrence` returns a `LabeledValue`.
-        if (in_array($event->recurrence->value(), ['daily', 'weekly', 'monthly', 'every'])) {
-            return new RecurringEvent($event);
+        if (($event->multi_day || $event->get('recurrence') === 'multi_day') && !empty($event->get('days'))) {
+            return MultiDayEvent::class;
         }
 
-        return new SingleDayEvent($event);
+        return SingleDayEvent::class;
     }
 }

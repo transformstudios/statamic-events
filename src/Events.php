@@ -14,6 +14,7 @@ use Statamic\Facades\Site;
 use Statamic\Fields\Values;
 use Statamic\Support\Arr;
 use Statamic\Tags\Concerns\QueriesConditions;
+use TransformStudios\Events\Types\MultiDayEvent;
 
 class Events
 {
@@ -163,6 +164,11 @@ class Events
         return $this;
     }
 
+    private function isMultiDay(Entry $occurrence): bool
+    {
+        return EventFactory::getTypeClass(event: $occurrence) === MultiDayEvent::class;
+    }
+
     private function occurrences(callable $generator): EntryCollection
     {
         return $this->entries
@@ -178,7 +184,7 @@ class Events
 
     private function hasStartDate(Entry $occurrence): bool
     {
-        if ($occurrence->multi_day || $occurrence->get('recurrence') === 'multi_day') {
+        if ($this->isMultiDay($occurrence)) {
             try {
                 $days = collect($occurrence->days);
 
