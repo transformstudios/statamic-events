@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.3.1 - 2024-02-21
+
+### 🐛 Fixed
+
+- Improve legacy data handling [@edalzell](https://github.com/edalzell) (#84)
+
 ## v5.3.0 - 2024-02-14
 
 ### 🚀 New
