@@ -4,6 +4,7 @@ namespace TransformStudios\Events;
 
 use Edalzell\Forma\Forma;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Artisan;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Providers\AddonServiceProvider;
@@ -40,10 +41,14 @@ class ServiceProvider extends AddonServiceProvider
         parent::boot();
 
         Forma::add('transformstudios/events');
+    }
 
+    public function bootAddon()
+    {
         $this
             ->bootCarbon()
-            ->bootFields();
+            ->bootFields()
+            ->publishConfig();
     }
 
     private function bootCarbon(): self
@@ -96,6 +101,13 @@ class ServiceProvider extends AddonServiceProvider
                 ->value()
                 ->value();
         });
+
+        return $this;
+    }
+
+    private function publishConfig(): self
+    {
+        Artisan::call('vendor:publish', ['--tag' => 'events-config', '--force' => false]);
 
         return $this;
     }
