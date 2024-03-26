@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.3.4 - 2024-03-26
+
+### 🐛 Fixed
+
+- Auto-publish config if it doesn’t exist [@edalzell](https://github.com/edalzell) (#89)
+
 ## v5.3.3 - 2024-02-21
 
 ### 🐛 Fixed
