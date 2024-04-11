@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.4 - 2024-04-11
+
+### 🐛 New
+
+- Add support for Laravel 11, Statamic 5, and Forma 3 [@edalzell](https://github.com/edalzell) (#90)
+
 ## v5.3.4 - 2024-03-26
 
 ### 🐛 Fixed
