@@ -100,7 +100,7 @@ class Events
         return $this;
     }
 
-    public function site(string $handle): self
+    public function site(?string $handle = null): self
     {
         $this->site = $handle;
 
