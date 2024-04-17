@@ -132,6 +132,7 @@ class Events extends Tags
             Generator::fromCollection($this->params->get('collection', 'events'));
 
         return $generator
+            ->site($this->params->get('site'))
             ->sort($this->params->get('sort', 'asc'))
             ->when(
                 value: $this->parseTerms(),

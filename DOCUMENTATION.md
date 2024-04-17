@@ -63,9 +63,11 @@ days:
 
 ### Tags (Between, Calendar, Download Link, In, Today, Upcoming)
 
-Standard Entries are returned, with some extra data:
+**Common Parameters**
 
-**Additional Variables**
+All of the above (except Download Link) have a `site` parameter you can pass the handle of the site to get the events from. It defaults to your default site. **Note**: if you use Livewire you may need to set this from Antlers, using `{site:handle}`
+
+**Additional Variables** (normal entry data is available)
 
 * `start` - Carbon date/time of the occurrence start
 * `end` - Carbon date/time of the occurrence end. Note if it's an all date event this will be set to 11:59:59pm
@@ -81,7 +83,6 @@ Only supported on `between`, `in`, & `today` tags.
 If you want to paginate the results, add `paginate="xx"`, where `xx` is the number of items per page, to the tag. The tag will look for a `page` query parameter and paginate appropriately.
 
 The output is identical to the `collection` tag [pagination](https://statamic.dev/tags/collection#pagination).
-
 
 *Example*
 ```
