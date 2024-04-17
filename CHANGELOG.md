@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.4.1 - 2024-04-17
+
+### 🐛 Fixed
+
+- Use `site` to get events [@edalzell](https://github.com/edalzell) (#91)
+
 ## v5.4 - 2024-04-11
 
 ### 🐛 New
