@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.4.2 - 2024-04-23
+
+### 🐛 Fixed
+
+- Fix config publishing [@edalzell](https://github.com/edalzell) (#92)
+
 ## v5.4.1 - 2024-04-17
 
 ### 🐛 Fixed
