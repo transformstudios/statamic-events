@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Providers\AddonServiceProvider;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use TransformStudios\Events\Exceptions\FieldNotFoundException;
 use TransformStudios\Events\Fieldtypes\Timezones;
@@ -107,7 +108,9 @@ class ServiceProvider extends AddonServiceProvider
 
     private function publishConfig(): self
     {
-        Artisan::call('vendor:publish', ['--tag' => 'events-config', '--force' => false]);
+        Statamic::afterInstalled(function ($command) {
+            Artisan::call('vendor:publish', ['--tag' => 'events-config', '--force' => false]);
+        });
 
         return $this;
     }
