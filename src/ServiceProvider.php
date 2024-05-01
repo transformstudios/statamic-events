@@ -73,7 +73,9 @@ class ServiceProvider extends AddonServiceProvider
 
     private function bootFields(): self
     {
-        Collection::computed('events', 'recurrence', function ($entry, $value) {
+        $collectionHandle = config('events.collection', 'events');
+
+        Collection::computed($collectionHandle, 'recurrence', function ($entry, $value) {
             if ($value) {
                 return $value;
             }
@@ -81,14 +83,14 @@ class ServiceProvider extends AddonServiceProvider
             return $entry->multi_day ? 'multi_day' : 'none';
         });
 
-        Collection::computed('events', 'timezone', function ($entry, $value) {
+        Collection::computed($collectionHandle, 'timezone', function ($entry, $value) use ($collectionHandle) {
             if ($value) {
                 return $value;
             }
 
             $timezone = config('events.timezone', config('app.timezone'));
 
-            $collection = Collection::findByHandle(config('events.collection', 'events'));
+            $collection = Collection::findByHandle($collectionHandle);
 
             $blueprint = Arr::first($collection->entryBlueprints());
 
