@@ -51,7 +51,7 @@ class Events extends Tags
         return route(
             'statamic.events.ics.show',
             Arr::removeNullValues([
-                'collection' => $this->params->get('collection', config('events.collection')),
+                'collection' => $this->params->get('collection', config('events.collection', 'events')),
                 'date' => $this->params->has('date') ? Carbon::parse($this->params->get('date'))->toDateString() : null,
                 'event' => $this->params->get('event'),
             ])
@@ -129,7 +129,7 @@ class Events extends Tags
     {
         $generator = $this->params->has('event') ?
             Generator::fromEntry($this->params->get('event')) :
-            Generator::fromCollection($this->params->get('collection', config('events.collection')));
+            Generator::fromCollection($this->params->get('collection', config('events.collection', 'events')));
 
         return $generator
             ->site($this->params->get('site'))
