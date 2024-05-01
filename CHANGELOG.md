@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.4.3 - 2024-05-01
+
+### 🐛 Fixed
+
+- Use `collection` in config [@edalzell](https://github.com/edalzell) (#93)
+
 ## v5.4.2 - 2024-04-23
 
 ### 🐛 Fixed
