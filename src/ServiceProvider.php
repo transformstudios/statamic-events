@@ -88,7 +88,7 @@ class ServiceProvider extends AddonServiceProvider
                 return $value;
             }
 
-            $timezone = config('events.timezone');
+            $timezone = config('events.timezone', config('app.timezone'));
 
             $collection = Collection::findByHandle($collectionHandle);
 
