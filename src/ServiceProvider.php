@@ -73,9 +73,7 @@ class ServiceProvider extends AddonServiceProvider
 
     private function bootFields(): self
     {
-        if (is_null($collectionHandle = config('events.collection'))) {
-            return $this;
-        }
+        $collectionHandle = config('events.collection', 'events');
 
         Collection::computed($collectionHandle, 'recurrence', function ($entry, $value) {
             if ($value) {
