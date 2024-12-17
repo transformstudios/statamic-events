@@ -75,14 +75,6 @@ class ServiceProvider extends AddonServiceProvider
     {
         $collectionHandle = config('events.collection', 'events');
 
-        Collection::computed($collectionHandle, 'recurrence', function ($entry, $value) {
-            if ($value) {
-                return $value;
-            }
-
-            return $entry->multi_day ? 'multi_day' : 'none';
-        });
-
         Collection::computed($collectionHandle, 'timezone', function ($entry, $value) use ($collectionHandle) {
             if ($value) {
                 return $value;
