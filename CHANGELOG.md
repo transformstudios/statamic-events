@@ -1,5 +1,12 @@
 # Changelog
 
+## v5.4.4 - 2024-12-17
+
+### 🐛 Fixed
+
+- Remove legacy `recurrence` computed field [@edalzell](https://github.com/edalzell) (#98)
+- Use correct status filter @panda4man (#97)
+
 ## v5.4.3 - 2024-05-01
 
 ### 🐛 Fixed
