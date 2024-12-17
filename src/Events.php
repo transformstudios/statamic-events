@@ -150,7 +150,7 @@ class Events
                 fn ($query, $id) => $query->where('id', $id),
                 fn ($query) => $query->where('collection', $this->collection)
             )->where('site', $this->site ?? Site::current()->handle())
-            ->where('status', 'published')
+            ->whereStatus('published')
             ->when($this->terms, fn ($query, $terms) => $query->whereTaxonomyIn($terms));
 
         collect($this->filters)->each(function ($value, $fieldCondition) use ($query) {
