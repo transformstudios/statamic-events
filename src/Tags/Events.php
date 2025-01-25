@@ -140,6 +140,9 @@ class Events extends Tags
             )->when(
                 value: $this->parseFilters(),
                 callback: fn (Generator $generator, array $filters) => $generator->filters(filters: $filters)
+            )-> when(
+                value: $this->params->int('offset'),
+                callback: fn (Generator $generator, int $offset) => $generator->offset(offset: $offset)
             )->when(
                 value: $this->params->int('paginate'),
                 callback: fn (Generator $generator, int $perPage) => $generator->pagination(

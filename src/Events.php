@@ -31,6 +31,8 @@ class Events
 
     private array $filters = [];
 
+    private ?int $offset = null;
+
     private ?int $page = null;
 
     private ?int $perPage = null;
@@ -92,6 +94,13 @@ class Events
         return $this;
     }
 
+    public function offset(int $offset): self
+    {
+        $this->offset = $offset;
+
+        return $this;
+    }
+
     public function pagination(int $page = 1, int $perPage = 10): self
     {
         $this->page = $page;
@@ -138,6 +147,10 @@ class Events
     private function output(callable $type): EntryCollection|LengthAwarePaginator
     {
         $occurrences = $this->entries()->occurrences(generator: $type);
+
+        if ($this->offset) {
+            $occurrences = $occurrences->slice(offset: $this->offset);
+        }
 
         return $this->page ? $this->paginate(occurrences: $occurrences) : $occurrences;
     }
