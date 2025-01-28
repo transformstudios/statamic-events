@@ -1,43 +1,31 @@
 <?php
 
-namespace TransformStudios\Events\Tests\Feature;
-
+uses(\TransformStudios\Events\Tests\TestCase::class);
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\Tags\Events;
-use TransformStudios\Events\Tests\PreventSavingStacheItemsToDisk;
-use TransformStudios\Events\Tests\TestCase;
 
-class EventsOffsetTest extends TestCase
-{
-  use PreventSavingStacheItemsToDisk;
+uses(\TransformStudios\Events\Tests\PreventSavingStacheItemsToDisk::class);
 
-  private Events $tag;
+beforeEach(function () {
+    Entry::make()
+        ->collection('events')
+        ->slug('recurring-event')
+        ->id('recurring-event')
+        ->data([
+            'title' => 'Recurring Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'weekly',
+            'categories' => ['one'],
+        ])->save();
 
-  public function setUp(): void
-  {
-      parent::setUp();
+    $this->tag = app(Events::class);
+});
 
-      Entry::make()
-          ->collection('events')
-          ->slug('recurring-event')
-          ->id('recurring-event')
-          ->data([
-              'title' => 'Recurring Event',
-              'start_date' => Carbon::now()->toDateString(),
-              'start_time' => '11:00',
-              'end_time' => '12:00',
-              'recurrence' => 'weekly',
-              'categories' => ['one'],
-          ])->save();
-
-      $this->tag = app(Events::class);
-  }
-
-  /** @test */
-  public function canOffsetUpcomingOccurrences()
-  {
+test('can offset upcoming occurrences', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
     $this->tag
@@ -50,12 +38,10 @@ class EventsOffsetTest extends TestCase
 
     $occurrences = $this->tag->upcoming();
 
-    $this->assertCount(3, $occurrences);
-  }
+    expect($occurrences)->toHaveCount(3);
+});
 
-  /** @test */
-  public function canOffsetBetweenOccurrences()
-  {
+test('can offset between occurrences', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
     $this->tag->setContext([])
@@ -68,12 +54,10 @@ class EventsOffsetTest extends TestCase
 
     $occurrences = $this->tag->between();
 
-    $this->assertCount(2, $occurrences);
-  }
+    expect($occurrences)->toHaveCount(2);
+});
 
-  /** @test */
-  public function canOffsetTodayOccurrences()
-  {
+test('can offset today occurrences', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('12:01'));
 
     Entry::make()
@@ -92,7 +76,7 @@ class EventsOffsetTest extends TestCase
             'offset' => 1,
         ]);
 
-    $this->assertCount(1, $this->tag->today());
+    expect($this->tag->today())->toHaveCount(1);
 
     $this->tag->setContext([])
         ->setParameters([
@@ -101,12 +85,10 @@ class EventsOffsetTest extends TestCase
             'offset' => 1,
         ]);
 
-    $this->assertCount(0, $this->tag->today());
-  }
+    expect($this->tag->today())->toHaveCount(0);
+});
 
-  /** @test */
-  public function canOffsetSingleDayOccurrences()
-  {
+test('can offset single day occurrences', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
     $this->tag->setContext([])
@@ -115,6 +97,5 @@ class EventsOffsetTest extends TestCase
             'offset' => 1,
         ]);
 
-    $this->assertCount(0, $this->tag->today());
-  }
-}
+    expect($this->tag->today())->toHaveCount(0);
+});

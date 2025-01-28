@@ -1,164 +1,146 @@
 <?php
 
-namespace TransformStudios\Events\Tests\Unit;
-
+uses(\TransformStudios\Events\Tests\TestCase::class);
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonTimeZone;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
-use TransformStudios\Events\Tests\TestCase;
 use TransformStudios\Events\Types\SingleDayEvent;
 
-class SingleDayEventsTest extends TestCase
-{
-    /** @test */
-    public function canCreateSingleEvent()
-    {
-        $entry = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => Carbon::now()->toDateString(),
-                'start_time' => '11:00',
-                'end_time' => '12:00',
-                'timezone' => 'America/Vancouver',
-            ]);
 
-        $event = EventFactory::createFromEntry($entry);
+test('can create single event', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'timezone' => 'America/Vancouver',
+        ]);
 
-        $this->assertTrue($event instanceof SingleDayEvent);
-        $this->assertFalse($event->isRecurring());
-        $this->assertFalse($event->isMultiDay());
-        $this->assertTrue($event->hasEndTime());
-        $this->assertEquals(new CarbonTimeZone('America/Vancouver'), $event->start()->timezone);
-        $this->assertEquals(new CarbonTimeZone('America/Vancouver'), $event->end()->timezone);
-    }
+    $event = EventFactory::createFromEntry($entry);
 
-    /** @test */
-    public function canCreateSingleAllDayEvent()
-    {
-        $entry = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => Carbon::now()->toDateString(),
-                'all_day' => true,
-            ]);
+    expect($event instanceof SingleDayEvent)->toBeTrue();
+    expect($event->isRecurring())->toBeFalse();
+    expect($event->isMultiDay())->toBeFalse();
+    expect($event->hasEndTime())->toBeTrue();
+    expect($event->start()->timezone)->toEqual(new CarbonTimeZone('America/Vancouver'));
+    expect($event->end()->timezone)->toEqual(new CarbonTimeZone('America/Vancouver'));
+});
 
-        $event = EventFactory::createFromEntry($entry);
+test('can create single all day event', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => Carbon::now()->toDateString(),
+            'all_day' => true,
+        ]);
 
-        $this->assertTrue($event instanceof SingleDayEvent);
-        $this->assertTrue($event->isAllDay());
-    }
+    $event = EventFactory::createFromEntry($entry);
 
-    /** @test */
-    public function endIsEndOfDayWhenNoEndTime()
-    {
-        Carbon::setTestNow(now());
+    expect($event instanceof SingleDayEvent)->toBeTrue();
+    expect($event->isAllDay())->toBeTrue();
+});
 
-        $entry = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => Carbon::now()->toDateString(),
-                'start_time' => '11:00',
-            ]);
+test('end is end of day when no end time', function () {
+    Carbon::setTestNow(now());
 
-        $event = EventFactory::createFromEntry($entry);
+    $entry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+        ]);
 
-        $this->assertEquals('23:59:59', $event->endTime());
-        $nextOccurrences = $event->nextOccurrences();
+    $event = EventFactory::createFromEntry($entry);
 
-        $this->assertFalse($nextOccurrences[0]->has_end_time);
-        $this->assertEquals(now()->endOfDay()->setMicrosecond(0), $nextOccurrences[0]->end);
-    }
+    expect($event->endTime())->toEqual('23:59:59');
+    $nextOccurrences = $event->nextOccurrences();
 
-    /** @test */
-    public function emptyOccurrencesIfNowAfterEndDate()
-    {
-        $recurringEntry = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => Carbon::now()->toDateString(),
-                'start_time' => '11:00',
-                'end_time' => '12:00',
-            ]);
+    expect($nextOccurrences[0]->has_end_time)->toBeFalse();
+    expect($nextOccurrences[0]->end)->toEqual(now()->endOfDay()->setMicrosecond(0));
+});
 
-        $event = EventFactory::createFromEntry($recurringEntry);
+test('empty occurrences if now after end date', function () {
+    $recurringEntry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+        ]);
 
-        Carbon::setTestNow(now()->addDays(1));
-        $nextOccurrences = $event->nextOccurrences();
+    $event = EventFactory::createFromEntry($recurringEntry);
 
-        $this->assertEmpty($nextOccurrences);
-    }
+    Carbon::setTestNow(now()->addDays(1));
+    $nextOccurrences = $event->nextOccurrences();
 
-    /** @test */
-    public function canGenerateNextDayIfNowIsBefore()
-    {
-        $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
+    expect($nextOccurrences)->toBeEmpty();
+});
 
-        $recurringEntry = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => $startDate->toDateString(),
-                'start_time' => '11:00',
-                'end_time' => '12:00',
-            ]);
+test('can generate next day if now is before', function () {
+    $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
 
-        $event = EventFactory::createFromEntry($recurringEntry);
+    $recurringEntry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $startDate->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+        ]);
 
-        Carbon::setTestNow($startDate->setTimeFromTimeString('10:59:00'));
+    $event = EventFactory::createFromEntry($recurringEntry);
 
-        $nextOccurrences = $event->nextOccurrences(2);
+    Carbon::setTestNow($startDate->setTimeFromTimeString('10:59:00'));
 
-        $this->assertCount(1, $nextOccurrences);
+    $nextOccurrences = $event->nextOccurrences(2);
 
-        $this->assertEquals($startDate, $nextOccurrences->first()->start);
-    }
+    expect($nextOccurrences)->toHaveCount(1);
 
-    /** @test */
-    public function canGenerateNextOccurrenceIfNowIsDuring()
-    {
-        $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
-        $single = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => $startDate->toDateString(),
-                'start_time' => '11:00',
-                'end_time' => '12:00',
-            ]);
+    expect($nextOccurrences->first()->start)->toEqual($startDate);
+});
 
-        $singleNoEndTime = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => $startDate->toDateString(),
-                'start_time' => '11:00',
-            ]);
+test('can generate next occurrence if now is during', function () {
+    $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
+    $single = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $startDate->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+        ]);
 
-        Carbon::setTestNow($startDate->addMinutes(10));
+    $singleNoEndTime = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $startDate->toDateString(),
+            'start_time' => '11:00',
+        ]);
 
-        $event = EventFactory::createFromEntry($single);
-        $noEndTimeEvent = EventFactory::createFromEntry($singleNoEndTime);
-        $nextOccurrences = $event->nextOccurrences();
+    Carbon::setTestNow($startDate->addMinutes(10));
 
-        $this->assertEquals($startDate, $nextOccurrences[0]->start);
-        $this->assertEquals($startDate, $noEndTimeEvent->nextOccurrences()[0]->start);
-    }
+    $event = EventFactory::createFromEntry($single);
+    $noEndTimeEvent = EventFactory::createFromEntry($singleNoEndTime);
+    $nextOccurrences = $event->nextOccurrences();
 
-    /** @test */
-    public function canSupplementNoEndTime()
-    {
-        $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
-        $noEndTimeEntry = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => $startDate->toDateString(),
-                'start_time' => '11:00',
-            ]);
+    expect($nextOccurrences[0]->start)->toEqual($startDate);
+    expect($noEndTimeEvent->nextOccurrences()[0]->start)->toEqual($startDate);
+});
 
-        Carbon::setTestNow($startDate->addMinutes(10));
+test('can supplement no end time', function () {
+    $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
+    $noEndTimeEntry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $startDate->toDateString(),
+            'start_time' => '11:00',
+        ]);
 
-        $event = EventFactory::createFromEntry($noEndTimeEntry);
-        $nextOccurrences = $event->nextOccurrences();
+    Carbon::setTestNow($startDate->addMinutes(10));
 
-        $this->assertFalse($nextOccurrences[0]->has_end_time);
-    }
-}
+    $event = EventFactory::createFromEntry($noEndTimeEntry);
+    $nextOccurrences = $event->nextOccurrences();
+
+    expect($nextOccurrences[0]->has_end_time)->toBeFalse();
+});

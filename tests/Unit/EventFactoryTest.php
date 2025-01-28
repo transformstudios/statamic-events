@@ -1,97 +1,80 @@
 <?php
 
-namespace TransformStudios\Events\Tests\Unit;
-
+uses(\TransformStudios\Events\Tests\TestCase::class);
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
-use TransformStudios\Events\Tests\TestCase;
 use TransformStudios\Events\Types\MultiDayEvent;
 use TransformStudios\Events\Types\RecurringEvent;
 use TransformStudios\Events\Types\SingleDayEvent;
 
-class EventFactoryTest extends TestCase
-{
-    /**
-     * @test
-     *
-     * @dataProvider provideEventData
-     */
-    public function canGetEventTypeClass(string $class, array $data)
-    {
-        $entry = Entry::make()
-            ->collection('events')
-            ->data($data);
 
-        $this->assertEquals($class, EventFactory::getTypeClass($entry));
-    }
+test('can get event type class', function (string $class, array $data) {
+    $entry = Entry::make()
+        ->collection('events')
+        ->data($data);
 
-    /**
-     * @test
-     *
-     * @dataProvider provideEventData
-     */
-    public function canCreateCorrectEventType(string $class, array $data)
-    {
-        $entry = Entry::make()
-            ->collection('events')
-            ->data($data);
+    expect(EventFactory::getTypeClass($entry))->toEqual($class);
+})->with('provideEventData');
 
-        $this->assertInstanceOf($class, EventFactory::createFromEntry($entry));
-    }
+test('can create correct event type', function (string $class, array $data) {
+    $entry = Entry::make()
+        ->collection('events')
+        ->data($data);
 
-    public static function provideEventData()
-    {
-        return [
+    expect(EventFactory::createFromEntry($entry))->toBeInstanceOf($class);
+})->with('provideEventData');
+
+dataset('provideEventData', function () {
+    return [
+        [
+            SingleDayEvent::class,
             [
-                SingleDayEvent::class,
-                [
-                    'start_date' => Carbon::now()->toDateString(),
-                    'start_time' => '11:00',
-                    'end_time' => '12:00',
-                    'timezone' => 'America/Vancouver',
-                ],
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'timezone' => 'America/Vancouver',
             ],
+        ],
+        [
+            SingleDayEvent::class,
             [
-                SingleDayEvent::class,
-                [
-                    'multi_day' => true,
-                    'start_date' => Carbon::now()->toDateString(),
-                    'start_time' => '11:00',
-                    'end_time' => '12:00',
-                    'timezone' => 'America/Vancouver',
-                ],
+                'multi_day' => true,
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'timezone' => 'America/Vancouver',
             ],
+        ],
+        [
+            RecurringEvent::class,
             [
-                RecurringEvent::class,
-                [
-                    'start_date' => Carbon::now()->toDateString(),
-                    'end_date' => Carbon::now()->addWeek()->toDateString(),
-                    'start_time' => '11:00',
-                    'end_time' => '12:00',
-                    'recurrence' => 'daily',
-                    'timezone' => 'America/Vancouver',
-                ],
+                'start_date' => Carbon::now()->toDateString(),
+                'end_date' => Carbon::now()->addWeek()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'daily',
+                'timezone' => 'America/Vancouver',
             ],
+        ],
+        [
+            MultiDayEvent::class,
             [
-                MultiDayEvent::class,
-                [
-                    'recurrence' => 'multi_day',
-                    'days' => [
-                        [
-                            'date' => '2019-11-23',
-                            'start_time' => '19:00',
-                            'end_time' => '21:00',
-                        ],
-                        [
-                            'date' => '2019-11-24',
-                            'start_time' => '11:00',
-                            'end_time' => '15:00',
-                        ],
+                'recurrence' => 'multi_day',
+                'days' => [
+                    [
+                        'date' => '2019-11-23',
+                        'start_time' => '19:00',
+                        'end_time' => '21:00',
                     ],
-                    'timezone' => 'America/Vancouver',
+                    [
+                        'date' => '2019-11-24',
+                        'start_time' => '11:00',
+                        'end_time' => '15:00',
+                    ],
                 ],
+                'timezone' => 'America/Vancouver',
             ],
-        ];
-    }
-}
+        ],
+    ];
+});

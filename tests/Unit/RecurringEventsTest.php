@@ -1,72 +1,62 @@
 <?php
 
-namespace TransformStudios\Events\Tests\Unit;
-
+uses(\TransformStudios\Events\Tests\TestCase::class);
 use Carbon\Carbon;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
-use TransformStudios\Events\Tests\TestCase;
 use TransformStudios\Events\Types\MultiDayEvent;
 use TransformStudios\Events\Types\RecurringEvent;
 use TransformStudios\Events\Types\SingleDayEvent;
 
-class RecurringEventsTest extends TestCase
-{
-    /** @test */
-    public function canCreateRecurringEvent()
-    {
-        $recurringEntry = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => Carbon::now()->toDateString(),
-                'start_time' => '11:00',
-                'recurrence' => 'daily',
-            ]);
 
-        $event = EventFactory::createFromEntry($recurringEntry);
+test('can create recurring event', function () {
+    $recurringEntry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'recurrence' => 'daily',
+        ]);
 
-        $this->assertTrue($event instanceof RecurringEvent);
-        $this->assertTrue($event->isRecurring());
-        $this->assertFalse($event->isMultiDay());
-    }
+    $event = EventFactory::createFromEntry($recurringEntry);
 
-    /** @test */
-    public function wontCreateRecurringEventWhenMultiDay()
-    {
-        $recurringEntry = Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => Carbon::now()->toDateString(),
-                'start_time' => '11:00',
-                'recurrence' => 'multi_day',
-            ]);
+    expect($event instanceof RecurringEvent)->toBeTrue();
+    expect($event->isRecurring())->toBeTrue();
+    expect($event->isMultiDay())->toBeFalse();
+});
 
-        $event = EventFactory::createFromEntry($recurringEntry);
+test('wont create recurring event when multi day', function () {
+    $recurringEntry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'recurrence' => 'multi_day',
+        ]);
 
-        $this->assertTrue($event instanceof SingleDayEvent);
-        $this->assertFalse($event->isRecurring());
-        $this->assertFalse($event->isMultiDay());
-    }
+    $event = EventFactory::createFromEntry($recurringEntry);
 
-    /** @test */
-    public function canShowLastOccurrenceWhenNoEndTime()
-    {
-        Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+    expect($event instanceof SingleDayEvent)->toBeTrue();
+    expect($event->isRecurring())->toBeFalse();
+    expect($event->isMultiDay())->toBeFalse();
+});
 
-        $recurringEntry = tap(Entry::make()
-            ->collection('events')
-            ->data([
-                'start_date' => Carbon::now()->addDays(1)->toDateString(),
-                'start_time' => '22:00',
-                'recurrence' => 'daily',
-                'end_date' => Carbon::now()->addDays(2)->toDateString(),
-                'timezone' => 'America/Chicago',
-            ]))->save();
+test('can show last occurrence when no end time', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
-        $occurrences = Events::fromCollection(handle: 'events')
-            ->between(Carbon::now(), Carbon::now()->addDays(5)->endOfDay());
+    $recurringEntry = tap(Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => Carbon::now()->addDays(1)->toDateString(),
+            'start_time' => '22:00',
+            'recurrence' => 'daily',
+            'end_date' => Carbon::now()->addDays(2)->toDateString(),
+            'timezone' => 'America/Chicago',
+        ]))->save();
 
-        $this->assertCount(2, $occurrences);
-    }
-}
+    $occurrences = Events::fromCollection(handle: 'events')
+        ->between(Carbon::now(), Carbon::now()->addDays(5)->endOfDay());
+
+    expect($occurrences)->toHaveCount(2);
+});
