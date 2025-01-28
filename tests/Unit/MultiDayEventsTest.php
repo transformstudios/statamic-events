@@ -1,121 +1,169 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
+namespace TransformStudios\Events\Tests\Unit;
+
 use Carbon\Carbon;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
+use TransformStudios\Events\Tests\TestCase;
 use TransformStudios\Events\Types\MultiDayEvent;
 
+class MultiDayEventsTest extends TestCase
+{
+    /** @var MultiDayEvent */
+    private $allDayEvent;
 
-beforeEach(function () {
-    Carbon::setTestNowAndTimezone(now(), 'America/Vancouver');
+    /** @var MultiDayEvent */
+    private $event;
 
-    $entry = Entry::make()
-        ->slug('multi-day-event')
-        ->collection('events')
-        ->data([
-            'recurrence' => 'multi_day',
-            'days' => [
-                [
-                    'date' => '2019-11-23',
-                    'start_time' => '19:00',
-                    'end_time' => '21:00',
+    /** @var MultiDayEvent */
+    private $noEndTimeEvnt;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNowAndTimezone(now(), 'America/Vancouver');
+
+        $entry = Entry::make()
+            ->slug('multi-day-event')
+            ->collection('events')
+            ->data([
+                'recurrence' => 'multi_day',
+                'days' => [
+                    [
+                        'date' => '2019-11-23',
+                        'start_time' => '19:00',
+                        'end_time' => '21:00',
+                    ],
+                    [
+                        'date' => '2019-11-24',
+                        'start_time' => '11:00',
+                        'end_time' => '15:00',
+                    ],
+                    [
+                        'date' => '2019-11-25',
+                        'start_time' => '11:00',
+                        'end_time' => '15:00',
+                    ],
                 ],
-                [
-                    'date' => '2019-11-24',
-                    'start_time' => '11:00',
-                    'end_time' => '15:00',
+                'timezone' => 'America/Vancouver',
+            ]);
+
+        $this->event = EventFactory::createFromEntry($entry);
+
+        $noEndTimeEntry = Entry::make()
+            ->collection('events')
+            ->slug('no-end-time')
+            ->data([
+                'recurrence' => 'multi_day',
+                'days' => [
+                    [
+                        'date' => '2019-11-23',
+                        'start_time' => '19:00',
+                    ],
+                    [
+                        'date' => '2019-11-24',
+                        'start_time' => '15:00',
+                    ],
                 ],
-                [
-                    'date' => '2019-11-25',
-                    'start_time' => '11:00',
-                    'end_time' => '15:00',
+                'timezone' => 'America/Vancouver',
+            ]);
+
+        $this->noEndTimeEvent = EventFactory::createFromEntry($noEndTimeEntry);
+
+        $allDayEntry = Entry::make()
+            ->collection('events')
+            ->data([
+                'recurrence' => 'multi_day',
+                'days' => [
+                    [
+                        'date' => '2019-11-20',
+                    ],
+                    [
+                        'date' => '2019-11-21',
+                    ],
                 ],
-            ],
-            'timezone' => 'America/Vancouver',
-        ]);
+                'timezone' => 'America/Vancouver',
+            ]);
+        $this->allDayEvent = EventFactory::createFromEntry($allDayEntry);
+    }
 
-    $this->event = EventFactory::createFromEntry($entry);
+    /** @test */
+    public function canCreateMultiDayEvent()
+    {
+        $this->assertTrue($this->event instanceof MultiDayEvent);
+        $this->assertTrue($this->allDayEvent instanceof MultiDayEvent);
+        $this->assertTrue($this->noEndTimeEvent instanceof MultiDayEvent);
+        $this->assertTrue($this->event->isMultiDay());
+        $this->assertTrue($this->allDayEvent->isMultiDay());
+        $this->assertTrue($this->noEndTimeEvent->isMultiDay());
+    }
 
-    $noEndTimeEntry = Entry::make()
-        ->collection('events')
-        ->slug('no-end-time')
-        ->data([
-            'recurrence' => 'multi_day',
-            'days' => [
-                [
-                    'date' => '2019-11-23',
-                    'start_time' => '19:00',
-                ],
-                [
-                    'date' => '2019-11-24',
-                    'start_time' => '15:00',
-                ],
-            ],
-            'timezone' => 'America/Vancouver',
-        ]);
+    /** @test */
+    public function canGetStart()
+    {
+        $this->assertEquals(
+            Carbon::parse('2019-11-23 19:00')->shiftTimezone('America/Vancouver'),
+            $this->event->start()
+        );
+        $this->assertEquals(
+            Carbon::parse('2019-11-20 0:00')->shiftTimezone('America/Vancouver'),
+            $this->allDayEvent->start()
+        );
+        $this->assertEquals(
+            Carbon::parse('2019-11-20 0:00')->shiftTimezone('America/Vancouver')->timezone,
+            $this->event->start()->timezone
+        );
+    }
 
-    $this->noEndTimeEvent = EventFactory::createFromEntry($noEndTimeEntry);
+    /** @test */
+    public function noOccurrencesIfNowAfterEndDate()
+    {
+        Carbon::setTestNow('2019-11-26');
+        $this->assertEmpty($this->event->nextOccurrences(1));
+    }
 
-    $allDayEntry = Entry::make()
-        ->collection('events')
-        ->data([
-            'recurrence' => 'multi_day',
-            'days' => [
-                [
-                    'date' => '2019-11-20',
-                ],
-                [
-                    'date' => '2019-11-21',
-                ],
-            ],
-            'timezone' => 'America/Vancouver',
-        ]);
-    $this->allDayEvent = EventFactory::createFromEntry($allDayEntry);
-});
+    /** @test */
+    public function canGenerateNextOccurrenceIfBefore()
+    {
+        Carbon::setTestNowAndTimezone('2019-11-22', 'America/Vancouver');
 
-test('can create multi day event', function () {
-    expect($this->event instanceof MultiDayEvent)->toBeTrue();
-    expect($this->allDayEvent instanceof MultiDayEvent)->toBeTrue();
-    expect($this->noEndTimeEvent instanceof MultiDayEvent)->toBeTrue();
-    expect($this->event->isMultiDay())->toBeTrue();
-    expect($this->allDayEvent->isMultiDay())->toBeTrue();
-    expect($this->noEndTimeEvent->isMultiDay())->toBeTrue();
-});
+        $this->assertEquals(
+            Carbon::parse('2019-11-23')->setTimeFromTimeString('19:00:00'),
+            $this->event->nextOccurrences()[0]->start
+        );
+        $this->assertEquals(
+            Carbon::parse('2019-11-23')->setTimeFromTimeString('21:00'),
+            $this->event->nextOccurrences()[0]->end
+        );
+    }
 
-test('can get start', function () {
-    expect($this->event->start())->toEqual(Carbon::parse('2019-11-23 19:00')->shiftTimezone('America/Vancouver'));
-    expect($this->allDayEvent->start())->toEqual(Carbon::parse('2019-11-20 0:00')->shiftTimezone('America/Vancouver'));
-    expect($this->event->start()->timezone)->toEqual(Carbon::parse('2019-11-20 0:00')->shiftTimezone('America/Vancouver')->timezone);
-});
+    /** @test */
+    public function canGenerateNextOccurrenceIfDuring()
+    {
+        Carbon::setTestNowAndTimezone('2019-11-24 10:00', 'America/Vancouver');
+        $this->assertEquals(
+            Carbon::parse('2019-11-24')->setTimeFromTimeString('11:00:00'),
+            $this->event->nextOccurrences()[0]->start
+        );
+    }
 
-test('no occurrences if now after end date', function () {
-    Carbon::setTestNow('2019-11-26');
-    expect($this->event->nextOccurrences(1))->toBeEmpty();
-});
+    /** @test */
+    public function canGenerateICalendar()
+    {
+        $this->markTestSkipped('revisit');
+        $events = $this->event->toICalendarEvents();
 
-test('can generate next occurrence if before', function () {
-    Carbon::setTestNowAndTimezone('2019-11-22', 'America/Vancouver');
+        dd($events);
+    }
 
-    expect($this->event->nextOccurrences()[0]->start)->toEqual(Carbon::parse('2019-11-23')->setTimeFromTimeString('19:00:00'));
-    expect($this->event->nextOccurrences()[0]->end)->toEqual(Carbon::parse('2019-11-23')->setTimeFromTimeString('21:00'));
-});
+    /** @test */
+    public function dayIsAllDayWhenNoStartAndEndTime()
+    {
+        $days = $this->allDayEvent->days();
 
-test('can generate next occurrence if during', function () {
-    Carbon::setTestNowAndTimezone('2019-11-24 10:00', 'America/Vancouver');
-    expect($this->event->nextOccurrences()[0]->start)->toEqual(Carbon::parse('2019-11-24')->setTimeFromTimeString('11:00:00'));
-});
-
-test('can generate icalendar', function () {
-    $this->markTestSkipped('revisit');
-    $events = $this->event->toICalendarEvents();
-
-    dd($events);
-});
-
-test('day is all day when no start and end time', function () {
-    $days = $this->allDayEvent->days();
-
-    expect($days[0]->isAllDay())->toBeTrue();
-});
+        $this->assertTrue($days[0]->isAllDay());
+    }
+}

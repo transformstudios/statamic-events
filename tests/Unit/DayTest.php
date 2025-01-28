@@ -1,27 +1,39 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
+namespace TransformStudios\Events\Tests\Unit;
+
 use Illuminate\Support\Carbon;
 use TransformStudios\Events\Day;
+use TransformStudios\Events\Tests\TestCase;
 
-test('can get end when no end time', function () {
-    $dayData = [
-        'date' => '2019-11-23',
-        'start_time' => '19:00',
-    ];
+class DayTest extends TestCase
+{
+    /** @test */
+    public function canGetEndWhenNoEndTime()
+    {
+        $dayData = [
+            'date' => '2019-11-23',
+            'start_time' => '19:00',
+        ];
 
-    $day = new Day(data: $dayData, timezone: 'America/Vancouver');
+        $day = new Day(data: $dayData, timezone: 'America/Vancouver');
 
-    expect($day->end())->toEqual(Carbon::parse('2019-11-23')->shiftTimezone('America/Vancouver')->endOfDay());
-});
+        $this->assertEquals(
+            Carbon::parse('2019-11-23')->shiftTimezone('America/Vancouver')->endOfDay(),
+            $day->end()
+        );
+    }
 
-test('has no end time when no end time', function () {
-    $dayData = [
-        'date' => '2019-11-23',
-        'start_time' => '19:00',
-    ];
+    /** @test */
+    public function hasNoEndTimeWhenNoEndTime()
+    {
+        $dayData = [
+            'date' => '2019-11-23',
+            'start_time' => '19:00',
+        ];
 
-    $day = new Day(data: $dayData, timezone: 'America/Vancouver');
+        $day = new Day(data: $dayData, timezone: 'America/Vancouver');
 
-    expect($day->hasEndTime())->toBeFalse();
-});
+        $this->assertFalse($day->hasEndTime());
+    }
+}
