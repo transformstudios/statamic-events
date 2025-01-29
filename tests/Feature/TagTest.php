@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Tests\Feature;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry;
 use Statamic\Support\Arr;
@@ -33,7 +34,7 @@ class TagTest extends TestCase
         $this->tag = app(Events::class);
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_between_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -51,7 +52,7 @@ class TagTest extends TestCase
         $this->assertCount(4, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_between_occurrences_with_default_from()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -68,7 +69,7 @@ class TagTest extends TestCase
         $this->assertCount(4, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_calendar_occurrences()
     {
         Carbon::setTestNow('jan 1, 2022 10:00');
@@ -113,7 +114,7 @@ class TagTest extends TestCase
         $this->assertCount(1, Arr::get($occurrences, '13.dates'));
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_in_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -130,7 +131,7 @@ class TagTest extends TestCase
         $this->assertCount(4, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_today_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('12:01'));
@@ -163,7 +164,7 @@ class TagTest extends TestCase
         $this->assertCount(1, $this->tag->today());
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_upcoming_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -180,7 +181,7 @@ class TagTest extends TestCase
         $this->assertCount(3, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_upcoming_limited_occurrences()
     {
         Entry::make()
@@ -209,7 +210,7 @@ class TagTest extends TestCase
         $this->assertCount(3, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_paginate_upcoming_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -237,7 +238,7 @@ class TagTest extends TestCase
         $this->assertEquals('/events?page=2', $pagination['paginate']['next_page']);
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_upcoming_occurrences_with_taxonomy_terms()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -267,7 +268,7 @@ class TagTest extends TestCase
         $this->assertCount(1, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_upcoming_occurrences_with_filter()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -297,7 +298,7 @@ class TagTest extends TestCase
         $this->assertCount(1, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_date_event_download_link()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -315,7 +316,7 @@ class TagTest extends TestCase
         $this->assertEquals('http://localhost/!/events/ics?collection=events&date='.now()->toDateString().'&event=recurring-event', $url);
     }
 
-    /** @test */
+    #[Test]
     public function can_generate_event_download_link()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -332,7 +333,7 @@ class TagTest extends TestCase
         $this->assertEquals('http://localhost/!/events/ics?collection=events&event=recurring-event', $url);
     }
 
-    /** @test */
+    #[Test]
     public function can_sort_occurrences_desc()
     {
 

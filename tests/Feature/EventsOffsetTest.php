@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Tests\Feature;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\Tags\Events;
 use TransformStudios\Events\Tests\TestCase;
@@ -31,7 +32,7 @@ class EventsOffsetTest extends TestCase
         $this->tag = app(Events::class);
     }
 
-    /** @test */
+    #[Test]
     public function can_offset_upcoming_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -49,7 +50,7 @@ class EventsOffsetTest extends TestCase
         $this->assertCount(3, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_offset_between_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -67,7 +68,7 @@ class EventsOffsetTest extends TestCase
         $this->assertCount(2, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_offset_today_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('12:01'));
@@ -100,7 +101,7 @@ class EventsOffsetTest extends TestCase
         $this->assertCount(0, $this->tag->today());
     }
 
-    /** @test */
+    #[Test]
     public function can_offset_single_day_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));

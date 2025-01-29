@@ -3,7 +3,7 @@
 namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
-use Statamic\Facades\Blueprint;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Tests\TestCase;
@@ -20,7 +20,7 @@ class MultiDayEventsTest extends TestCase
     /** @var MultiDayEvent */
     private $noEndTimeEvnt;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -90,7 +90,7 @@ class MultiDayEventsTest extends TestCase
         $this->allDayEvent = EventFactory::createFromEntry($allDayEntry);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateMultiDayEvent()
     {
         $this->assertTrue($this->event instanceof MultiDayEvent);
@@ -101,7 +101,7 @@ class MultiDayEventsTest extends TestCase
         $this->assertTrue($this->noEndTimeEvent->isMultiDay());
     }
 
-    /** @test */
+    #[Test]
     public function canGetStart()
     {
         $this->assertEquals(
@@ -118,14 +118,14 @@ class MultiDayEventsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function noOccurrencesIfNowAfterEndDate()
     {
         Carbon::setTestNow('2019-11-26');
         $this->assertEmpty($this->event->nextOccurrences(1));
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextOccurrenceIfBefore()
     {
         Carbon::setTestNowAndTimezone('2019-11-22', 'America/Vancouver');
@@ -140,7 +140,7 @@ class MultiDayEventsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextOccurrenceIfDuring()
     {
         Carbon::setTestNowAndTimezone('2019-11-24 10:00', 'America/Vancouver');
@@ -150,7 +150,7 @@ class MultiDayEventsTest extends TestCase
         );
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateICalendar()
     {
         $this->markTestSkipped('revisit');
@@ -159,7 +159,7 @@ class MultiDayEventsTest extends TestCase
         dd($events);
     }
 
-    /** @test */
+    #[Test]
     public function dayIsAllDayWhenNoStartAndEndTime()
     {
         $days = $this->allDayEvent->days();

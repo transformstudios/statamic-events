@@ -3,17 +3,17 @@
 namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
 use TransformStudios\Events\Tests\TestCase;
-use TransformStudios\Events\Types\MultiDayEvent;
 use TransformStudios\Events\Types\RecurringEvent;
 use TransformStudios\Events\Types\SingleDayEvent;
 
 class RecurringEventsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function canCreateRecurringEvent()
     {
         $recurringEntry = Entry::make()
@@ -31,7 +31,7 @@ class RecurringEventsTest extends TestCase
         $this->assertFalse($event->isMultiDay());
     }
 
-    /** @test */
+    #[Test]
     public function wontCreateRecurringEventWhenMultiDay()
     {
         $recurringEntry = Entry::make()
@@ -49,7 +49,7 @@ class RecurringEventsTest extends TestCase
         $this->assertFalse($event->isMultiDay());
     }
 
-    /** @test */
+    #[Test]
     public function canShowLastOccurrenceWhenNoEndTime()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));

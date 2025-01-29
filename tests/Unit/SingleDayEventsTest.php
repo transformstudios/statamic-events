@@ -5,6 +5,7 @@ namespace TransformStudios\Events\Tests\Unit;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonTimeZone;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Tests\TestCase;
@@ -12,7 +13,7 @@ use TransformStudios\Events\Types\SingleDayEvent;
 
 class SingleDayEventsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function canCreateSingleEvent()
     {
         $entry = Entry::make()
@@ -34,7 +35,7 @@ class SingleDayEventsTest extends TestCase
         $this->assertEquals(new CarbonTimeZone('America/Vancouver'), $event->end()->timezone);
     }
 
-    /** @test */
+    #[Test]
     public function canCreateSingleAllDayEvent()
     {
         $entry = Entry::make()
@@ -50,7 +51,7 @@ class SingleDayEventsTest extends TestCase
         $this->assertTrue($event->isAllDay());
     }
 
-    /** @test */
+    #[Test]
     public function endIsEndOfDayWhenNoEndTime()
     {
         Carbon::setTestNow(now());
@@ -71,7 +72,7 @@ class SingleDayEventsTest extends TestCase
         $this->assertEquals(now()->endOfDay()->setMicrosecond(0), $nextOccurrences[0]->end);
     }
 
-    /** @test */
+    #[Test]
     public function emptyOccurrencesIfNowAfterEndDate()
     {
         $recurringEntry = Entry::make()
@@ -90,7 +91,7 @@ class SingleDayEventsTest extends TestCase
         $this->assertEmpty($nextOccurrences);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextDayIfNowIsBefore()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
@@ -114,7 +115,7 @@ class SingleDayEventsTest extends TestCase
         $this->assertEquals($startDate, $nextOccurrences->first()->start);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextOccurrenceIfNowIsDuring()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
@@ -143,7 +144,7 @@ class SingleDayEventsTest extends TestCase
         $this->assertEquals($startDate, $noEndTimeEvent->nextOccurrences()[0]->start);
     }
 
-    /** @test */
+    #[Test]
     public function canSupplementNoEndTime()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');

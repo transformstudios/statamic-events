@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Tests\Feature;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\Tests\TestCase;
 
@@ -25,7 +26,7 @@ class IcsControllerTest extends TestCase
             ])->save();
     }
 
-    /** @test */
+    #[Test]
     public function can_create_single_day_event_ics_file()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -35,11 +36,11 @@ class IcsControllerTest extends TestCase
             'event' => 'the-id',
         ]))->assertDownload('single-event.ics');
 
-        $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
+        $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
         $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
     }
 
-    /** @test */
+    #[Test]
     public function can_create_single_day_recurring_event_ics_file()
     {
         Carbon::setTestNow(now()->addDay()->setTimeFromTimeString('10:00'));
@@ -61,7 +62,7 @@ class IcsControllerTest extends TestCase
             'event' => 'the-recurring-id',
         ]))->assertDownload('recurring-event.ics');
 
-        $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
+        $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
 
         $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),
@@ -69,7 +70,7 @@ class IcsControllerTest extends TestCase
         ]))->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function can_create_single_day_multiday_event_ics_file()
     {
         Carbon::setTestNow(now());
@@ -110,10 +111,10 @@ class IcsControllerTest extends TestCase
             'event' => 'the-multi-day-event',
         ]))->assertDownload('multi-day-event.ics');
 
-        $this->assertStringContainsString('DTSTART:'.now()->addDay()->setTimeFromTimeString('11:00')->format('Ymd\THis\Z'), $response->streamedContent());
+        $this->assertStringContainsString('DTSTART:'.now()->addDay()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
     }
 
-    /** @test */
+    #[Test]
     public function throws404_error_when_event_does_not_occur_on_date()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -124,7 +125,7 @@ class IcsControllerTest extends TestCase
         ]))->assertStatus(404);
     }
 
-    /** @test */
+    #[Test]
     public function throws404_error_when_event_does_not_exist()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));

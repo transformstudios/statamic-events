@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Tests\Unit;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
@@ -11,7 +12,7 @@ use TransformStudios\Events\Tests\TestCase;
 
 class EventsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function can_generate_dates_when_now_before_start()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -54,7 +55,7 @@ class EventsTest extends TestCase
         $this->assertEquals($expectedStartDates[3], $occurrences[3]->start);
     }
 
-    /** @test */
+    #[Test]
     public function can_paginate_upcoming_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -91,7 +92,7 @@ class EventsTest extends TestCase
         $this->assertEquals(3, $paginator->currentPage());
     }
 
-    /** @test */
+    #[Test]
     public function can_paginate_occurrences_between()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -122,7 +123,7 @@ class EventsTest extends TestCase
         $this->assertEquals(now()->addDay()->setTimeFromTimeString('11:00'), $paginator->items()[1]->start);
     }
 
-    /** @test */
+    #[Test]
     public function can_filter_events()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -156,7 +157,7 @@ class EventsTest extends TestCase
         $this->assertCount(10, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_filter_multiple_events()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -202,7 +203,7 @@ class EventsTest extends TestCase
         $this->assertCount(10, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_filter_by_term_events()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -238,7 +239,7 @@ class EventsTest extends TestCase
         $this->assertCount(10, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_filter_by_filter_events()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -272,7 +273,7 @@ class EventsTest extends TestCase
         $this->assertCount(10, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_determine_occurs_at_for_single_event()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -293,7 +294,7 @@ class EventsTest extends TestCase
         $this->assertTrue($event->occursOnDate(now()));
     }
 
-    /** @test */
+    #[Test]
     public function can_determine_occurs_at_for_multiday_event()
     {
         Carbon::setTestNow(now());
@@ -331,7 +332,7 @@ class EventsTest extends TestCase
         $this->assertFalse($event->occursOnDate(now()->addDays(3)));
     }
 
-    /** @test */
+    #[Test]
     public function can_exclude_dates()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -354,7 +355,7 @@ class EventsTest extends TestCase
         $this->assertCount(3, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_handle_empty_exclude_dates()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
@@ -377,7 +378,7 @@ class EventsTest extends TestCase
         $this->assertCount(4, $occurrences);
     }
 
-    /** @test */
+    #[Test]
     public function can_filter_our_events_with_no_start_date()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
