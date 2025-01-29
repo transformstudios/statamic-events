@@ -4,6 +4,7 @@ namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Tests\TestCase;
@@ -11,7 +12,7 @@ use TransformStudios\Events\Types\RecurringEvent;
 
 class RecurringEveryXEventsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function canCreateEveryXEvent()
     {
         $recurringEntry = Entry::make()
@@ -30,7 +31,7 @@ class RecurringEveryXEventsTest extends TestCase
         $this->assertInstanceOf(RecurringEvent::class, $event);
     }
 
-    /** @test */
+    #[Test]
     public function noOccurencesWhenNowAfterEndDate()
     {
         $recurringEntry = Entry::make()
@@ -53,7 +54,7 @@ class RecurringEveryXEventsTest extends TestCase
         $this->assertEmpty($nextOccurrences);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateOccurrenceIfNowBefore()
     {
         $startDate = Carbon::now()->addDay()->setTimeFromTimeString('11:00');
@@ -82,7 +83,7 @@ class RecurringEveryXEventsTest extends TestCase
         $this->assertEquals($startDate, $occurrences[0]->start);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateOccurrenceIfDuring()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
@@ -104,7 +105,7 @@ class RecurringEveryXEventsTest extends TestCase
         $this->assertEquals($startDate, $occurrences[0]->start);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateOccurrenceIfNowAfterFirstDate()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
@@ -133,7 +134,7 @@ class RecurringEveryXEventsTest extends TestCase
         // $this->assertEquals($startDate, $nextDate->start());
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextOccurrenceInWeeksIfNowAfterStart()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
@@ -158,7 +159,7 @@ class RecurringEveryXEventsTest extends TestCase
         $this->assertEquals($startDate->addWeeks(2), $occurrences[0]->start);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextOccurrenceIfNow_after_weeks()
     {
         $recurringEntry = Entry::make()
@@ -183,7 +184,7 @@ class RecurringEveryXEventsTest extends TestCase
         $this->assertEquals(Carbon::parse('2021-03-15')->setTimeFromTimeString('11:00:00'), $occurrences[0]->start);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextOccurrenceIfNowDuringMonths()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
@@ -208,19 +209,19 @@ class RecurringEveryXEventsTest extends TestCase
         $this->assertEquals($startDate->setTimeFromTimeString('11:00:00'), $occurrences[0]->start);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextXOccurrencesFromTodayBeforeEventTime()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
         $recurringEntry = Entry::make()
             ->collection('events')
             ->data([
-                    'start_date' => $startDate->toDateString(),
-                    'start_time' => '11:00',
-                    'end_time' => '12:00',
-                    'recurrence' => 'every',
-                    'interval' => 2,
-                    'period' => 'days',
+                'start_date' => $startDate->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'every',
+                'interval' => 2,
+                'period' => 'days',
             ]);
         $event = EventFactory::createFromEntry($recurringEntry);
 
@@ -238,7 +239,7 @@ class RecurringEveryXEventsTest extends TestCase
         $this->assertEquals($events[1], $occurrences[1]->start);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateAllOccurrencesWhenAfterStartDateDaily()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00:00');
@@ -253,7 +254,7 @@ class RecurringEveryXEventsTest extends TestCase
                 'recurrence' => 'every',
                 'interval' => 2,
                 'period' => 'days',
-        ]);
+            ]);
 
         for ($x = 1; $x <= 2; $x++) {
             $events[] = $startDate->addDays($x * 2 + 1);

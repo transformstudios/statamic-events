@@ -15,13 +15,19 @@ abstract class Event
 {
     abstract protected function rule(): RRuleInterface;
 
-    public function __construct(protected Entry $event)
-    {
-    }
+    public function __construct(protected Entry $event) {}
 
     public function __get(string $key): mixed
     {
         return $this->event->$key;
+    }
+
+    /*
+        Can remove this once https://github.com/statamic/cms/pull/11402 is released
+    */
+    public function __isset(string $key): bool
+    {
+        return isset($this->event->$key);
     }
 
     public function endTime(): string

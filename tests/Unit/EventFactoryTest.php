@@ -3,6 +3,8 @@
 namespace TransformStudios\Events\Tests\Unit;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Tests\TestCase;
@@ -12,12 +14,9 @@ use TransformStudios\Events\Types\SingleDayEvent;
 
 class EventFactoryTest extends TestCase
 {
-    /**
-     * @test
-     *
-     * @dataProvider provideEventData
-     */
-    public function canGetEventTypeClass(string $class, array $data)
+    #[Test]
+    #[DataProvider('provideEventData')]
+    public function can_get_event_type_class(string $class, array $data)
     {
         $entry = Entry::make()
             ->collection('events')
@@ -26,12 +25,9 @@ class EventFactoryTest extends TestCase
         $this->assertEquals($class, EventFactory::getTypeClass($entry));
     }
 
-    /**
-     * @test
-     *
-     * @dataProvider provideEventData
-     */
-    public function canCreateCorrectEventType(string $class, array $data)
+    #[Test]
+    #[DataProvider('provideEventData')]
+    public function can_create_correct_event_type(string $class, array $data)
     {
         $entry = Entry::make()
             ->collection('events')

@@ -3,20 +3,18 @@
 namespace TransformStudios\Events\Tests\Feature;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry;
 use Statamic\Support\Arr;
 use TransformStudios\Events\Tags\Events;
-use TransformStudios\Events\Tests\PreventSavingStacheItemsToDisk;
 use TransformStudios\Events\Tests\TestCase;
 
 class TagTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
-
     private Events $tag;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -36,8 +34,8 @@ class TagTest extends TestCase
         $this->tag = app(Events::class);
     }
 
-    /** @test */
-    public function canGenerateBetweenOccurrences()
+    #[Test]
+    public function can_generate_between_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -54,8 +52,8 @@ class TagTest extends TestCase
         $this->assertCount(4, $occurrences);
     }
 
-    /** @test */
-    public function canGenerateBetweenOccurrencesWithDefaultFrom()
+    #[Test]
+    public function can_generate_between_occurrences_with_default_from()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -71,8 +69,8 @@ class TagTest extends TestCase
         $this->assertCount(4, $occurrences);
     }
 
-    /** @test */
-    public function canGenerateCalendarOccurrences()
+    #[Test]
+    public function can_generate_calendar_occurrences()
     {
         Carbon::setTestNow('jan 1, 2022 10:00');
 
@@ -116,8 +114,8 @@ class TagTest extends TestCase
         $this->assertCount(1, Arr::get($occurrences, '13.dates'));
     }
 
-    /** @test */
-    public function canGenerateInOccurrences()
+    #[Test]
+    public function can_generate_in_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -133,8 +131,8 @@ class TagTest extends TestCase
         $this->assertCount(4, $occurrences);
     }
 
-    /** @test */
-    public function canGenerateTodayOccurrences()
+    #[Test]
+    public function can_generate_today_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('12:01'));
 
@@ -166,8 +164,8 @@ class TagTest extends TestCase
         $this->assertCount(1, $this->tag->today());
     }
 
-    /** @test */
-    public function canGenerateUpcomingOccurrences()
+    #[Test]
+    public function can_generate_upcoming_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -183,8 +181,8 @@ class TagTest extends TestCase
         $this->assertCount(3, $occurrences);
     }
 
-    /** @test */
-    public function canGenerateUpcomingLimitedOccurrences()
+    #[Test]
+    public function can_generate_upcoming_limited_occurrences()
     {
         Entry::make()
             ->collection('events')
@@ -212,8 +210,8 @@ class TagTest extends TestCase
         $this->assertCount(3, $occurrences);
     }
 
-    /** @test */
-    public function canPaginateUpcomingOccurrences()
+    #[Test]
+    public function can_paginate_upcoming_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -240,8 +238,8 @@ class TagTest extends TestCase
         $this->assertEquals('/events?page=2', $pagination['paginate']['next_page']);
     }
 
-    /** @test */
-    public function canGenerateUpcomingOccurrencesWithTaxonomyTerms()
+    #[Test]
+    public function can_generate_upcoming_occurrences_with_taxonomy_terms()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -270,8 +268,8 @@ class TagTest extends TestCase
         $this->assertCount(1, $occurrences);
     }
 
-    /** @test */
-    public function canGenerateUpcomingOccurrencesWithFilter()
+    #[Test]
+    public function can_generate_upcoming_occurrences_with_filter()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -300,8 +298,8 @@ class TagTest extends TestCase
         $this->assertCount(1, $occurrences);
     }
 
-    /** @test */
-    public function canGenerateDateEventDownloadLink()
+    #[Test]
+    public function can_generate_date_event_download_link()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -318,8 +316,8 @@ class TagTest extends TestCase
         $this->assertEquals('http://localhost/!/events/ics?collection=events&date='.now()->toDateString().'&event=recurring-event', $url);
     }
 
-    /** @test */
-    public function canGenerateEventDownloadLink()
+    #[Test]
+    public function can_generate_event_download_link()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -335,8 +333,8 @@ class TagTest extends TestCase
         $this->assertEquals('http://localhost/!/events/ics?collection=events&event=recurring-event', $url);
     }
 
-    /** @test */
-    public function canSortOccurrencesDesc()
+    #[Test]
+    public function can_sort_occurrences_desc()
     {
 
         $this->tag
