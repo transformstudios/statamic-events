@@ -36,22 +36,14 @@ fields:
       unless:
         recurrence: 'equals multi_day'
   -
-    handle: by_day
-    field:
-      type: toggle
-      display: 'By Day'
-      width: 25
-      if:
-        recurrence: 'equals monthly'
-  -
     handle: specific_days
     field:
       dictionary: month_day_recurrence
       type: dictionary
       display: 'Which Day(s)'
-      width: 75
+      width: 100
       if:
-        by_day: 'equals true'
+        recurrence: 'equals monthly'
   -
     handle: interval
     field:
