@@ -151,15 +151,6 @@ class MultiDayEventsTest extends TestCase
     }
 
     #[Test]
-    public function canGenerateICalendar()
-    {
-        $this->markTestSkipped('revisit');
-        $events = $this->event->toICalendarEvents();
-
-        dd($events);
-    }
-
-    #[Test]
     public function dayIsAllDayWhenNoStartAndEndTime()
     {
         $days = $this->allDayEvent->days();
