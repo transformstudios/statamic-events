@@ -31,6 +31,7 @@ You can also use our sample fieldset by importing `events::event`.
 
 * all the single day fields
 * `recurrence` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`, `every`
+* `specific_days` - **Optional** - when `recurrence` is `monthly`, you can choose options like every 3rd Tuesday, etc. You can have more than one.
 * `interval` - **Optional** - required if `recurrence` is `every` and indicates the frequency of the event
 * `period` - **Optional** - required if `recurrence` is `every` and indicates the period of recurrence. One of `days`, `weeks`, `months`, `years`
 * `end_date` - **Optional** - when is the last event. If `recurrence` is set and this is not, the event goes on forever
