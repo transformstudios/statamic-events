@@ -14,17 +14,6 @@ fields:
       width: 33
       display: Recurrence
       default: none
-      instructions_position: above
-      listable: hidden
-      visibility: visible
-      replicator_preview: true
-      taggable: false
-      push_tags: false
-      multiple: false
-      clearable: false
-      searchable: true
-      cast_booleans: false
-      hide_display: false
   -
     handle: timezone
     field:
@@ -36,9 +25,6 @@ fields:
       cast_booleans: false
       display: Timezone
       type: timezones
-      icon: select
-      listable: hidden
-      instructions_position: above
       mode: typeahead
       width: 33
   -
@@ -47,14 +33,25 @@ fields:
       type: toggle
       width: 33
       display: 'All Day?'
-      instructions_position: above
-      listable: hidden
-      visibility: visible
-      replicator_preview: true
-      default: false
-      hide_display: false
       unless:
         recurrence: 'equals multi_day'
+  -
+    handle: by_day
+    field:
+      type: toggle
+      display: 'By Day'
+      width: 25
+      if:
+        recurrence: 'equals monthly'
+  -
+    handle: specific_days
+    field:
+      dictionary: month_day_recurrence
+      type: dictionary
+      display: 'Which Day(s)'
+      width: 75
+      if:
+        by_day: 'equals true'
   -
     handle: interval
     field:
@@ -85,18 +82,8 @@ fields:
       input_format: M/D/YYYY
       width: 50
       display: 'Start Date'
-      instructions_position: above
-      listable: hidden
-      visibility: visible
-      replicator_preview: true
-      mode: single
       inline: true
       full_width: true
-      columns: 1
-      rows: 1
-      time_enabled: false
-      time_seconds_enabled: false
-      hide_display: false
       unless_any:
         multi_day: 'equals true'
         recurrence: 'equals multi_day'
@@ -110,19 +97,9 @@ fields:
       input_format: M/D/YYYY
       display: 'End Date'
       width: 50
-      listable: hidden
-      mode: single
-      time_enabled: false
       time_required: false
       full_width: true
       inline: true
-      columns: 1
-      rows: 1
-      instructions_position: above
-      visibility: visible
-      replicator_preview: true
-      time_seconds_enabled: false
-      hide_display: false
       if:
         recurrence: 'contains_any daily, weekly, monthly, every'
   -
@@ -132,12 +109,6 @@ fields:
       width: 25
       display: 'Start Time'
       instructions: 'Input in [24-hour format](https://en.wikipedia.org/wiki/24-hour_clock)'
-      instructions_position: above
-      listable: hidden
-      visibility: visible
-      replicator_preview: true
-      seconds_enabled: false
-      hide_display: false
       unless_any:
         multi_day: 'equals true'
         all_day: 'equals true'
@@ -149,12 +120,6 @@ fields:
       width: 25
       display: 'End Time'
       instructions: 'Input in [24-hour format](https://en.wikipedia.org/wiki/24-hour_clock)'
-      instructions_position: above
-      listable: hidden
-      visibility: visible
-      replicator_preview: true
-      seconds_enabled: false
-      hide_display: false
       unless_any:
         multi_day: 'equals true'
         all_day: 'equals true'
@@ -163,7 +128,12 @@ fields:
     handle: days
     field:
       type: grid
-      mode: table
+      display: 'Event Days'
+      add_row: 'Add Day'
+      min_rows: 1
+      if_any:
+        multi_day: 'equals true'
+        recurrence: 'equals multi_day'
       fields:
         -
           handle: date
@@ -210,24 +180,14 @@ fields:
           field: 'events::event.all_day'
           config:
             width: 25
-      display: 'Event Days'
-      add_row: 'Add Day'
-      listable: hidden
-      reorderable: true
-      instructions_position: above
-      visibility: visible
-      replicator_preview: true
-      min_rows: 1
-      fullscreen: true
-      hide_display: false
-      if_any:
-        multi_day: 'equals true'
-        recurrence: 'equals multi_day'
   -
     handle: exclude_dates
     field:
       type: grid
-      mode: table
+      display: 'Exclude Days'
+      add_row: 'Add Day'
+      if_any:
+        recurrence: 'contains_any monthly, daily, weekly, every'
       fields:
         -
           handle: date
@@ -238,14 +198,3 @@ fields:
             require_time: false
             input_format: M/D/YYYY
             display: Date
-      display: 'Exclude Days'
-      add_row: 'Add Day'
-      listable: hidden
-      reorderable: true
-      instructions_position: above
-      visibility: visible
-      replicator_preview: true
-      fullscreen: true
-      hide_display: false
-      if_any:
-        recurrence: 'contains_any monthly, daily, weekly, every'
