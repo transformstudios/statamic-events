@@ -14,7 +14,7 @@ use TransformStudios\Events\Types\SingleDayEvent;
 class RecurringEventsTest extends TestCase
 {
     #[Test]
-    public function canCreateRecurringEvent()
+    public function can_create_recurring_event()
     {
         $recurringEntry = Entry::make()
             ->collection('events')
@@ -32,7 +32,7 @@ class RecurringEventsTest extends TestCase
     }
 
     #[Test]
-    public function wontCreateRecurringEventWhenMultiDay()
+    public function wont_create_recurring_event_when_multi_day()
     {
         $recurringEntry = Entry::make()
             ->collection('events')
@@ -50,7 +50,7 @@ class RecurringEventsTest extends TestCase
     }
 
     #[Test]
-    public function canShowLastOccurrenceWhenNoEndTime()
+    public function can_show_last_occurrence_when_no_end_time()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
