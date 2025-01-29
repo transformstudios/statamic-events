@@ -2,6 +2,7 @@
 
 namespace TransformStudios\Events\Types;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use RRule\RRule;
 use RRule\RRuleInterface;
@@ -11,6 +12,11 @@ use Spatie\IcalendarGenerator\ValueObjects\RRule as ICalendarRule;
 
 class RecurringEvent extends Event
 {
+    public function onSpecificDays(): array
+    {
+        return $this->specific_days ?? [];
+    }
+
     public function interval(): int
     {
         return $this->interval ?? 1;
@@ -42,6 +48,10 @@ class RecurringEvent extends Event
 
         if ($end = $this->end_date) {
             $rule['until'] = Carbon::parse($end)->shiftTimezone($this->timezone['timezone'])->endOfDay();
+        }
+
+        if (! empty($days = $this->onSpecificDays())) {
+            $rule['byday'] = Arr::pluck($days, 'rrule');
         }
 
         return new RRule($rule);
