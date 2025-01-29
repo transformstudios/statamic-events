@@ -44,13 +44,13 @@ class MonthDayRecurrence extends BasicDictionary
             ['label' => 'Fifth Thursday', 'value' => 'fifth_thursday', 'rrule' => '5TH'],
             ['label' => 'Fifth Friday', 'value' => 'fifth_friday', 'rrule' => '5FR'],
             ['label' => 'Fifth Saturday', 'value' => 'fifth_saturday', 'rrule' => '5SA'],
-            ['label' => 'Last Sunday', 'value' => 'last_sunday', 'rrule' => '-1 SU'],
-            ['label' => 'Last Monday', 'value' => 'last_monday', 'rrule' => '-1 MO'],
-            ['label' => 'Last Tuesday', 'value' => 'last_tuesday', 'rrule' => '-1 TU'],
-            ['label' => 'Last Wednesday', 'value' => 'last_wednesday', 'rrule' => '-1 WE'],
-            ['label' => 'Last Thursday', 'value' => 'last_thursday', 'rrule' => '-1 TH'],
-            ['label' => 'Last Friday', 'value' => 'last_friday', 'rrule' => '-1 FR'],
-            ['label' => 'Last Saturday', 'value' => 'last_saturday', 'rrule' => '-1 SA'],
+            ['label' => 'Last Sunday', 'value' => 'last_sunday', 'rrule' => '-1SU'],
+            ['label' => 'Last Monday', 'value' => 'last_monday', 'rrule' => '-1MO'],
+            ['label' => 'Last Tuesday', 'value' => 'last_tuesday', 'rrule' => '-1TU'],
+            ['label' => 'Last Wednesday', 'value' => 'last_wednesday', 'rrule' => '-1WE'],
+            ['label' => 'Last Thursday', 'value' => 'last_thursday', 'rrule' => '-1TH'],
+            ['label' => 'Last Friday', 'value' => 'last_friday', 'rrule' => '-1FR'],
+            ['label' => 'Last Saturday', 'value' => 'last_saturday', 'rrule' => '-1SA'],
         ];
     }
 }
