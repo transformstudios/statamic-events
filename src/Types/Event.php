@@ -15,9 +15,7 @@ abstract class Event
 {
     abstract protected function rule(): RRuleInterface;
 
-    public function __construct(protected Entry $event)
-    {
-    }
+    public function __construct(protected Entry $event) {}
 
     public function __get(string $key): mixed
     {
@@ -41,7 +39,7 @@ abstract class Event
 
     public function isMultiDay(): bool
     {
-        return boolval(($this->multi_day || $this->recurrence?->value() === 'multi_day') && ! empty($this->days));
+        return boolval(($this->multi_day || $this->recurrence?->value() === 'multi_day') && count($this->days) > 0);
     }
 
     public function isRecurring(): bool
