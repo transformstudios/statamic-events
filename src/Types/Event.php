@@ -22,6 +22,11 @@ abstract class Event
         return $this->event->$key;
     }
 
+    public function __isset(string $key): bool
+    {
+        return isset($this->event->$key);
+    }
+
     public function endTime(): string
     {
         return $this->end_time ?? now()->endOfDay()->toTimeString();
@@ -39,7 +44,7 @@ abstract class Event
 
     public function isMultiDay(): bool
     {
-        return boolval(($this->multi_day || $this->recurrence?->value() === 'multi_day') && count($this->days) > 0);
+        return boolval(($this->multi_day || $this->recurrence?->value() === 'multi_day') && ! empty($this->days));
     }
 
     public function isRecurring(): bool
