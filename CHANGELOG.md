@@ -1,5 +1,17 @@
 # Changelog
 
+## v5.5.0 - 2025-01-29
+
+### 🚀 New
+
+- Support By Day recurrence [@edalzell](https://github.com/edalzell) (#101)
+- Add offset parameter [@cpswsg](https://github.com/cpswsg) (#99)
+
+### 🧰 Maintenance
+
+- Never upload assets when creating release [@edalzell](https://github.com/edalzell) (#102)
+- Get test suite running [@edalzell](https://github.com/edalzell) (#100)
+
 ## v5.4.4 - 2024-12-17
 
 ### 🐛 Fixed
