@@ -12,7 +12,7 @@ use TransformStudios\Events\Tests\TestCase;
 class EventsTest extends TestCase
 {
     /** @test */
-    public function canGenerateDatesWhenNowBeforeStart()
+    public function can_generate_dates_when_now_before_start()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -55,7 +55,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canPaginateUpcomingOccurrences()
+    public function can_paginate_upcoming_occurrences()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -92,7 +92,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canPaginateOccurrencesBetween()
+    public function can_paginate_occurrences_between()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -123,7 +123,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canFilterEvents()
+    public function can_filter_events()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -157,7 +157,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canFilterMultipleEvents()
+    public function can_filter_multiple_events()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -203,7 +203,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canFilterByTermEvents()
+    public function can_filter_by_term_events()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -239,7 +239,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canFilterByFilterEvents()
+    public function can_filter_by_filter_events()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -273,7 +273,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canDetermineOccursAtForSingleEvent()
+    public function can_determine_occurs_at_for_single_event()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -294,7 +294,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canDetermineOccursAtForMultidayEvent()
+    public function can_determine_occurs_at_for_multiday_event()
     {
         Carbon::setTestNow(now());
 
@@ -332,7 +332,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canExcludeDates()
+    public function can_exclude_dates()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -355,7 +355,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canHandleEmptyExcludeDates()
+    public function can_handle_empty_exclude_dates()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -378,7 +378,7 @@ class EventsTest extends TestCase
     }
 
     /** @test */
-    public function canFilterOurEventsWithNoStartDate()
+    public function can_filter_our_events_with_no_start_date()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 

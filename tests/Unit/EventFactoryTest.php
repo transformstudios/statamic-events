@@ -17,7 +17,7 @@ class EventFactoryTest extends TestCase
      *
      * @dataProvider provideEventData
      */
-    public function canGetEventTypeClass(string $class, array $data)
+    public function can_get_event_type_class(string $class, array $data)
     {
         $entry = Entry::make()
             ->collection('events')
@@ -31,7 +31,7 @@ class EventFactoryTest extends TestCase
      *
      * @dataProvider provideEventData
      */
-    public function canCreateCorrectEventType(string $class, array $data)
+    public function can_create_correct_event_type(string $class, array $data)
     {
         $entry = Entry::make()
             ->collection('events')

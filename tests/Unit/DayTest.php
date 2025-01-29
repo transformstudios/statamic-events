@@ -9,7 +9,7 @@ use TransformStudios\Events\Tests\TestCase;
 class DayTest extends TestCase
 {
     /** @test */
-    public function canGetEndWhenNoEndTime()
+    public function can_get_end_when_no_end_time()
     {
         $dayData = [
             'date' => '2019-11-23',
@@ -25,7 +25,7 @@ class DayTest extends TestCase
     }
 
     /** @test */
-    public function hasNoEndTimeWhenNoEndTime()
+    public function has_no_end_time_when_no_end_time()
     {
         $dayData = [
             'date' => '2019-11-23',

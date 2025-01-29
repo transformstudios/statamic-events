@@ -4,14 +4,11 @@ namespace TransformStudios\Events\Tests\Feature;
 
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Entry;
-use TransformStudios\Events\Tests\PreventSavingStacheItemsToDisk;
 use TransformStudios\Events\Tests\TestCase;
 
 class IcsControllerTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
-
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -29,7 +26,7 @@ class IcsControllerTest extends TestCase
     }
 
     /** @test */
-    public function canCreateSingleDayEventIcsFile()
+    public function can_create_single_day_event_ics_file()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -43,7 +40,7 @@ class IcsControllerTest extends TestCase
     }
 
     /** @test */
-    public function canCreateSingleDayRecurringEventIcsFile()
+    public function can_create_single_day_recurring_event_ics_file()
     {
         Carbon::setTestNow(now()->addDay()->setTimeFromTimeString('10:00'));
 
@@ -73,7 +70,7 @@ class IcsControllerTest extends TestCase
     }
 
     /** @test */
-    public function canCreateSingleDayMultidayEventIcsFile()
+    public function can_create_single_day_multiday_event_ics_file()
     {
         Carbon::setTestNow(now());
 
@@ -117,7 +114,7 @@ class IcsControllerTest extends TestCase
     }
 
     /** @test */
-    public function throws404ErrorWhenEventDoesNotOccurOnDate()
+    public function throws404_error_when_event_does_not_occur_on_date()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -128,7 +125,7 @@ class IcsControllerTest extends TestCase
     }
 
     /** @test */
-    public function throws404ErrorWhenEventDoesNotExist()
+    public function throws404_error_when_event_does_not_exist()
     {
         Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
