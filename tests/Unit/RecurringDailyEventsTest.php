@@ -4,13 +4,14 @@ namespace TransformStudios\Events\Tests\Unit;
 
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
+use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Tests\TestCase;
 
 class RecurringDailyEventsTest extends TestCase
 {
-    /** @test */
+    #[Test]
     public function nullNextDateIfNowAfterEndDate()
     {
         $recurringEntry = Entry::make()
@@ -31,7 +32,7 @@ class RecurringDailyEventsTest extends TestCase
         $this->assertEmpty($nextOccurrences);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextDayIfNowIsBefore()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');
@@ -56,7 +57,7 @@ class RecurringDailyEventsTest extends TestCase
         $this->assertEquals($startDate, $nextOccurrences->first()->start);
     }
 
-    /** @test */
+    #[Test]
     public function canGenerateNextOccurrenceIfNowIsDuring()
     {
         $startDate = CarbonImmutable::now()->setTimeFromTimeString('11:00');

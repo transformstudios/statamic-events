@@ -3,13 +3,14 @@
 namespace TransformStudios\Events\Tests\Unit;
 
 use Illuminate\Support\Carbon;
+use PHPUnit\Framework\Attributes\Test;
 use TransformStudios\Events\Day;
 use TransformStudios\Events\Tests\TestCase;
 
 class DayTest extends TestCase
 {
-    /** @test */
-    public function canGetEndWhenNoEndTime()
+    #[Test]
+    public function can_get_end_when_no_end_time()
     {
         $dayData = [
             'date' => '2019-11-23',
@@ -24,8 +25,8 @@ class DayTest extends TestCase
         );
     }
 
-    /** @test */
-    public function hasNoEndTimeWhenNoEndTime()
+    #[Test]
+    public function has_no_end_time_when_no_end_time()
     {
         $dayData = [
             'date' => '2019-11-23',
