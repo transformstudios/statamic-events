@@ -110,7 +110,7 @@ abstract class Event
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
 
         if ($location = $this->event->location) {
-            $iCalEvent->address($location);
+            $iCalEvent->address($location['label']);
         }
 
         return $iCalEvent;
