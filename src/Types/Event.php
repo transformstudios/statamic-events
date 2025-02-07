@@ -109,7 +109,7 @@ abstract class Event
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
 
-        if ($location = $this->event->location) {
+        if ($location = $this->location($this->event)) {
             $iCalEvent->address($location);
         }
 
@@ -124,6 +124,15 @@ abstract class Event
         return [
             $this->toICalendarEvent($this->start()),
         ];
+    }
+
+    protected function location(Entry $event): ?string
+    {
+        $collectionHandle = $event->collectionHandle();
+
+        $locationField = config("events.collections.$collectionHandle.location_field", 'location');
+
+        return $event->{$locationField};
     }
 
     protected function supplement(CarbonInterface $date): ?Entry

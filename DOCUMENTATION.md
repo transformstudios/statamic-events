@@ -12,6 +12,16 @@ If you'd like to have a different event timezone default than the app default (u
 
 The default collection for your events is `events`, if you use a different one, publish the config file and then update it via the CP.
 
+For the ICS downloads, you can have a "location" field. By default Events uses a field named 'location' but if you need something different add it to the config:
+
+```php
+    'collections' => [
+        'events' => [
+            'location_field' => 'your_location_field',
+        ],
+    ],
+```
+
 ## Fieldset
 
 In your collection's blueprint, make sure you have fields like in our sample [fieldset](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml).
@@ -218,7 +228,7 @@ Tag pair that returns the next X event dates.
 
 ### Download Links
 
-Single Tag returns a url to the event data and add it to your calendar.
+Single Tag returns a url to the event data and add it to your calendar. If there's a "location" field (see config above), it'll get added to the download.
 
 Parameters:
 
