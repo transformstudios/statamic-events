@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.6.0 - 2025-02-07
+
+### 🚀 New
+
+- Make `location` field configurable [@edalzell](https://github.com/edalzell) (#104)
+
 ## v5.5.0 - 2025-01-29
 
 ### 🚀 New
