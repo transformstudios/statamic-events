@@ -132,7 +132,7 @@ abstract class Event
 
         $locationField = config("events.collections.$collectionHandle.location_field", 'location');
 
-        return $event->get($locationField);
+        return $event->{$locationField};
     }
 
     protected function supplement(CarbonInterface $date): ?Entry
