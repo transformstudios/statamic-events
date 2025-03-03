@@ -33,11 +33,6 @@ class MultiDayEventsTest extends TestCase
                 'recurrence' => 'multi_day',
                 'days' => [
                     [
-                        'date' => '2019-11-23',
-                        'start_time' => '19:00',
-                        'end_time' => '21:00',
-                    ],
-                    [
                         'date' => '2019-11-24',
                         'start_time' => '11:00',
                         'end_time' => '15:00',
@@ -46,6 +41,11 @@ class MultiDayEventsTest extends TestCase
                         'date' => '2019-11-25',
                         'start_time' => '11:00',
                         'end_time' => '15:00',
+                    ],
+                    [
+                        'date' => '2019-11-23',
+                        'start_time' => '19:00',
+                        'end_time' => '21:00',
                     ],
                 ],
                 'timezone' => 'America/Vancouver',
