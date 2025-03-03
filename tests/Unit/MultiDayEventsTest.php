@@ -33,11 +33,6 @@ class MultiDayEventsTest extends TestCase
                 'recurrence' => 'multi_day',
                 'days' => [
                     [
-                        'date' => '2019-11-23',
-                        'start_time' => '19:00',
-                        'end_time' => '21:00',
-                    ],
-                    [
                         'date' => '2019-11-24',
                         'start_time' => '11:00',
                         'end_time' => '15:00',
@@ -46,6 +41,11 @@ class MultiDayEventsTest extends TestCase
                         'date' => '2019-11-25',
                         'start_time' => '11:00',
                         'end_time' => '15:00',
+                    ],
+                    [
+                        'date' => '2019-11-23',
+                        'start_time' => '19:00',
+                        'end_time' => '21:00',
                     ],
                 ],
                 'timezone' => 'America/Vancouver',
@@ -115,6 +115,23 @@ class MultiDayEventsTest extends TestCase
         $this->assertEquals(
             Carbon::parse('2019-11-20 0:00')->shiftTimezone('America/Vancouver')->timezone,
             $this->event->start()->timezone
+        );
+    }
+
+    #[Test]
+    public function canGetEnd()
+    {
+        $this->assertEquals(
+            Carbon::parse('2019-11-25 15:00')->shiftTimezone('America/Vancouver'),
+            $this->event->end()
+        );
+        $this->assertEquals(
+            Carbon::parse('2019-11-21 23:59:59.999999')->shiftTimezone('America/Vancouver'),
+            $this->allDayEvent->end()
+        );
+        $this->assertEquals(
+            Carbon::parse('2019-11-21 23:59:00')->shiftTimezone('America/Vancouver')->timezone,
+            $this->event->end()->timezone
         );
     }
 
