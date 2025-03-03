@@ -1,5 +1,16 @@
 # Changelog
 
+## v5.6.1 - 2025-03-03
+
+### 🐛 Fixed
+
+- Make sure multi-day event days are in order [@edalzell](https://github.com/edalzell) (#109)
+- Restrict to Carbon v2 [@edalzell](https://github.com/edalzell) (#108)
+
+### 🧰 Maintenance
+
+- Update cache action [@edalzell](https://github.com/edalzell) (#107)
+
 ## v5.6.0 - 2025-02-07
 
 ### 🚀 New
