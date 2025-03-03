@@ -119,6 +119,23 @@ class MultiDayEventsTest extends TestCase
     }
 
     #[Test]
+    public function canGetEnd()
+    {
+        $this->assertEquals(
+            Carbon::parse('2019-11-25 15:00')->shiftTimezone('America/Vancouver'),
+            $this->event->end()
+        );
+        $this->assertEquals(
+            Carbon::parse('2019-11-21 23:59:59.999999')->shiftTimezone('America/Vancouver'),
+            $this->allDayEvent->end()
+        );
+        $this->assertEquals(
+            Carbon::parse('2019-11-21 23:59:00')->shiftTimezone('America/Vancouver')->timezone,
+            $this->event->end()->timezone
+        );
+    }
+
+    #[Test]
     public function noOccurrencesIfNowAfterEndDate()
     {
         Carbon::setTestNow('2019-11-26');
