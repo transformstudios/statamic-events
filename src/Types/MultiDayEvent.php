@@ -22,6 +22,7 @@ class MultiDayEvent extends Event
         parent::__construct($event);
 
         $this->days = collect($this->event->days)
+            ->sortBy('date')
             ->map(fn (Values $day) => new Day(
                 $day->all(),
                 $this->timezone['timezone'],
