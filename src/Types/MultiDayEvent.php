@@ -62,7 +62,10 @@ class MultiDayEvent extends Event
         return ICalendarEvent::create($this->event->title)
             ->uniqueIdentifier($this->event->id())
             ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
-            ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
+            ->endsAt($immutableDate->setTimeFromTimeString($day->end()))
+            ->address($this->location($this->event))
+            ->description($this->event->description)
+            ->url($this->event->link);
     }
 
     /**
@@ -87,7 +90,7 @@ class MultiDayEvent extends Event
         }
 
         return tap(
-            new RSet(),
+            new RSet,
             fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([
                 'count' => 1,
                 'dtstart' => $day->end()->subSecond(),
