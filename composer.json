@@ -37,7 +37,6 @@
     "require": {
         "php": "^8.2",
         "edalzell/forma": "^2.0 || ^3.0",
-        "laravel/framework": "^9.6 || ^10.11 || ^11.0",
         "nesbot/carbon": "^2.0",
         "rlanvin/php-rrule": "^2.3.1",
         "spatie/calendar-links": "^1.0",
