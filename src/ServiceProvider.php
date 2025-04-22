@@ -56,8 +56,6 @@ class ServiceProvider extends AddonServiceProvider
     {
         Carbon::setLocale(Site::current()->locale());
 
-        $weekStartDay = Carbon::getTranslator()->trans(id: 'first_day_of_week', locale: Site::current()->locale());
-
         /*
          Using these deprecated methods because I couldn't figure out another way to
          have the weekstart set based on the current locale.
@@ -65,6 +63,11 @@ class ServiceProvider extends AddonServiceProvider
          When the next version of Carbon is released, it should be set properly: https://github.com/briannesbitt/Carbon/issues/2539#issuecomment-1037257768
 
         */
+
+        if (is_string($weekStartDay = Carbon::getTranslator()->trans(id: 'first_day_of_week', locale: Site::current()->locale()))) {
+            $weekStartDay = 0;
+        }
+
         Carbon::setWeekStartsAt(day: $weekStartDay);
         Carbon::setWeekEndsAt(day: ($weekStartDay + 6) % 7);
 
