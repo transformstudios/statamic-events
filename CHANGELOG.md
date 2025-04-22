@@ -1,5 +1,12 @@
 # Changelog
 
+## v5.6.2 - 2025-04-22
+
+### 🐛 Fixed
+
+- [5.x] Add support for PHP 8.4 & Laravel 12 [@edalzell](https://github.com/edalzell) (#112)
+- Default first day of week to Sunday [@edalzell](https://github.com/edalzell) (#113)
+
 ## v5.6.1 - 2025-03-03
 
 ### 🐛 Fixed
