@@ -27,8 +27,6 @@ class RecurringEvent extends Event
      */
     public function toICalendarEvents(): array
     {
-        $timezone = $this->timezone['timezone'];
-
         return [
             ICalendarEvent::create($this->event->title)
                 ->uniqueIdentifier($this->event->id())
