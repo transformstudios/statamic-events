@@ -32,6 +32,9 @@ class RecurringEvent extends Event
                 ->uniqueIdentifier($this->event->id())
                 ->startsAt($this->start())
                 ->endsAt($this->end())
+                ->address($this->location($this->event))
+                ->description($this->event->description)
+                ->url($this->event->link)
                 ->rrule($this->spatieRule()),
         ];
     }
