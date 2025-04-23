@@ -109,8 +109,16 @@ abstract class Event
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
 
-        if ($location = $this->location($this->event)) {
+        if (!is_null($location = $this->location($this->event))) {
             $iCalEvent->address($location);
+        }
+
+        if (!is_null($description = $this->event->description)) {
+            $iCalEvent->description($description);
+        }
+
+        if (!is_null($link = $this->event->link)) {
+            $iCalEvent->url($link);
         }
 
         return $iCalEvent;

@@ -23,6 +23,8 @@ class IcsControllerTest extends TestCase
                 'start_time' => '11:00',
                 'end_time' => '12:00',
                 'location' => 'The Location',
+                'description' => 'The description',
+                'link' => 'https://transformstudios.com'
             ])->save();
     }
 
@@ -38,6 +40,8 @@ class IcsControllerTest extends TestCase
 
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
         $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
+        $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
+        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
     }
 
     #[Test]
@@ -55,6 +59,9 @@ class IcsControllerTest extends TestCase
                 'start_time' => '11:00',
                 'end_time' => '12:00',
                 'recurrence' => 'weekly',
+                'location' => 'The Location',
+                'description' => 'The description',
+                'link' => 'https://transformstudios.com'
             ])->save();
 
         $response = $this->get(route('statamic.events.ics.show', [
@@ -63,6 +70,9 @@ class IcsControllerTest extends TestCase
         ]))->assertDownload('recurring-event.ics');
 
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
+        $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
+        $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
+        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
 
         $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),
@@ -71,17 +81,84 @@ class IcsControllerTest extends TestCase
     }
 
     #[Test]
+    public function can_create_ics_with_single_date_recurrence()
+    {
+        Carbon::setTestNow(now()->addDay()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->collection('events')
+            ->slug('recurring-event')
+            ->id('the-recurring-id')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'weekly',
+                'location' => 'The Location',
+                'description' => 'The description',
+                'link' => 'https://transformstudios.com'
+            ])->save();
+
+        $response = $this->get(route('statamic.events.ics.show', [
+            'date' => now()->toDateString(),
+            'event' => 'the-recurring-id',
+        ]))->assertDownload('recurring-event.ics');
+
+
+        $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
+        $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
+        $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
+        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
+
+    }
+
+    #[Test]
+    public function can_create_ics_with_recurrence()
+    {
+        Carbon::setTestNow(now()->addDay()->setTimeFromTimeString('10:00'));
+
+        Entry::make()
+            ->collection('events')
+            ->slug('recurring-event')
+            ->id('the-recurring-id')
+            ->data([
+                'title' => 'Recurring Event',
+                'start_date' => Carbon::now()->toDateString(),
+                'start_time' => '11:00',
+                'end_time' => '12:00',
+                'recurrence' => 'weekly',
+                'location' => 'The Location',
+                'description' => 'The description',
+                'link' => 'https://transformstudios.com'
+            ])->save();
+
+        $response = $this->get(route('statamic.events.ics.show', [
+            'event' => 'the-recurring-id',
+        ]))->assertDownload('recurring-event.ics');
+
+        $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
+        $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
+        $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
+        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
+
+    }
+
+    #[Test]
     public function can_create_single_day_multiday_event_ics_file()
     {
         Carbon::setTestNow(now());
 
-        $entry = Entry::make()
+        Entry::make()
             ->slug('multi-day-event')
             ->collection('events')
             ->id('the-multi-day-event')
             ->data([
                 'title' => 'Multi-day Event',
                 'multi_day' => true,
+                'location' => 'The Location',
+                'description' => 'The description',
+                'link' => 'https://transformstudios.com',
                 'days' => [
                     [
                         'date' => now()->toDateString(),
@@ -112,6 +189,10 @@ class IcsControllerTest extends TestCase
         ]))->assertDownload('multi-day-event.ics');
 
         $this->assertStringContainsString('DTSTART:'.now()->addDay()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
+        $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
+        $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
+        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
+
     }
 
     #[Test]

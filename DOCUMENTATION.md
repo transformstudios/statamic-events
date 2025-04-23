@@ -228,7 +228,10 @@ Tag pair that returns the next X event dates.
 
 ### Download Links
 
-Single Tag returns a url to the event data and add it to your calendar. If there's a "location" field (see config above), it'll get added to the download.
+Single Tag returns a url to the event data and add it to your calendar. The following fields will be added to the ICS if they exist:
+  * `location` (see config above)
+  * `description`
+  * `link`
 
 Parameters:
 
