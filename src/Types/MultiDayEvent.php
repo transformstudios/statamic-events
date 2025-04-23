@@ -59,13 +59,24 @@ class MultiDayEvent extends Event
         $immutableDate = $this->toCarbonImmutable($date);
         $day = $this->getDayFromDate($immutableDate);
 
-        return ICalendarEvent::create($this->event->title)
+        $iCalEvent = ICalendarEvent::create($this->event->title)
             ->uniqueIdentifier($this->event->id())
             ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
-            ->endsAt($immutableDate->setTimeFromTimeString($day->end()))
-            ->address($this->location($this->event))
-            ->description($this->event->description)
-            ->url($this->event->link);
+            ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
+
+        if (! is_null($location = $this->location($this->event))) {
+            $iCalEvent->address($location);
+        }
+
+        if (! is_null($description = $this->event->description)) {
+            $iCalEvent->description($description);
+        }
+
+        if (! is_null($link = $this->event->link)) {
+            $iCalEvent->url($link);
+        }
+
+        return $iCalEvent;
     }
 
     /**

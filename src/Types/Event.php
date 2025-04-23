@@ -103,14 +103,25 @@ abstract class Event
 
         $immutableDate = $this->toCarbonImmutable($date);
 
-        return ICalendarEvent::create($this->event->title)
+        $iCalEvent = ICalendarEvent::create($this->event->title)
             ->withoutTimezone()
             ->uniqueIdentifier($this->event->id())
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
-            ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()))
-            ->address($this->location($this->event))
-            ->description($this->event->description)
-            ->url($this->event->link);
+            ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
+
+        if (!is_null($location = $this->location($this->event))) {
+            $iCalEvent->address($location);
+        }
+
+        if (!is_null($description = $this->event->description)) {
+            $iCalEvent->description($description);
+        }
+
+        if (!is_null($link = $this->event->link)) {
+            $iCalEvent->url($link);
+        }
+
+        return $iCalEvent;
     }
 
     /**
