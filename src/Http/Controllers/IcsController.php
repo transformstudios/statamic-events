@@ -51,7 +51,8 @@ class IcsController extends Controller
 
         if ($entry) {
             return $this->downloadIcs(
-                EventFactory::createFromEntry($entry)->toICalendarEvents()
+                EventFactory::createFromEntry($entry)->toICalendarEvents(),
+                $entry->title
             );
         }
     }
