@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.7.0 - 2025-04-24
+
+### 🚀 New
+
+- [5.x] Add ability to set description and URL on an event [@edalzell](https://github.com/edalzell) (#111)
+
 ## v5.6.2 - 2025-04-22
 
 ### 🐛 Fixed
