@@ -22,9 +22,14 @@ class IcsControllerTest extends TestCase
                 'start_date' => Carbon::now()->toDateString(),
                 'start_time' => '11:00',
                 'end_time' => '12:00',
+                'address' => '123 Main St',
                 'location' => 'The Location',
+                'coordinates' => [
+                    'latitude' => 40,
+                    'longitude' => 50,
+                ],
                 'description' => 'The description',
-                'link' => 'https://transformstudios.com'
+                'link' => 'https://transformstudios.com',
             ])->save();
     }
 
@@ -38,10 +43,13 @@ class IcsControllerTest extends TestCase
             'event' => 'the-id',
         ]))->assertDownload('single-event.ics');
 
+        $content = $response->streamedContent();
+
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
-        $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
-        $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
-        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
+        $this->assertStringContainsString('LOCATION:123 Main St', $content);
+        $this->assertStringContainsString('DESCRIPTION:The description', $content);
+        $this->assertStringContainsString('GEO:40;50', $content);
+        $this->assertStringContainsString('URL:https://transformstudios.com', $content);
     }
 
     #[Test]
@@ -61,7 +69,7 @@ class IcsControllerTest extends TestCase
                 'recurrence' => 'weekly',
                 'location' => 'The Location',
                 'description' => 'The description',
-                'link' => 'https://transformstudios.com'
+                'link' => 'https://transformstudios.com',
             ])->save();
 
         $response = $this->get(route('statamic.events.ics.show', [
@@ -97,14 +105,13 @@ class IcsControllerTest extends TestCase
                 'recurrence' => 'weekly',
                 'location' => 'The Location',
                 'description' => 'The description',
-                'link' => 'https://transformstudios.com'
+                'link' => 'https://transformstudios.com',
             ])->save();
 
         $response = $this->get(route('statamic.events.ics.show', [
             'date' => now()->toDateString(),
             'event' => 'the-recurring-id',
         ]))->assertDownload('recurring-event.ics');
-
 
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
         $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
@@ -130,7 +137,7 @@ class IcsControllerTest extends TestCase
                 'recurrence' => 'weekly',
                 'location' => 'The Location',
                 'description' => 'The description',
-                'link' => 'https://transformstudios.com'
+                'link' => 'https://transformstudios.com',
             ])->save();
 
         $response = $this->get(route('statamic.events.ics.show', [
