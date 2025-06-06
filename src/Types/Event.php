@@ -121,10 +121,6 @@ abstract class Event
             $iCalEvent->description($description);
         }
 
-        if (! is_null($link = $this->event->link)) {
-            $iCalEvent->url($link);
-        }
-
         return $iCalEvent;
     }
 
