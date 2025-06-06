@@ -12,7 +12,13 @@ If you'd like to have a different event timezone default than the app default (u
 
 The default collection for your events is `events`, if you use a different one, publish the config file and then update it via the CP.
 
-For the ICS downloads, it will use `address`, `coordinates`, and `description` fields if they exist. If your field is named something else, use a [Computed Value](https://statamic.dev/computed-values).
+For the ICS downloads, it will use `address`, `coordinates`, and `description` fields if they exist. If your field is named something else, use a [Computed Value](https://statamic.dev/computed-values). `coordinates` must be a keyed array:
+```
+'coordinates' => [
+    'latitude' => 40,
+    'longitude' => 50,
+],
+```
 
 ## Fieldset
 
