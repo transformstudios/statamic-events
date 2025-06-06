@@ -29,7 +29,6 @@ class IcsControllerTest extends TestCase
                     'longitude' => 50,
                 ],
                 'description' => 'The description',
-                'link' => 'https://transformstudios.com',
             ])->save();
     }
 
@@ -49,7 +48,6 @@ class IcsControllerTest extends TestCase
         $this->assertStringContainsString('LOCATION:123 Main St', $content);
         $this->assertStringContainsString('DESCRIPTION:The description', $content);
         $this->assertStringContainsString('GEO:40;50', $content);
-        $this->assertStringContainsString('URL:https://transformstudios.com', $content);
     }
 
     #[Test]
@@ -69,7 +67,6 @@ class IcsControllerTest extends TestCase
                 'recurrence' => 'weekly',
                 'location' => 'The Location',
                 'description' => 'The description',
-                'link' => 'https://transformstudios.com',
             ])->save();
 
         $response = $this->get(route('statamic.events.ics.show', [
@@ -80,7 +77,6 @@ class IcsControllerTest extends TestCase
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
         $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
         $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
-        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
 
         $this->get(route('statamic.events.ics.show', [
             'date' => now()->addDay()->toDateString(),
@@ -105,7 +101,6 @@ class IcsControllerTest extends TestCase
                 'recurrence' => 'weekly',
                 'location' => 'The Location',
                 'description' => 'The description',
-                'link' => 'https://transformstudios.com',
             ])->save();
 
         $response = $this->get(route('statamic.events.ics.show', [
@@ -116,7 +111,6 @@ class IcsControllerTest extends TestCase
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
         $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
         $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
-        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
 
     }
 
@@ -137,7 +131,6 @@ class IcsControllerTest extends TestCase
                 'recurrence' => 'weekly',
                 'location' => 'The Location',
                 'description' => 'The description',
-                'link' => 'https://transformstudios.com',
             ])->save();
 
         $response = $this->get(route('statamic.events.ics.show', [
@@ -147,8 +140,6 @@ class IcsControllerTest extends TestCase
         $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
         $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
         $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
-        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
-
     }
 
     #[Test]
@@ -165,7 +156,6 @@ class IcsControllerTest extends TestCase
                 'multi_day' => true,
                 'location' => 'The Location',
                 'description' => 'The description',
-                'link' => 'https://transformstudios.com',
                 'days' => [
                     [
                         'date' => now()->toDateString(),
@@ -198,8 +188,6 @@ class IcsControllerTest extends TestCase
         $this->assertStringContainsString('DTSTART:'.now()->addDay()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
         $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
         $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
-        $this->assertStringContainsString('URL:https://transformstudios.com', $response->streamedContent());
-
     }
 
     #[Test]

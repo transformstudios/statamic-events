@@ -113,8 +113,8 @@ abstract class Event
             $iCalEvent->address($address);
         }
 
-        if (! is_null($this->event->coordinates->latitude) && ! is_null($this->event->coordinates->longitude)) {
-            $iCalEvent->coordinates($this->event->coordinates->latitude, $this->event->coordinates->longitude);
+        if (! is_null($coords = $this->event->coordinates)) {
+            $iCalEvent->coordinates($coords['latitude'], $coords['longitude']);
         }
 
         if (! is_null($description = $this->event->description)) {
