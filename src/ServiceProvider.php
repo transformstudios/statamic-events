@@ -2,6 +2,7 @@
 
 namespace TransformStudios\Events;
 
+use Composer\InstalledVersions;
 use Edalzell\Forma\Forma;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
@@ -55,6 +56,10 @@ class ServiceProvider extends AddonServiceProvider
     private function bootCarbon(): self
     {
         Carbon::setLocale(Site::current()->locale());
+
+        if (InstalledVersions::getVersion('nesbot/carbon') >= '3') {
+            return $this;
+        }
 
         /*
          Using these deprecated methods because I couldn't figure out another way to
