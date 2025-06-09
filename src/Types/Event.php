@@ -109,15 +109,19 @@ abstract class Event
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
 
-        if (!is_null($location = $this->location($this->event))) {
-            $iCalEvent->address($location);
+        if (! is_null($address = $this->event->address ?? $this->location($this->event))) {
+            $iCalEvent->address($address);
         }
 
-        if (!is_null($description = $this->event->description)) {
+        if (! is_null($coords = $this->event->coordinates)) {
+            $iCalEvent->coordinates($coords['latitude'], $coords['longitude']);
+        }
+
+        if (! is_null($description = $this->event->description)) {
             $iCalEvent->description($description);
         }
 
-        if (!is_null($link = $this->event->link)) {
+        if (! is_null($link = $this->event->link)) {
             $iCalEvent->url($link);
         }
 
