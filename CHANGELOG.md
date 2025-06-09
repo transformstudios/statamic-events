@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.8.0 - 2025-06-09
+
+### 🚀 New
+
+- Support `address` and `coordinates` fields [@edalzell](https://github.com/edalzell) (#115)
+
 ## v5.7.0 - 2025-04-24
 
 ### 🚀 New
