@@ -144,7 +144,15 @@ abstract class Event
 
         $locationField = config("events.collections.$collectionHandle.location_field", 'location');
 
-        return $event->{$locationField};
+        if (is_null($location = $event->{$locationField})) {
+            return null;
+        }
+
+        if (! is_string($location)) {
+            return null;
+        }
+
+        return $location;
     }
 
     protected function supplement(CarbonInterface $date): ?Entry
