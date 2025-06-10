@@ -37,7 +37,7 @@
     "require": {
         "php": "^8.2",
         "edalzell/forma": "^2.0 || ^3.0",
-        "nesbot/carbon": "^2.0",
+        "nesbot/carbon": "^2.0 || ^3.0",
         "rlanvin/php-rrule": "^2.3.1",
         "spatie/calendar-links": "^1.0",
         "spatie/icalendar-generator": "^2.3.3",
