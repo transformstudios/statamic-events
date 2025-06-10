@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.8.1 - 2025-06-10
+
+### 🐛 Fixed
+
+- Ensure location field is a string [@edalzell](https://github.com/edalzell) (#117)
+
 ## v5.8.0 - 2025-06-09
 
 ### 🚀 New
