@@ -1,5 +1,11 @@
 # Changelog
 
+## v5.8.2 - 2025-06-16
+
+### 🐛 Fixed
+
+- Handle Carbon v3 [@edalzell](https://github.com/edalzell) (#116)
+
 ## v5.8.1 - 2025-06-10
 
 ### 🐛 Fixed
