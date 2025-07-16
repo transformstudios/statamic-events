@@ -59,6 +59,7 @@ fields:
       options:
         days: Days
         weeks: Weeks
+        months: Months
         years: Years
       display: Period
       width: 50
