@@ -1,5 +1,16 @@
 # Changelog
 
+## v5.8.3 - 2025-08-29
+
+### 🐛 Fixed
+
+- Fix test [@edalzell](https://github.com/edalzell) (#124)
+- Timezone field not required in blueprint [@aerni](https://github.com/aerni) (#121)
+
+### 🧰 Maintenance
+
+- Update event.yaml adding Months to Period [@adampatterson](https://github.com/adampatterson) (#122)
+
 ## v5.8.2 - 2025-06-16
 
 ### 🐛 Fixed
