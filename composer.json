@@ -18,8 +18,7 @@
     },
     "require-dev": {
         "orchestra/testbench": "^9.2 || ^10.0",
-        "pestphp/pest": "4.x-dev",
-        "pestphp/pest-plugin-drift": "^4.0",
+        "pestphp/pest": "^4.0",
         "spatie/laravel-ray": "^1.35",
         "spatie/test-time": "^1.2"
     },
