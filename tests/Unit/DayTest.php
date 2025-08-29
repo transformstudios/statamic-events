@@ -1,8 +1,6 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\Attributes\Test;
 use TransformStudios\Events\Day;
 
 test('can get end when no end time', function () {

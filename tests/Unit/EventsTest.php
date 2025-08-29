@@ -1,8 +1,6 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\Attributes\Test;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;

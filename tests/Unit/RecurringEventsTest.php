@@ -1,14 +1,11 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
 use Carbon\Carbon;
-use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
 use TransformStudios\Events\Types\RecurringEvent;
 use TransformStudios\Events\Types\SingleDayEvent;
-
 
 test('can create recurring event', function () {
     $recurringEntry = Entry::make()
@@ -67,10 +64,10 @@ test('can generate monthly by day occurrences', function () {
     $recurringEntry = tap(Entry::make()
         ->collection('events')
         ->data([
-            'start_date' => ray()->pass(Carbon::now()->addDays(1)->toDateString()),
+            'start_date' => Carbon::now()->addDays(1)->toDateString(),
             'start_time' => '22:00',
             'recurrence' => 'monthly',
-            'end_date' => ray()->pass(Carbon::now()->addMonths(3)->toDateString()),
+            'end_date' => Carbon::now()->addMonths(3)->toDateString(),
             'timezone' => 'America/Chicago',
             'specific_days' => ['first_sunday', 'last_wednesday'],
         ]))->save();

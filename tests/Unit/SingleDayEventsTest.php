@@ -1,14 +1,11 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonTimeZone;
-use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Types\SingleDayEvent;
-
 
 test('can create single event', function () {
     $entry = Entry::make()

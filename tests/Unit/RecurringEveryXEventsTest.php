@@ -1,13 +1,11 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Types\RecurringEvent;
-
 
 test('can create every xevent', function () {
     $recurringEntry = Entry::make()

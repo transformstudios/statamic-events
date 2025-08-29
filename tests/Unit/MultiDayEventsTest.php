@@ -1,12 +1,9 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
 use Carbon\Carbon;
-use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Types\MultiDayEvent;
-
 
 beforeEach(function () {
     Carbon::setTestNowAndTimezone(now(), 'America/Vancouver');

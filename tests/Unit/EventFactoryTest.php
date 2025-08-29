@@ -1,15 +1,11 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Types\MultiDayEvent;
 use TransformStudios\Events\Types\RecurringEvent;
 use TransformStudios\Events\Types\SingleDayEvent;
-
 
 test('can get event type class', function (string $class, array $data) {
     $entry = Entry::make()

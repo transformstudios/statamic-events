@@ -24,7 +24,8 @@
     },
     "autoload": {
         "psr-4": {
-            "TransformStudios\\Events\\": "src"
+            "TransformStudios\\Events\\": "src",
+            "TransformStudios\\Events\\Tests\\": "tests"
         },
         "files": [
             "src/helpers.php"

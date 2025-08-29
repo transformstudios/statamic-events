@@ -1,6 +1,5 @@
 <?php
 
-uses(\TransformStudios\Events\Tests\TestCase::class);
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use PHPUnit\Framework\Attributes\Test;
