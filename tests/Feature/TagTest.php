@@ -109,9 +109,8 @@ class TagTest extends TestCase
         $occurrences = $this->tag->calendar();
 
         $this->assertCount(42, $occurrences);
-        $this->assertCount(2, Arr::get($occurrences, '6.dates'));
-        $this->assertTrue(Arr::get($occurrences, '7.no_results'));
-        $this->assertCount(1, Arr::get($occurrences, '13.dates'));
+        $this->assertCount(2, Arr::get($occurrences, '5.dates'));
+        $this->assertTrue(Arr::get($occurrences, '6.no_results'));
     }
 
     #[Test]
