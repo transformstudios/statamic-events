@@ -8,10 +8,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
+use Statamic\Fields\Field;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
-use TransformStudios\Events\Exceptions\FieldNotFoundException;
 use TransformStudios\Events\Fieldtypes\Timezones;
 use TransformStudios\Events\Modifiers\InMonth;
 use TransformStudios\Events\Modifiers\IsEndOfWeek;
@@ -81,27 +80,17 @@ class ServiceProvider extends AddonServiceProvider
 
     private function bootFields(): self
     {
-        $collectionHandle = config('events.collection', 'events');
+        Collection::computed(config('events.collection', 'events'), 'timezone', function ($entry, $value) {
+            $value ??= config('events.timezone', config('app.timezone'));
 
-        Collection::computed($collectionHandle, 'timezone', function ($entry, $value) use ($collectionHandle) {
-            if ($value) {
+            if ($entry->blueprint()->fields()->get('timezone')?->fieldtype() instanceof Timezones) {
                 return $value;
             }
 
-            $timezone = config('events.timezone', config('app.timezone'));
-
-            $collection = Collection::findByHandle($collectionHandle);
-
-            $blueprint = Arr::first($collection->entryBlueprints());
-
-            if (is_null($tzField = $blueprint->field('timezone'))) {
-                throw new FieldNotFoundException('timezone');
-            }
-
-            return $tzField
-                ->setValue($timezone)
+            return (new Field('timezone', ['type' => 'timezones', 'max_items' => 1]))
+                ->setValue($value)
+                ->setParent($entry)
                 ->augment()
-                ->value()
                 ->value();
         });
 
