@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        php: [8.2, 8.3, 8.4]
+        php: [8.3, 8.4]
         laravel: [11.*, 12.*]
         stability: [prefer-lowest, prefer-stable]
         os: [ubuntu-latest]
