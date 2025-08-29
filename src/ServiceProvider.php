@@ -3,7 +3,6 @@
 namespace TransformStudios\Events;
 
 use Composer\InstalledVersions;
-use Edalzell\Forma\Forma;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Statamic\Facades\Collection;
@@ -36,13 +35,6 @@ class ServiceProvider extends AddonServiceProvider
     protected $tags = [
         Events::class,
     ];
-
-    public function boot()
-    {
-        parent::boot();
-
-        Forma::add('transformstudios/events');
-    }
 
     public function bootAddon()
     {
