@@ -4,10 +4,12 @@ namespace TransformStudios\Events;
 
 use Carbon\CarbonInterface;
 use Exception;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Addon;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry as EntryFacade;
 use Statamic\Facades\Site;
@@ -45,17 +47,30 @@ class Events
 
     public static function fromCollection(string $handle): self
     {
-        return tap(new static())->collection($handle);
+        return tap(new static)->collection($handle);
     }
 
     public static function fromEntry(string $id): self
     {
-        return tap(new static())->event($id);
+        return tap(new static)->event($id);
     }
 
-    private function __construct()
+    public static function collectionHandles(): Collection
     {
+        return collect(static::setting('collections', ['events']))->keys();
     }
+
+    public static function setting(string $key, $default = null): mixed
+    {
+        return Addon::get('transformstudios/events')->setting($key, $default);
+    }
+
+    public static function timezone(): string
+    {
+        return static::setting('timezone', config('app.timezone'));
+    }
+
+    private function __construct() {}
 
     public function collapseMultiDays(): self
     {
