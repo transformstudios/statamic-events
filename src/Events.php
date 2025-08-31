@@ -62,7 +62,7 @@ class Events
 
     public static function setting(string $key, $default = null): mixed
     {
-        return Addon::get('transformstudios/events')->setting($key, $default);
+        return Addon::get('transformstudios/events')->settings()->get($key, $default);
     }
 
     public static function timezone(): string
