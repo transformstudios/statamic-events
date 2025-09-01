@@ -74,7 +74,7 @@ class ServiceProvider extends AddonServiceProvider
 
     private function bootFields(): self
     {
-        collect(Events::setting('collections'))
+        collect(Events::setting('collections', [['collection' => 'events']]))
             ->each(fn (array $collection) => $this
                 ->defineComputedTimezoneField($collection['collection']));
 
