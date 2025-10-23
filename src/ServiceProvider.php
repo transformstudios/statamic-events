@@ -97,7 +97,6 @@ class ServiceProvider extends AddonServiceProvider
 
     private function timezone(Entry $entry, $value): string|Value
     {
-        ray('hi');
         $value ??= Events::timezone();
 
         if ($entry->blueprint()->fields()->get('timezone')?->fieldtype() instanceof Timezones) {

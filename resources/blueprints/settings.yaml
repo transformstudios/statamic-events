@@ -11,6 +11,7 @@ tabs:
               display: Collections
               sortable: false
               add_row: 'Add Collection'
+              full_width_setting: true
               fields:
                 -
                   handle: collection
@@ -34,3 +35,4 @@ tabs:
               max_items: 1
               type: timezones
               display: Timezone
+              full_width_setting: true
