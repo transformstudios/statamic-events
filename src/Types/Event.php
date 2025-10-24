@@ -133,9 +133,7 @@ abstract class Event
      */
     public function toICalendarEvents(): array
     {
-        return [
-            $this->toICalendarEvent($this->start()),
-        ];
+        return Arr::wrap($this->toICalendarEvent($this->start()));
     }
 
     protected function location(Entry $event): ?string

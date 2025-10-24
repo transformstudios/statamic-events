@@ -25,9 +25,9 @@ class IcsController extends Controller
 
     public function __invoke(Request $request)
     {
-        $handle = $request->get('collection', 'events');
+        $handle = $request->string('collection', 'events');
         $date = $request->has('date') ? CarbonImmutable::parse($request->get('date')) : null;
-        $eventId = $request->get('event');
+        $eventId = $request->string('event');
         $entry = null;
 
         abort_if(! is_null($eventId) && is_null($entry = EntryFacade::find($eventId)), 404);
@@ -59,14 +59,13 @@ class IcsController extends Controller
 
     private function downloadIcs(ICalendarEvent|array $event, string $title = 'events')
     {
+        // have to use long function syntax so we can echo within it
         return response()->streamDownload(
             function () use ($event) {
                 echo Calendar::create()->event(Arr::wrap($event))->get();
             },
             Str::slugify($title).'.ics',
-            [
-                'Content-Type' => 'text/calendar; charset=utf-8',
-            ]
+            ['Content-Type' => 'text/calendar; charset=utf-8']
         );
     }
 }
