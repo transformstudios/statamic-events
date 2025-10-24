@@ -25,7 +25,7 @@ class IcsController extends Controller
 
     public function __invoke(Request $request)
     {
-        $handle = $request->get('collection', config('events.collection', 'events'));
+        $handle = $request->get('collection', 'events');
         $date = $request->has('date') ? CarbonImmutable::parse($request->get('date')) : null;
         $eventId = $request->get('event');
         $entry = null;

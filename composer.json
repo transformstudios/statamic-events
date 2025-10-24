@@ -15,7 +15,7 @@
         "rlanvin/php-rrule": "^2.3.1",
         "spatie/calendar-links": "^1.0",
         "spatie/icalendar-generator": "^2.3.3",
-        "statamic/cms": "6.0.0-alpha.4"
+        "statamic/cms": "^6.0.0-alpha.14"
     },
     "require-dev": {
         "orchestra/testbench": "^9.2 || ^10.0",

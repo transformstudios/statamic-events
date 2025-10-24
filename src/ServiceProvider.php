@@ -5,16 +5,18 @@ namespace TransformStudios\Events;
 use Composer\InstalledVersions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
+use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
 use TransformStudios\Events\Fieldtypes\Timezones;
 use TransformStudios\Events\Modifiers\InMonth;
 use TransformStudios\Events\Modifiers\IsEndOfWeek;
 use TransformStudios\Events\Modifiers\IsStartOfWeek;
-use TransformStudios\Events\Tags\Events;
+use TransformStudios\Events\Tags\Events as EventsTag;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -33,7 +35,7 @@ class ServiceProvider extends AddonServiceProvider
     ];
 
     protected $tags = [
-        Events::class,
+        EventsTag::class,
     ];
 
     public function bootAddon()
@@ -72,21 +74,16 @@ class ServiceProvider extends AddonServiceProvider
 
     private function bootFields(): self
     {
-        Collection::computed(config('events.collection', 'events'), 'timezone', function ($entry, $value) {
-            $value ??= config('events.timezone', config('app.timezone'));
-
-            if ($entry->blueprint()->fields()->get('timezone')?->fieldtype() instanceof Timezones) {
-                return $value;
-            }
-
-            return (new Field('timezone', ['type' => 'timezones', 'max_items' => 1]))
-                ->setValue($value)
-                ->setParent($entry)
-                ->augment()
-                ->value();
-        });
+        collect(Events::setting('collections', [['collection' => 'events']]))
+            ->each(fn (array $collection) => $this
+                ->defineComputedTimezoneField($collection['collection']));
 
         return $this;
+    }
+
+    private function defineComputedTimezoneField(string $handle): void
+    {
+        Collection::computed($handle, 'timezone', $this->timezone(...));
     }
 
     private function publishConfig(): self
@@ -96,5 +93,20 @@ class ServiceProvider extends AddonServiceProvider
         });
 
         return $this;
+    }
+
+    private function timezone(Entry $entry, $value): string|Value
+    {
+        $value ??= Events::timezone();
+
+        if ($entry->blueprint()->fields()->get('timezone')?->fieldtype() instanceof Timezones) {
+            return $value;
+        }
+
+        return (new Field('timezone', ['type' => 'timezones', 'max_items' => 1]))
+            ->setValue($value)
+            ->setParent($entry)
+            ->augment()
+            ->value();
     }
 }
