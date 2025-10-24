@@ -13,29 +13,11 @@ use Statamic\Fields\Value;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
 use TransformStudios\Events\Fieldtypes\Timezones;
-use TransformStudios\Events\Modifiers\InMonth;
-use TransformStudios\Events\Modifiers\IsEndOfWeek;
-use TransformStudios\Events\Modifiers\IsStartOfWeek;
-use TransformStudios\Events\Tags\Events as EventsTag;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    protected $fieldtypes = [
-        Timezones::class,
-    ];
-
-    protected $modifiers = [
-        InMonth::class,
-        IsEndOfWeek::class,
-        IsStartOfWeek::class,
-    ];
-
     protected $routes = [
         'actions' => __DIR__.'/../routes/actions.php',
-    ];
-
-    protected $tags = [
-        EventsTag::class,
     ];
 
     public function bootAddon()
