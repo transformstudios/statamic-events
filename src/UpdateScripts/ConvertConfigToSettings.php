@@ -4,6 +4,7 @@ namespace TransformStudios\Events\UpdateScripts;
 
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
+use Statamic\Facades\Addon;
 use Statamic\Support\Arr;
 use Statamic\UpdateScripts\UpdateScript;
 
@@ -16,7 +17,6 @@ class ConvertConfigToSettings extends UpdateScript
 
     public function update()
     {
-
         $config = Fluent::make(config('events'));
 
         if ($config->isEmpty()) {
@@ -33,20 +33,21 @@ class ConvertConfigToSettings extends UpdateScript
                     ];
                 }
 
-                $locationField = Arr::get($collection, 'location_field', 'location');
-
                 $collectionSetting = [
                     'id' => Str::random(8),
                     'collection' => $handle,
-                    'location_field' => $locationField == 'location' ? null : $locationField,
+                    'location_field' => Arr::get($collection, 'location_field', 'location'),
                 ];
 
                 return Arr::removeNullValues($collectionSetting);
             })->reject(fn (array $collection) => $collection['collection'] == 'events' && is_null(Arr::get($collection, 'location_field')))
             ->all();
 
-        $timezone = $config->timezone ?: config('app.timezone', 'UTC');
+        $timezone = $config->timezone;
 
-        return Arr::removeNullValues(compact('collections', 'timezone'));
+        Addon::get('transformstudios/events')
+            ->settings()
+            ->set(Arr::removeNullValues(compact('collections', 'timezone')))
+            ->save();
     }
 }

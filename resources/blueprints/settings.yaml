@@ -28,6 +28,10 @@ tabs:
                     display: 'Location Field'
                     width: 50
                     default: location
+              default:
+                -
+                  collection: events
+                  location_field: location
           -
             handle: timezone
             field:
@@ -36,3 +40,4 @@ tabs:
               type: timezones
               display: Timezone
               full_width_setting: true
+              default: 'UTC'
