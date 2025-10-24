@@ -1980,6 +1980,16 @@
         "name": "Ulaanbaatar Standard Time"
     },
     {
+        "timezone": "America/Danmarkshavn",
+        "abbreviation": "UTC",
+        "name": "UTC"
+    },
+    {
+        "timezone": "Etc/GMT",
+        "abbreviation": "UTC",
+        "name": "UTC"
+    },
+    {
         "timezone": "UTC",
         "abbreviation": "UTC",
         "name": "Coordinated Universal Time"
