@@ -1,5 +1,7 @@
 <?php
 
+namespace TransformStudios\Events\Tests;
+
 use Illuminate\Support\Carbon;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Entry;

@@ -1,5 +1,7 @@
 <?php
 
+namespace TransformStudios\Events\Tests\Http\Controllers;
+
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Entry;
 

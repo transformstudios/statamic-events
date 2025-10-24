@@ -1,5 +1,7 @@
 <?php
 
+namespace TransformStudios\Events\Tests\Tags;
+
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry;
@@ -310,4 +312,78 @@ test('can sort occurrences desc', function () {
 
     expect($occurrences[0]->start->isAfter($occurrences[1]->start))->toBeTrue();
     expect($occurrences[1]->start->isAfter($occurrences[2]->start))->toBeTrue();
+});
+test('can offset upcoming occurrences', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'limit' => 5,
+            'offset' => 2,
+        ]);
+
+    $occurrences = $this->tag->upcoming();
+
+    expect($occurrences)->toHaveCount(3);
+});
+
+test('can offset between occurrences', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    $this->tag->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'from' => Carbon::now()->toDateString(),
+            'to' => Carbon::now()->addWeek(3),
+            'offset' => 2,
+        ]);
+
+    $occurrences = $this->tag->between();
+
+    expect($occurrences)->toHaveCount(2);
+});
+
+test('can offset today occurrences', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('12:01'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('single-event')
+        ->data([
+            'title' => 'Single Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '13:00',
+            'end_time' => '15:00',
+        ])->save();
+
+    $this->tag->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'offset' => 1,
+        ]);
+
+    expect($this->tag->today())->toHaveCount(1);
+
+    $this->tag->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'ignore_finished' => true,
+            'offset' => 1,
+        ]);
+
+    expect($this->tag->today())->toHaveCount(0);
+});
+
+test('can offset single day occurrences', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    $this->tag->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'offset' => 1,
+        ]);
+
+    expect($this->tag->today())->toHaveCount(0);
 });
