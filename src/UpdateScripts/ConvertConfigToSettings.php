@@ -72,6 +72,7 @@ class ConvertConfigToSettings extends UpdateScript
 
                 return Arr::removeNullValues($collectionSetting);
             })->reject(fn (array $collection) => $collection['collection'] == 'events' && is_null(Arr::get($collection, 'location_field')))
+            ->values()
             ->all();
 
         $timezone = $config->timezone;
