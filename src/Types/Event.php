@@ -24,7 +24,7 @@ abstract class Event
     }
 
     /*
-        Can remove this once https://github.com/statamic/cms/pull/11402 is released
+        Can remove this once https://github.com/statamic/cms/pull/12865 is released
     */
     public function __isset(string $key): bool
     {
