@@ -24,7 +24,9 @@ abstract class Event
     }
 
     /*
-        Can remove this once https://github.com/statamic/cms/pull/12865 is released
+        This is needed so that empty($event->days) works. This is due to how PHP handles
+        `empty`: it gets translated to
+        `!$class->__isset('property') || empty($class->__get('property')))`
     */
     public function __isset(string $key): bool
     {
@@ -48,7 +50,7 @@ abstract class Event
 
     public function isMultiDay(): bool
     {
-        return boolval(($this->multi_day || $this->recurrence?->value() === 'multi_day') && ! empty($this->days));
+        return boolval(($this->multi_day || $this->recurrence?->value() === 'multi_day') && ! empty($this->days()));
     }
 
     public function isRecurring(): bool
