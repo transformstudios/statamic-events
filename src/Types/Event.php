@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use RRule\RRuleInterface;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
@@ -20,14 +21,6 @@ abstract class Event
     public function __get(string $key): mixed
     {
         return $this->event->$key;
-    }
-
-    /*
-        Can remove this once https://github.com/statamic/cms/pull/11402 is released
-    */
-    public function __isset(string $key): bool
-    {
-        return isset($this->event->$key);
     }
 
     public function endTime(): string
