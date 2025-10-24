@@ -23,6 +23,14 @@ abstract class Event
         return $this->event->$key;
     }
 
+    /*
+        Can remove this once https://github.com/statamic/cms/pull/11402 is released
+    */
+    public function __isset(string $key): bool
+    {
+        return isset($this->event->$key);
+    }
+
     public function endTime(): string
     {
         return $this->end_time ?? now()->endOfDay()->toTimeString();
