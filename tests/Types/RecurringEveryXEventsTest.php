@@ -1,8 +1,9 @@
 <?php
 
+namespace TransformStudios\Events\Tests\Types;
+
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use PHPUnit\Framework\Attributes\Test;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Types\RecurringEvent;

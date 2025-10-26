@@ -1,5 +1,7 @@
 <?php
 
+namespace TransformStudios\Events\Tests\Types;
+
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonTimeZone;

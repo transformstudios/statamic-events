@@ -1,5 +1,7 @@
 <?php
 
+namespace TransformStudios\Events\Tests;
+
 use Illuminate\Support\Carbon;
 use TransformStudios\Events\Day;
 

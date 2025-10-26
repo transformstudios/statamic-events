@@ -1,5 +1,7 @@
 <?php
 
+namespace TransformStudios\Events\Tests\Types;
+
 use Carbon\Carbon;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
