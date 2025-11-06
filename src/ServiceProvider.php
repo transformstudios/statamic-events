@@ -10,9 +10,9 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Dictionary;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
-use TransformStudios\Events\Fieldtypes\Timezones;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -81,7 +81,7 @@ class ServiceProvider extends AddonServiceProvider
     {
         $value ??= Events::timezone();
 
-        if ($entry->blueprint()->fields()->get('timezone')?->fieldtype() instanceof Timezones) {
+        if ($entry->blueprint()->fields()->get('timezone')?->fieldtype() instanceof Dictionary) {
             return $value;
         }
 

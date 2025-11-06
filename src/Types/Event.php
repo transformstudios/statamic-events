@@ -87,14 +87,14 @@ abstract class Event
     public function start(): CarbonImmutable
     {
         return CarbonImmutable::parse($this->start_date)
-            ->shiftTimezone($this->timezone['timezone'])
+            ->shiftTimezone($this->timezone['name'])
             ->setTimeFromTimeString($this->startTime());
     }
 
     public function end(): CarbonImmutable
     {
         return CarbonImmutable::parse($this->start_date)
-            ->shiftTimezone($this->timezone['timezone'])
+            ->shiftTimezone($this->timezone['name'])
             ->setTimeFromTimeString($this->endTime());
     }
 
@@ -169,14 +169,14 @@ abstract class Event
     {
         $carbon = is_string($date) ? Carbon::parse($date) : $date;
 
-        return $carbon->shiftTimezone($this->timezone['timezone'])->toImmutable();
+        return $carbon->shiftTimezone($this->timezone['name'])->toImmutable();
     }
 
     private function collect(array $dates): Collection
     {
         return collect($dates)
             ->map(fn (DateTimeInterface $date) => $this->supplement(
-                date: CarbonImmutable::parse($date, $this->timezone['timezone'])
+                date: CarbonImmutable::parse($date, $this->timezone['name'])
             ))->filter();
     }
 }
