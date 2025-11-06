@@ -2,7 +2,6 @@
 
 namespace TransformStudios\Events\Types;
 
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
@@ -167,9 +166,9 @@ abstract class Event
 
     protected function toCarbonImmutable(string|CarbonInterface $date): CarbonImmutable
     {
-        $carbon = is_string($date) ? Carbon::parse($date) : $date;
+        $carbon = is_string($date) ? CarbonImmutable::parse($date) : $date;
 
-        return $carbon->shiftTimezone($this->timezone['name'])->toImmutable();
+        return $carbon->shiftTimezone($this->timezone['name']);
     }
 
     private function collect(array $dates): Collection

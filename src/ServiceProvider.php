@@ -2,8 +2,8 @@
 
 namespace TransformStudios\Events;
 
+use Carbon\CarbonImmutable;
 use Composer\InstalledVersions;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
@@ -30,7 +30,7 @@ class ServiceProvider extends AddonServiceProvider
 
     private function bootCarbon(): self
     {
-        Carbon::setLocale(Site::current()->locale());
+        CarbonImmutable::setLocale(Site::current()->locale());
 
         if (InstalledVersions::getVersion('nesbot/carbon') >= '3') {
             return $this;
@@ -44,12 +44,12 @@ class ServiceProvider extends AddonServiceProvider
 
         */
 
-        if (is_string($weekStartDay = Carbon::getTranslator()->trans(id: 'first_day_of_week', locale: Site::current()->locale()))) {
+        if (is_string($weekStartDay = CarbonImmutable::getTranslator()->trans(id: 'first_day_of_week', locale: Site::current()->locale()))) {
             $weekStartDay = 0;
         }
 
-        Carbon::setWeekStartsAt(day: $weekStartDay);
-        Carbon::setWeekEndsAt(day: ($weekStartDay + 6) % 7);
+        CarbonImmutable::setWeekStartsAt(day: $weekStartDay);
+        CarbonImmutable::setWeekEndsAt(day: ($weekStartDay + 6) % 7);
 
         return $this;
     }
