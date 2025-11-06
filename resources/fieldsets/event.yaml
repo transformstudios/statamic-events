@@ -18,7 +18,6 @@ fields:
     handle: timezone
     field:
       dictionary: timezones
-      clearable: true
       max_items: 1
       default: UTC
       type: dictionary
