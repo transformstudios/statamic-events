@@ -82,11 +82,11 @@ class RecurringEvent extends Event
     private function frequencyToRecurrence(): RecurrenceFrequency
     {
         return match ($this->frequency()) {
-            Rrule::DAILY => RecurrenceFrequency::daily(),
-            Rrule::WEEKLY => RecurrenceFrequency::weekly(),
-            Rrule::MONTHLY => RecurrenceFrequency::monthly(),
-            Rrule::YEARLY => RecurrenceFrequency::yearly(),
-            default => RecurrenceFrequency::daily()
+            Rrule::DAILY => RecurrenceFrequency::Daily,
+            Rrule::WEEKLY => RecurrenceFrequency::Weekly,
+            Rrule::MONTHLY => RecurrenceFrequency::Monthly,
+            Rrule::YEARLY => RecurrenceFrequency::Yearly,
+            default => RecurrenceFrequency::Daily
         };
     }
 
