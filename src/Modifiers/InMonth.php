@@ -2,7 +2,7 @@
 
 namespace TransformStudios\Events\Modifiers;
 
-use Illuminate\Support\Carbon;
+use Carbon\CarbonImmutable;
 use Statamic\Modifiers\Modifier;
 use Statamic\Support\Arr;
 
@@ -11,11 +11,11 @@ class InMonth extends Modifier
     public function index($value, $params, $context)
     {
         $month = parse_date(
-            Arr::get($context, 'get.month', Carbon::now()->englishMonth).
+            Arr::get($context, 'get.month', CarbonImmutable::now()->englishMonth).
             ' '.
-            Arr::get($context, 'get.year', Carbon::now()->year)
+            Arr::get($context, 'get.year', CarbonImmutable::now()->year)
         )->month;
 
-        return Carbon::parse($value)->month == $month;
+        return CarbonImmutable::parse($value)->month == $month;
     }
 }

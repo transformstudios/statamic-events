@@ -2,8 +2,8 @@
 
 namespace TransformStudios\Events\Types;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use RRule\RRule;
 use RRule\RRuleInterface;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
@@ -57,7 +57,7 @@ class RecurringEvent extends Event
         ];
 
         if ($end = $this->end_date) {
-            $rule['until'] = Carbon::parse($end)->shiftTimezone($this->timezone['name'])->endOfDay();
+            $rule['until'] = CarbonImmutable::parse($end)->shiftTimezone($this->timezone['name'])->endOfDay();
         }
 
         if (! empty($days = $this->onSpecificDays())) {
@@ -82,11 +82,11 @@ class RecurringEvent extends Event
     private function frequencyToRecurrence(): RecurrenceFrequency
     {
         return match ($this->frequency()) {
-            Rrule::DAILY => RecurrenceFrequency::daily(),
-            Rrule::WEEKLY => RecurrenceFrequency::weekly(),
-            Rrule::MONTHLY => RecurrenceFrequency::monthly(),
-            Rrule::YEARLY => RecurrenceFrequency::yearly(),
-            default => RecurrenceFrequency::daily()
+            Rrule::DAILY => RecurrenceFrequency::Daily,
+            Rrule::WEEKLY => RecurrenceFrequency::Weekly,
+            Rrule::MONTHLY => RecurrenceFrequency::Monthly,
+            Rrule::YEARLY => RecurrenceFrequency::Yearly,
+            default => RecurrenceFrequency::Daily
         };
     }
 
@@ -107,7 +107,7 @@ class RecurringEvent extends Event
             ->interval($this->interval());
 
         if ($end = $this->end_date) {
-            $rule->until(Carbon::parse($end)->endOfDay());
+            $rule->until(CarbonImmutable::parse($end)->endOfDay());
         }
 
         return $rule;
