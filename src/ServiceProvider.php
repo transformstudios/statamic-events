@@ -2,8 +2,8 @@
 
 namespace TransformStudios\Events;
 
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use Composer\InstalledVersions;
 use Illuminate\Support\Facades\Artisan;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
@@ -30,26 +30,8 @@ class ServiceProvider extends AddonServiceProvider
 
     private function bootCarbon(): self
     {
+        Carbon::setLocale(Site::current()->locale());
         CarbonImmutable::setLocale(Site::current()->locale());
-
-        if (InstalledVersions::getVersion('nesbot/carbon') >= '3') {
-            return $this;
-        }
-
-        /*
-         Using these deprecated methods because I couldn't figure out another way to
-         have the weekstart set based on the current locale.
-
-         When the next version of Carbon is released, it should be set properly: https://github.com/briannesbitt/Carbon/issues/2539#issuecomment-1037257768
-
-        */
-
-        if (is_string($weekStartDay = CarbonImmutable::getTranslator()->trans(id: 'first_day_of_week', locale: Site::current()->locale()))) {
-            $weekStartDay = 0;
-        }
-
-        CarbonImmutable::setWeekStartsAt(day: $weekStartDay);
-        CarbonImmutable::setWeekEndsAt(day: ($weekStartDay + 6) % 7);
 
         return $this;
     }

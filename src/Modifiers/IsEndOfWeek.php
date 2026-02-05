@@ -3,7 +3,6 @@
 namespace TransformStudios\Events\Modifiers;
 
 use Carbon\CarbonImmutable;
-use Composer\InstalledVersions;
 use Statamic\Modifiers\Modifier;
 
 class IsEndOfWeek extends Modifier
@@ -12,9 +11,7 @@ class IsEndOfWeek extends Modifier
     {
         $date = CarbonImmutable::parse($value);
 
-        if (InstalledVersions::getVersion('nesbot/carbon') >= '3') {
-            $date->isSameDay($date->locale(CarbonImmutable::getLocale())->startOfWeek());
-        }
+        $date->isSameDay($date->locale(CarbonImmutable::getLocale())->startOfWeek());
 
         return $date->dayOfWeek == now()->endOfWeek()->dayOfWeek;
     }
