@@ -36,7 +36,6 @@ fields:
       dictionary: month_day_recurrence
       type: dictionary
       display: 'Which Day(s)'
-      width: 100
       if:
         recurrence: 'equals monthly'
   -
@@ -67,7 +66,7 @@ fields:
       allow_blank: false
       allow_time: false
       require_time: false
-      input_format: M/D/YYYY
+      input_format: YYYY/M/D
       width: 50
       display: 'Start Date'
       inline: true
@@ -75,6 +74,7 @@ fields:
       unless_any:
         multi_day: 'equals true'
         recurrence: 'equals multi_day'
+      format: Y-m-d
   -
     handle: end_date
     field:
@@ -90,6 +90,7 @@ fields:
       inline: true
       if:
         recurrence: 'contains_any daily, weekly, monthly, every'
+      format: Y-m-d
   -
     handle: start_time
     field:
@@ -130,9 +131,10 @@ fields:
             allow_blank: false
             allow_time: false
             require_time: false
-            input_format: M/D/YYYY
+            input_format: YYYY/M/D
             width: 25
             display: Date
+            format: Y-m-d
         -
           handle: start_time
           field:
@@ -184,5 +186,6 @@ fields:
             allow_blank: false
             allow_time: false
             require_time: false
-            input_format: M/D/YYYY
+            input_format: YYYY/M/D/YYYY
             display: Date
+            format: Y-m-d
