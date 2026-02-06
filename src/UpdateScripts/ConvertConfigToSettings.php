@@ -67,7 +67,6 @@ class ConvertConfigToSettings extends UpdateScript
                 $collectionSetting = [
                     'id' => Str::random(8),
                     'collection' => $handle,
-                    'location_field' => Arr::get($collection, 'location_field', 'location'),
                 ];
 
                 return Arr::removeNullValues($collectionSetting);
