@@ -146,7 +146,7 @@ abstract class Event
             return $link;
         }
 
-        if (is_null($location = $this->entry->location)) {
+        if (is_null($location = $this->event->location)) {
             return null;
         }
 
