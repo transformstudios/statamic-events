@@ -7,6 +7,7 @@ use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use RRule\RRuleInterface;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
@@ -111,7 +112,7 @@ abstract class Event
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
 
-        if (! is_null($address = $this->event->address ?? $this->location($this->event))) {
+        if (! is_null($address = $this->event->address ?? $this->event->location)) {
             $iCalEvent->address($address);
         }
 
@@ -123,7 +124,7 @@ abstract class Event
             $iCalEvent->description($description);
         }
 
-        if (! is_null($link = $this->event->link)) {
+        if (! is_null($link = $this->eventUrl())) {
             $iCalEvent->url($link);
         }
 
@@ -138,21 +139,18 @@ abstract class Event
         return Arr::wrap($this->toICalendarEvent($this->start()));
     }
 
-    protected function location(Entry $event): ?string
+    protected function eventUrl(): ?string
     {
-        $collectionHandle = $event->collectionHandle();
+        // check link field then check if location field is url
+        if (! is_null($link = $this->event->link)) {
+            return $link;
+        }
 
-        $locationField = config("events.collections.$collectionHandle.location_field", 'location');
-
-        if (is_null($location = $event->{$locationField})) {
+        if (is_null($location = $this->entry->location)) {
             return null;
         }
 
-        if (! is_string($location)) {
-            return null;
-        }
-
-        return $location;
+        return Str::isUrl($location) ? $location : null;
     }
 
     protected function supplement(CarbonInterface $date): ?Entry

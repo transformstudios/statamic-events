@@ -33,15 +33,19 @@ class RecurringEvent extends Event
             ->endsAt($this->end())
             ->rrule($this->spatieRule());
 
-        if (! is_null($location = $this->location($this->event))) {
-            $iCalEvent->address($location);
+        if (! is_null($address = $this->event->address ?? $this->event->location)) {
+            $iCalEvent->address($address);
+        }
+
+        if (! is_null($coords = $this->event->coordinates)) {
+            $iCalEvent->coordinates($coords['latitude'], $coords['longitude']);
         }
 
         if (! is_null($description = $this->event->description)) {
             $iCalEvent->description($description);
         }
 
-        if (! is_null($link = $this->event->link)) {
+        if (! is_null($link = $this->eventUrl())) {
             $iCalEvent->url($link);
         }
 
