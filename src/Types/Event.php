@@ -141,7 +141,6 @@ abstract class Event
 
     protected function eventUrl(): ?string
     {
-        // check link field then check if location field is url
         if (! is_null($link = $this->event->link)) {
             return $link;
         }
