@@ -1,0 +1,35 @@
+tabs:
+  main:
+    display: Main
+    sections:
+      -
+        fields:
+          -
+            handle: collections
+            field:
+              type: grid
+              display: Collections
+              sortable: false
+              add_row: 'Add Collection'
+              full_width_setting: true
+              fields:
+                -
+                  handle: collection
+                  field:
+                    type: collections
+                    display: Collection
+                    width: 50
+                    mode: select
+                    max_items: 1
+              default:
+                -
+                  collection: events
+          -
+            handle: timezone
+            field:
+              mode: select
+              max_items: 1
+              type: timezones
+              display: Timezone
+              full_width_setting: true
+              default: 'UTC'

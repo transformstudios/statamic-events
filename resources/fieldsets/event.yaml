@@ -17,16 +17,11 @@ fields:
   -
     handle: timezone
     field:
+      dictionary: timezones
       max_items: 1
-      clearable: false
-      searchable: true
-      taggable: false
-      push_tags: false
-      cast_booleans: false
+      default: UTC
+      type: dictionary
       display: Timezone
-      type: timezones
-      mode: typeahead
-      width: 33
   -
     handle: all_day
     field:

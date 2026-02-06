@@ -2,9 +2,10 @@
 
 namespace TransformStudios\Events\Tags;
 
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Contracts\Taxonomies\Term;
@@ -24,8 +25,8 @@ class Events extends Tags
     public function between(): EntryCollection|array
     {
         return $this->output($this->generator()->between(
-            from: Carbon::parse($this->params->get('from', now()))->startOfDay(),
-            to: Carbon::parse($this->params->get('to'))->endOfDay()
+            from: CarbonImmutable::parse($this->params->get('from', now()))->startOfDay(),
+            to: CarbonImmutable::parse($this->params->get('to'))->endOfDay()
         ));
     }
 
@@ -51,8 +52,8 @@ class Events extends Tags
         return route(
             'statamic.events.ics.show',
             Arr::removeNullValues([
-                'collection' => $this->params->get('collection', config('events.collection', 'events')),
-                'date' => $this->params->has('date') ? Carbon::parse($this->params->get('date'))->toDateString() : null,
+                'collection' => $this->params->get('collection', 'events'),
+                'date' => $this->params->has('date') ? CarbonImmutable::parse($this->params->get('date'))->toDateString() : null,
                 'event' => $this->params->get('event'),
             ])
         );
@@ -129,7 +130,7 @@ class Events extends Tags
     {
         $generator = $this->params->has('event') ?
             Generator::fromEntry($this->params->get('event')) :
-            Generator::fromCollection($this->params->get('collection', config('events.collection', 'events')));
+            Generator::fromCollection($this->params->get('collection', 'events'));
 
         return $generator
             ->site($this->params->get('site'))
@@ -140,7 +141,7 @@ class Events extends Tags
             )->when(
                 value: $this->parseFilters(),
                 callback: fn (Generator $generator, array $filters) => $generator->filters(filters: $filters)
-            )-> when(
+            )->when(
                 value: $this->params->int('offset'),
                 callback: fn (Generator $generator, int $offset) => $generator->offset(offset: $offset)
             )->when(
@@ -165,7 +166,7 @@ class Events extends Tags
         $dates = collect();
         $currentDay = $from->copy()->toMutable();
 
-        foreach (range(0, Carbon::parse($to)->diffInDays($from)) as $ignore) {
+        foreach (range(0, CarbonImmutable::parse($to)->diffInDays($from)) as $ignore) {
             $date = $currentDay->toDateString();
             $dates->put($date, [
                 'date' => $date,

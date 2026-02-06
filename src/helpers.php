@@ -1,8 +1,8 @@
 <?php
 
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Carbon\Exceptions\InvalidFormatException;
-use Illuminate\Support\Carbon;
 
 if (! function_exists('parse_date')) {
     /**
@@ -11,7 +11,7 @@ if (! function_exists('parse_date')) {
     function parse_date(string $date): CarbonInterface
     {
         try {
-            $date = Carbon::parse($date);
+            $date = CarbonImmutable::parse($date);
         } catch (InvalidFormatException $e) {
             $date = now();
         }

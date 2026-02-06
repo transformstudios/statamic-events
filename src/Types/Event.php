@@ -2,11 +2,12 @@
 
 namespace TransformStudios\Events\Types;
 
-use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use RRule\RRuleInterface;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
@@ -23,7 +24,9 @@ abstract class Event
     }
 
     /*
-        Can remove this once https://github.com/statamic/cms/pull/11402 is released
+        This is needed so that empty($event->days) works. This is due to how PHP handles
+        `empty`: it gets translated to
+        `!$class->__isset('property') || empty($class->__get('property')))`
     */
     public function __isset(string $key): bool
     {
@@ -84,14 +87,14 @@ abstract class Event
     public function start(): CarbonImmutable
     {
         return CarbonImmutable::parse($this->start_date)
-            ->shiftTimezone($this->timezone['timezone'])
+            ->shiftTimezone($this->timezone['name'])
             ->setTimeFromTimeString($this->startTime());
     }
 
     public function end(): CarbonImmutable
     {
         return CarbonImmutable::parse($this->start_date)
-            ->shiftTimezone($this->timezone['timezone'])
+            ->shiftTimezone($this->timezone['name'])
             ->setTimeFromTimeString($this->endTime());
     }
 
@@ -109,7 +112,7 @@ abstract class Event
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
 
-        if (! is_null($address = $this->event->address ?? $this->location($this->event))) {
+        if (! is_null($address = $this->event->address ?? $this->event->location)) {
             $iCalEvent->address($address);
         }
 
@@ -121,7 +124,7 @@ abstract class Event
             $iCalEvent->description($description);
         }
 
-        if (! is_null($link = $this->event->link)) {
+        if (! is_null($link = $this->eventUrl())) {
             $iCalEvent->url($link);
         }
 
@@ -133,26 +136,21 @@ abstract class Event
      */
     public function toICalendarEvents(): array
     {
-        return [
-            $this->toICalendarEvent($this->start()),
-        ];
+        return Arr::wrap($this->toICalendarEvent($this->start()));
     }
 
-    protected function location(Entry $event): ?string
+    protected function eventUrl(): ?string
     {
-        $collectionHandle = $event->collectionHandle();
+        // check link field then check if location field is url
+        if (! is_null($link = $this->event->link)) {
+            return $link;
+        }
 
-        $locationField = config("events.collections.$collectionHandle.location_field", 'location');
-
-        if (is_null($location = $event->{$locationField})) {
+        if (is_null($location = $this->event->location)) {
             return null;
         }
 
-        if (! is_string($location)) {
-            return null;
-        }
-
-        return $location;
+        return Str::isUrl($location) ? $location : null;
     }
 
     protected function supplement(CarbonInterface $date): ?Entry
@@ -166,16 +164,16 @@ abstract class Event
 
     protected function toCarbonImmutable(string|CarbonInterface $date): CarbonImmutable
     {
-        $carbon = is_string($date) ? Carbon::parse($date) : $date;
+        $carbon = is_string($date) ? CarbonImmutable::parse($date) : $date;
 
-        return $carbon->shiftTimezone($this->timezone['timezone'])->toImmutable();
+        return $carbon->shiftTimezone($this->timezone['name']);
     }
 
     private function collect(array $dates): Collection
     {
         return collect($dates)
             ->map(fn (DateTimeInterface $date) => $this->supplement(
-                date: CarbonImmutable::parse($date, $this->timezone['timezone'])
+                date: CarbonImmutable::parse($date, $this->timezone['name'])
             ))->filter();
     }
 }
