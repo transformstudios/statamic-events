@@ -43,7 +43,7 @@ class Events extends Tags
             ->groupBy(fn (Entry $occurrence) => $occurrence->start->toDateString())
             ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
-        return $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
+        return $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->sort()->values());
     }
 
     public function downloadLink(): string
