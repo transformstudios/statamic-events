@@ -11,7 +11,7 @@ fields:
         monthly: Monthly
         every: Every
         multi_day: Multi-Day
-      width: 33
+      width: 50
       display: Recurrence
       default: none
   -
@@ -22,14 +22,7 @@ fields:
       default: UTC
       type: dictionary
       display: Timezone
-  -
-    handle: all_day
-    field:
-      type: toggle
-      width: 33
-      display: 'All Day?'
-      unless:
-        recurrence: 'equals multi_day'
+      width: 50
   -
     handle: specific_days
     field:
@@ -76,6 +69,13 @@ fields:
         recurrence: 'equals multi_day'
       format: Y-m-d
   -
+    handle: end_date_spacer
+    field:
+      type: spacer
+      width: 33
+      if:
+        recurrence: 'equals none'
+  -
     handle: end_date
     field:
       type: date
@@ -92,10 +92,43 @@ fields:
         recurrence: 'contains_any daily, weekly, monthly, every'
       format: Y-m-d
   -
+    handle: exclude_dates
+    field:
+      type: grid
+      fullscreen: false
+      display: 'Exclude Days'
+      add_row: 'Add Day'
+      if_any:
+        recurrence: 'contains_any monthly, daily, weekly, every'
+      fields:
+        -
+          handle: date
+          field:
+            type: date
+            allow_blank: false
+            allow_time: false
+            require_time: false
+            input_format: YYYY/M/D/YYYY
+            display: Date
+            format: Y-m-d
+  -
+    handle: times_sections
+    field:
+      type: section
+      display: Times
+  -
+    handle: all_day
+    field:
+      type: toggle
+      width: 33
+      display: 'All Day?'
+      unless:
+        recurrence: 'equals multi_day'
+  -
     handle: start_time
     field:
       type: time
-      width: 25
+      width: 33
       display: 'Start Time'
       instructions: 'Input in [24-hour format](https://en.wikipedia.org/wiki/24-hour_clock)'
       unless_any:
@@ -106,7 +139,7 @@ fields:
     handle: end_time
     field:
       type: time
-      width: 25
+      width: 33
       display: 'End Time'
       instructions: 'Input in [24-hour format](https://en.wikipedia.org/wiki/24-hour_clock)'
       unless_any:
@@ -170,22 +203,3 @@ fields:
           field: 'events::event.all_day'
           config:
             width: 25
-  -
-    handle: exclude_dates
-    field:
-      type: grid
-      display: 'Exclude Days'
-      add_row: 'Add Day'
-      if_any:
-        recurrence: 'contains_any monthly, daily, weekly, every'
-      fields:
-        -
-          handle: date
-          field:
-            type: date
-            allow_blank: false
-            allow_time: false
-            require_time: false
-            input_format: YYYY/M/D/YYYY
-            display: Date
-            format: Y-m-d
