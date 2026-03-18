@@ -5,14 +5,17 @@ namespace TransformStudios\Events;
 use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Dictionary;
 use Statamic\Providers\AddonServiceProvider;
+use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
     public function bootAddon()
     {
+        // Fields::default('events_timezone', fn () => Statamic::displayTimezone());
         collect(Events::setting('collections', [['collection' => 'events']]))
             ->each(fn (array $collection) => Collection::computed(
                 $collection['collection'],
