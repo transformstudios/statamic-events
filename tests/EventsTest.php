@@ -2,6 +2,7 @@
 
 namespace TransformStudios\Events\Tests;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Entry;
@@ -385,4 +386,46 @@ test('can filter our events with no start date', function () {
         ->upcoming(5);
 
     expect($occurrences)->toBeEmpty();
+});
+
+
+test('app and event in same timezone ', function () {
+    $startDate = CarbonImmutable::createFromDate(2026, 2, 28);
+    Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $startDate->toDateString(),
+            'start_time' => '05:00',
+            'end_time' => '23:00',
+            'all_day' => false
+        ])->save();
+
+    $events = Events::fromCollection('events')
+        ->between(
+            CarbonImmutable::createFromDate(2026, 2, 1)->startOfDay(),
+            CarbonImmutable::createFromDate(2026, 2, 28)->endOfDay()
+        );
+
+    expect($events)->toHaveCount(1);
+});
+
+test('app and event in different timezone ', function () {
+    $startDate = CarbonImmutable::createFromDate(2026, 2, 28);
+    Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $startDate->toDateString(),
+            'timezone' => 'America/Los_Angeles',
+            'start_time' => '05:00',
+            'end_time' => '23:00',
+            'all_day' => false
+        ])->save();
+
+    $events = Events::fromCollection('events')
+        ->between(
+            CarbonImmutable::createFromDate(2026, 2, 1)->startOfDay(),
+            CarbonImmutable::createFromDate(2026, 2, 28)->endOfDay()
+        );
+
+    expect($events)->toHaveCount(1);
 });
