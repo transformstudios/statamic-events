@@ -200,7 +200,7 @@ class Events
     private function occurrences(callable $generator): EntryCollection
     {
         return $this->entries
-            ->filter(fn (Entry $occurrence) => $this->hasStartDate($occurrence))
+            ->filter(fn (Entry $event) => $this->hasStartDate($event))
             // take each event and generate the occurrences
             ->flatMap(callback: $generator)
             ->reject(fn (Entry $occurrence) => collect($occurrence->exclude_dates)
