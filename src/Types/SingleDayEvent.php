@@ -10,28 +10,22 @@ class SingleDayEvent extends Event
 {
     protected function rule(): RRuleInterface
     {
-        if ($this->spansDays()) {
-            $rset = new RSet;
-            $rset->addRRule([
-                'count' => 1,
-                'dtstart' => $this->start(),
-                'freq' => RRule::DAILY,
-            ]);
-            $rset->addRRule([
-                'count' => 1,
-                'dtstart' => $this->end(),
-                'freq' => RRule::DAILY,
-            ]);
-
-            return $rset;
-        }
-
-        return new RRule([
+        $rset = tap(new RSet)->addRRule([
             'count' => 1,
             'dtstart' => $this->end(),
             'freq' => RRule::DAILY,
         ]);
 
+        // if the occurrence spans days, include the start so that it's picked up on the "between" method
+        if ($this->spansDays()) {
+            $rset->addRRule([
+                'count' => 1,
+                'dtstart' => $this->start(),
+                'freq' => RRule::DAILY,
+            ]);
+        }
+
+        return $rset;
     }
 
     private function spansDays(): bool
