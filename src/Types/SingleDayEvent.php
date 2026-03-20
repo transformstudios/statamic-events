@@ -27,9 +27,4 @@ class SingleDayEvent extends Event
 
         return $rset;
     }
-
-    private function spansDays(): bool
-    {
-        return $this->start()->setTimezone('UTC')->day != $this->end()->setTimezone('UTC')->day;
-    }
 }

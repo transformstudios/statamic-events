@@ -79,6 +79,11 @@ abstract class Event
         return $this->collect($this->rule()->getOccurrencesAfter(date: now(), inclusive: true, limit: $limit));
     }
 
+    public function spansDays(): bool
+    {
+        return $this->start()->setTimezone(config('app.timezone'))->day != $this->end()->setTimezone(config('app.timezone'))->day;
+    }
+
     public function startTime(): string
     {
         return $this->start_time ?? now()->startOfDay()->toTimeString('second');
