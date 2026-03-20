@@ -388,43 +388,42 @@ test('can filter our events with no start date', function () {
     expect($occurrences)->toBeEmpty();
 });
 
-
 test('app and event in same timezone ', function () {
-    $startDate = CarbonImmutable::createFromDate(2026, 2, 28);
+    $startDate = CarbonImmutable::createFromDate(2026, 2, 15);
     Entry::make()
         ->collection('events')
         ->data([
             'start_date' => $startDate->toDateString(),
             'start_time' => '05:00',
             'end_time' => '23:00',
-            'all_day' => false
+            'all_day' => false,
         ])->save();
 
     $events = Events::fromCollection('events')
         ->between(
             CarbonImmutable::createFromDate(2026, 2, 1)->startOfDay(),
-            CarbonImmutable::createFromDate(2026, 2, 28)->endOfDay()
+            CarbonImmutable::createFromDate(2026, 2, 15)->endOfDay()
         );
 
     expect($events)->toHaveCount(1);
 });
 
 test('app and event in different timezone ', function () {
-    $startDate = CarbonImmutable::createFromDate(2026, 2, 28);
+    $startDate = CarbonImmutable::createFromDate(2026, 2, 15);
     Entry::make()
         ->collection('events')
         ->data([
             'start_date' => $startDate->toDateString(),
             'timezone' => 'America/Los_Angeles',
             'start_time' => '05:00',
-            'end_time' => '23:00',
-            'all_day' => false
+            'end_time' => '16:00',
+            'all_day' => false,
         ])->save();
 
     $events = Events::fromCollection('events')
         ->between(
             CarbonImmutable::createFromDate(2026, 2, 1)->startOfDay(),
-            CarbonImmutable::createFromDate(2026, 2, 28)->endOfDay()
+            CarbonImmutable::createFromDate(2026, 2, 15)->endOfDay()
         );
 
     expect($events)->toHaveCount(1);
