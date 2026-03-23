@@ -5,6 +5,7 @@ namespace TransformStudios\Events\Tags;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Carbon\CarbonPeriod;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Query\Builder;
@@ -45,6 +46,16 @@ class Events extends Tags
             ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
         return $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
+    }
+
+    public function daysOfWeek(): Collection
+    {
+        return collect(CarbonPeriod::dates(now()->startOfWeek(), now()->endOfWeek()))
+            ->map(fn (Carbon $date) => [
+                'short' => $date->format('D')[0],
+                'medium' => $date->format('D'),
+                'long' => $date->format('l'),
+            ]);
     }
 
     public function downloadLink(): string
