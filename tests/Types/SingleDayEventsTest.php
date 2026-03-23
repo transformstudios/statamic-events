@@ -144,3 +144,21 @@ test('can supplement no end time', function () {
 
     expect($nextOccurrences[0]->has_end_time)->toBeFalse();
 });
+
+test('app and event in different timezone ', function () {
+    $date = CarbonImmutable::createFromDate(2026, 2, 28);
+    $entry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $date->toDateString(),
+            'timezone' => 'America/Los_Angeles',
+            'start_time' => '05:00',
+            'end_time' => '23:00',
+        ]);
+
+    $events1 = EventFactory::createFromEntry($entry)->occurrencesBetween($date->startOfMonth(), $date->endOfMonth());
+    $events2 = EventFactory::createFromEntry($entry)->occurrencesBetween($date->startOfMonth(), $date->endOfMonth()->endOfWeek());
+
+    expect($events1)->toHaveCount(1);
+    expect($events2)->toHaveCount(1);
+});

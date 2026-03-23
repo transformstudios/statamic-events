@@ -64,7 +64,12 @@ abstract class Event
 
     public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
     {
-        return $this->collect($this->rule()->getOccurrencesBetween(begin: $from, end: $to));
+        $tz = $this->timezone['name'];
+
+        return $this->collect($this->rule()->getOccurrencesBetween(
+            begin: $from->shiftTimezone($tz),
+            end: $to->shiftTimezone($tz)
+        ));
     }
 
     public function occursOnDate(string|CarbonInterface $date): bool
@@ -77,11 +82,6 @@ abstract class Event
     public function nextOccurrences(int $limit = 1): Collection
     {
         return $this->collect($this->rule()->getOccurrencesAfter(date: now(), inclusive: true, limit: $limit));
-    }
-
-    public function spansDays(): bool
-    {
-        return $this->start()->setTimezone(config('app.timezone'))->day != $this->end()->setTimezone(config('app.timezone'))->day;
     }
 
     public function startTime(): string

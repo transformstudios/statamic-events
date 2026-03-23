@@ -388,23 +388,37 @@ test('can filter our events with no start date', function () {
     expect($occurrences)->toBeEmpty();
 });
 
-test('app and event in different timezone ', function () {
-    $startDate = CarbonImmutable::createFromDate(2026, 2, 15);
+test('app and event in same timezone ', function () {
+    $date = CarbonImmutable::createFromDate(2026, 2, 28);
     Entry::make()
         ->collection('events')
         ->data([
-            'start_date' => $startDate->toDateString(),
-            'timezone' => 'America/Los_Angeles',
+            'start_date' => $date->toDateString(),
             'start_time' => '05:00',
-            'end_time' => '16:00',
-            'all_day' => false,
+            'end_time' => '23:00',
         ])->save();
 
-    $events = Events::fromCollection('events')
-        ->between(
-            CarbonImmutable::createFromDate(2026, 2, 1)->startOfDay(),
-            CarbonImmutable::createFromDate(2026, 2, 15)->endOfDay()
-        );
+    $events1 = Events::fromCollection('events')->between($date->startOfMonth(), $date->endOfMonth());
+    $events2 = Events::fromCollection('events')->between($date->startOfMonth(), $date->endOfMonth()->endOfWeek());
 
-    expect($events)->toHaveCount(1);
+    expect($events1)->toHaveCount(1);
+    expect($events2)->toHaveCount(1);
+});
+
+test('app and event in different timezone', function () {
+    $date = CarbonImmutable::createFromDate(2026, 2, 28);
+    Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $date->toDateString(),
+            'timezone' => 'America/Los_Angeles',
+            'start_time' => '05:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $events1 = Events::fromCollection('events')->between($date->startOfMonth(), $date->endOfMonth());
+    $events2 = Events::fromCollection('events')->between($date->startOfMonth(), $date->endOfMonth()->endOfWeek());
+
+    expect($events1)->toHaveCount(1);
+    expect($events2)->toHaveCount(1);
 });
