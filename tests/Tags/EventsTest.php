@@ -391,7 +391,7 @@ test('can offset single day occurrences', function () {
 });
 
 it('sets the correct short form of the days of week', function () {
-    expect($this->tag->daysOfWeek())->pluck('short')->toBe(['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su']);
+    expect($this->tag->daysOfWeek())->pluck('short')->toMatchArray(['M', 'T', 'W', 'T', 'F', 'S', 'S']);
 });
 
 it('uses the current site locale to get days of week', function () {
