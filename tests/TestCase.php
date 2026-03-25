@@ -20,13 +20,24 @@ abstract class TestCase extends AddonTestCase
 
     protected string $addonServiceProvider = ServiceProvider::class;
 
-    protected $fakeStacheDirectory = __DIR__.'/__fixtures__/dev-null';
-
     protected $shouldFakeVersion = true;
 
     protected Collection $collection;
 
     protected Blueprint $blueprint;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Taxonomy::make('categories')->save();
+        Term::make('one')->taxonomy('categories')->dataForLocale('default', [])->save();
+        Term::make('two')->taxonomy('categories')->dataForLocale('default', [])->save();
+
+        $this->collection = CollectionFacade::make('events')
+            ->taxonomies(['categories'])
+            ->save();
+    }
 
     protected function getEnvironmentSetUp($app)
     {
@@ -40,13 +51,6 @@ abstract class TestCase extends AddonTestCase
             Fieldset::addNamespace('events', __DIR__.'/../resources/fieldsets');
             app()->extend(BlueprintRepository::class, fn ($repo) => $repo->setDirectory(__DIR__.'/__fixtures__/blueprints'));
 
-            Taxonomy::make('categories')->save();
-            Term::make('one')->taxonomy('categories')->dataForLocale('default', [])->save();
-            Term::make('two')->taxonomy('categories')->dataForLocale('default', [])->save();
-
-            $this->collection = CollectionFacade::make('events')
-                ->taxonomies(['categories'])
-                ->save();
         });
     }
 }
