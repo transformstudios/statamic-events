@@ -5,6 +5,8 @@ namespace TransformStudios\Events\Tests\Tags;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site as SiteFacade;
+use Statamic\Sites\Site;
 use Statamic\Support\Arr;
 use TransformStudios\Events\Tags\Events;
 
@@ -386,4 +388,24 @@ test('can offset single day occurrences', function () {
         ]);
 
     expect($this->tag->today())->toHaveCount(0);
+});
+
+it('sets the correct short form of the days of week', function () {
+    expect($this->tag->daysOfWeek())->pluck('short')->toBe(['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su']);
+});
+
+it('uses the current site locale to get days of week', function () {
+    SiteFacade::shouldReceive('current')
+        ->andReturn(new Site('default', [
+            'name' => 'Laravel',
+            'url' => '/',
+            'locale' => 'en_US',
+            'lang' => 'en',
+        ], true));
+
+    expect($this->tag->daysOfWeek())->first()->toBe([
+        'short' => 'S',
+        'medium' => 'Sun',
+        'long' => 'Sunday',
+    ]);
 });

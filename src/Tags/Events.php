@@ -13,6 +13,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Compare;
+use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\OutputsItems;
@@ -50,12 +51,23 @@ class Events extends Tags
 
     public function daysOfWeek(): Collection
     {
-        return collect(CarbonPeriod::dates(now()->startOfWeek(), now()->endOfWeek()))
+        /*
+            have to do this because Statamic sets the Carbon locale
+            to the `lang` of the site, instead of the `locale`
+        */
+        $currentLocale = Carbon::getLocale();
+        Carbon::setLocale(Site::current()->locale());
+
+        $days = collect(CarbonPeriod::dates(now()->startOfWeek(), now()->endOfWeek()))
             ->map(fn (Carbon $date) => [
                 'short' => $date->format('D')[0],
                 'medium' => $date->format('D'),
                 'long' => $date->format('l'),
             ]);
+
+        Carbon::setLocale($currentLocale);
+
+        return $days;
     }
 
     public function downloadLink(): string
