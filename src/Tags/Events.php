@@ -34,6 +34,9 @@ class Events extends Tags
 
     public function calendar(): Collection
     {
+        $currentLocale = CarbonImmutable::getLocale();
+        CarbonImmutable::setLocale(Site::current()->locale());
+
         $month = $this->params->get('month', now()->englishMonth);
         $year = $this->params->get('year', now()->year);
 
@@ -46,7 +49,11 @@ class Events extends Tags
             ->groupBy(fn (Entry $occurrence) => $occurrence->start->toDateString())
             ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
-        return $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
+        $days = $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
+
+        CarbonImmutable::setLocale($currentLocale);
+
+        return $days;
     }
 
     public function daysOfWeek(): Collection
