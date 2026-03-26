@@ -422,3 +422,21 @@ test('app and event in different timezone', function () {
     expect($events1)->toHaveCount(1);
     expect($events2)->toHaveCount(1);
 });
+
+test('event with timezone offset appears on the correct UTC date', function () {
+    $date = CarbonImmutable::createFromDate(2026, 2, 28);
+    Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $date->toDateString(),
+            'timezone' => 'America/Los_Angeles',
+            'start_time' => '22:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $events1 = Events::fromCollection('events')->between($date->startOfDay(), $date->endOfDay());
+    $events2 = Events::fromCollection('events')->between($date->startOfDay()->addDay(), $date->endOfDay()->addDay());
+
+    expect($events1)->toHaveCount(0);
+    expect($events2)->toHaveCount(1);
+});
