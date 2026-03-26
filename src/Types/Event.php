@@ -64,12 +64,7 @@ abstract class Event
 
     public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
     {
-        $tz = $this->timezone['name'];
-
-        return $this->collect($this->rule()->getOccurrencesBetween(
-            begin: $from->shiftTimezone($tz),
-            end: $to->shiftTimezone($tz)
-        ));
+        return $this->collect($this->rule()->getOccurrencesBetween(begin: $from, end: $to));
     }
 
     public function occursOnDate(string|CarbonInterface $date): bool

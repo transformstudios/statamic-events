@@ -45,7 +45,6 @@ abstract class TestCase extends AddonTestCase
 
         // Assume the pro edition within tests
         $app['config']->set('statamic.editions.pro', true);
-        $app['config']->set('events.timezone', 'UTC');
 
         Statamic::booted(function () {
             Fieldset::addNamespace('events', __DIR__.'/../resources/fieldsets');

@@ -1,5 +1,7 @@
 <?php
 
+use Statamic\Entries\Entry;
+use Statamic\Facades\Entry as EntryFacade;
 use TransformStudios\Events\Tests\TestCase;
 
 /*
@@ -41,7 +43,7 @@ pest()->extend(TestCase::class);
 |
 */
 
-function something()
+function makeEvent(array $data = []): Entry
 {
-    // ..
+    return EntryFacade::make()->collection('events')->data($data);
 }
