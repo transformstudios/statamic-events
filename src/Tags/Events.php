@@ -40,19 +40,19 @@ class Events extends Tags
         $month = $this->params->get('month', now()->englishMonth);
         $year = $this->params->get('year', now()->year);
 
-        $from = parse_date($month.' '.$year)->startOfMonth()->startOfWeek();
-        $to = parse_date($month.' '.$year)->endOfMonth()->endOfWeek();
+        $from = parse_date($month . ' ' . $year)->startOfMonth()->startOfWeek();
+        $to = parse_date($month . ' ' . $year)->endOfMonth()->endOfWeek();
 
         $occurrences = $this
             ->generator()
             ->between(from: $from, to: $to)
             ->groupBy(function (Entry $occurrence) {
-                $start = $occurrence->start->setTimezone('UTC');
-                $end = $occurrence->end->setTimezone('UTC');
+                $start = $occurrence->start->setTimezone($this->params->get('timezone') ?? Generator::timezone());
+                $end = $occurrence->end->setTimezone($this->params->get('timezone') ?? Generator::timezone());
 
                 return $start->isSameDay($end) ? $start->toDateString() : [$start->toDateString(), $end->toDateString()];
             })
-            ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
+            ->map(fn(EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
         $days = $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
 
