@@ -46,7 +46,12 @@ class Events extends Tags
         $occurrences = $this
             ->generator()
             ->between(from: $from, to: $to)
-            ->groupBy(fn (Entry $occurrence) => $occurrence->start->toDateString())
+            ->groupBy(function (Entry $occurrence) {
+                $start = $occurrence->start->setTimezone('UTC');
+                $end = $occurrence->end->setTimezone('UTC');
+
+                return $start->isSameDay($end) ? $start->toDateString() : [$start->toDateString(), $end->toDateString()];
+            })
             ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
         $days = $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
