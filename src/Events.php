@@ -67,7 +67,7 @@ class Events
 
     public static function timezone(): string
     {
-        return static::setting('timezone', config('app.timezone'));
+        return static::setting('timezone', config('statamic.system.display_timezone') ?? config('app.timezone'));
     }
 
     private function __construct() {}
