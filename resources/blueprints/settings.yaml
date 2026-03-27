@@ -27,9 +27,9 @@ tabs:
           -
             handle: timezone
             field:
-              mode: select
+              dictionary: timezones
               max_items: 1
-              type: timezones
+              default: UTC
+              type: dictionary
               display: Timezone
               full_width_setting: true
-              default: 'UTC'
