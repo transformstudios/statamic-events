@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
+use Carbon\CarbonPeriodImmutable;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Query\Builder;
@@ -47,10 +48,14 @@ class Events extends Tags
             ->generator()
             ->between(from: $from, to: $to)
             ->groupBy(function (Entry $occurrence) {
-                $start = $occurrence->start->setTimezone($this->params->get('timezone') ?? Generator::timezone());
-                $end = $occurrence->end->setTimezone($this->params->get('timezone') ?? Generator::timezone());
+                $periodInTimezone = CarbonPeriodImmutable::between(
+                    $occurrence->start->setTimezone($this->params->get('timezone') ?? Generator::timezone())->startOfDay(),
+                    $occurrence->end->setTimezone($this->params->get('timezone') ?? Generator::timezone())->endOfDay()
+                );
 
-                return $start->isSameDay($end) ? $start->toDateString() : [$start->toDateString(), $end->toDateString()];
+                return collect($periodInTimezone->toArray())
+                    ->map(fn (CarbonImmutable $date) => $date->toDateString())
+                    ->all();
             })
             ->map(fn(EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
