@@ -5,6 +5,7 @@ namespace TransformStudios\Events\Tests\Types;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonTimeZone;
+use Illuminate\Support\Facades\Date;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Types\SingleDayEvent;
@@ -146,36 +147,35 @@ test('can supplement no end time', function () {
 });
 
 it('queries occurrences based on timezone', function () {
-    $utcDate = now('UTC')->setTimeFromTimeString('11:00')->toImmutable();
-    $laDate = now('America/Los_Angeles')->setTimeFromTimeString('11:00')->toImmutable();
+    $utcDate = Date::parse('2026-03-26 11am')->toImmutable();
+    $laDate = $utcDate->shiftTimezone('America/Los_Angeles');
 
     $entry = makeEvent([
-        'start_date' => $utcDate->toDateString(),
+        'start_date' => '2026-03-26',
         'timezone' => 'America/Los_Angeles',
-        'start_time' => '22:00',
+        'start_time' => '05:00',
         'end_time' => '23:00',
     ]);
 
     $events1 = EventFactory::createFromEntry($entry)->occurrencesBetween($utcDate->startOfDay(), $utcDate->endOfDay());
     $events2 = EventFactory::createFromEntry($entry)->occurrencesBetween($laDate->startOfDay(), $laDate->endOfDay());
 
-    expect($events1)->toHaveCount(0);
+    expect($events1)->toHaveCount(1);
     expect($events2)->toHaveCount(1);
 });
 
-it('retrieves occurrences that span days', function () {
-    $date = CarbonImmutable::createFromDate(2026, 2, 28);
+it('retrieves occurrences that span days in different timezone than event', function ($from, $to, $count) {
     $entry = Entry::make()
         ->collection('events')
         ->data([
-            'start_date' => $date->toDateString(),
+            'start_date' => now()->toDateString(),
             'timezone' => 'America/Los_Angeles',
             'start_time' => '05:00',
             'end_time' => '23:00',
         ]);
 
-    $events1 = EventFactory::createFromEntry($entry)->occurrencesBetween($date->startOfMonth(), $date->endOfMonth());
-    // $events2 = EventFactory::createFromEntry($entry)->occurrencesBetween($date->startOfMonth(), $date->endOfMonth()->endOfWeek());
-
-    expect($events1)->toHaveCount(1);
-})->skip();
+    expect(EventFactory::createFromEntry($entry))->occurrencesBetween($from, $to)->toHaveCount($count);
+})->with([
+    [now()->startOfDay(), now()->endOfDay()->addDay(), 1],
+    [now()->startOfDay(), now()->endOfDay(), 1],
+]);

@@ -93,17 +93,8 @@ class MultiDayEvent extends Event
             ->all();
     }
 
-    protected function rule(bool $collapseDays = false): RRuleInterface
+    protected function rule(bool $useEnd = false): RRuleInterface
     {
-        // if we're collapsing, then return an rrule instead of rset and use start of first day to end of last day
-        if ($this->collapseMultiDays) {
-            return new RRule([
-                'count' => 1,
-                'dtstart' => $this->end(),
-                'freq' => RRule::DAILY,
-            ]);
-        }
-
         return tap(
             new RSet,
             fn (RSet $rset) => $this->days->each(fn (Day $day) => $rset->addRRule([

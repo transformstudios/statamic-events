@@ -52,7 +52,7 @@ class RecurringEvent extends Event
         return [$iCalEvent];
     }
 
-    protected function rule(): RRuleInterface
+    protected function rule(bool $useEnd = false): RRuleInterface
     {
         $rule = [
             'dtstart' => $this->end(),

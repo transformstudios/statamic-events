@@ -421,7 +421,7 @@ test('app and event in different timezone', function () {
 
     expect($events1)->toHaveCount(1);
     expect($events2)->toHaveCount(1);
-})->skip();
+});
 
 test('event with timezone offset appears on the correct UTC date', function () {
     $date = CarbonImmutable::createFromDate(2026, 2, 28);
