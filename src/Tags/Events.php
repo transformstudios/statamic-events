@@ -49,8 +49,8 @@ class Events extends Tags
             ->between(from: $from, to: $to)
             ->groupBy(function (Entry $occurrence) {
                 $periodInTimezone = CarbonPeriodImmutable::between(
-                    $occurrence->start->setTimezone($this->params->get('timezone') ?? Generator::timezone())->startOfDay(),
-                    $occurrence->end->setTimezone($this->params->get('timezone') ?? Generator::timezone())->endOfDay()
+                    $occurrence->start->setTimezone($this->params->get('timezone') ?? Generator::defaultTimezone())->startOfDay(),
+                    $occurrence->end->setTimezone($this->params->get('timezone') ?? Generator::defaultTimezone())->endOfDay()
                 );
 
                 return collect($periodInTimezone->toArray())

@@ -26,7 +26,7 @@ class ServiceProvider extends AddonServiceProvider
 
     private function timezone(Entry $entry, $value): string|Value
     {
-        $value ??= Events::timezone();
+        $value ??= Events::defaultTimezone();
 
         if ($entry->blueprint()->fields()->get('timezone')?->fieldtype() instanceof Dictionary) {
             return $value;

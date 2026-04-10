@@ -4,7 +4,6 @@ namespace TransformStudios\Events;
 
 use Carbon\CarbonInterface;
 use Exception;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
@@ -45,6 +44,11 @@ class Events
 
     private array $terms = [];
 
+    public static function defaultTimezone(): string
+    {
+        return static::setting('timezone', config('statamic.system.display_timezone') ?? config('app.timezone', 'UTC'));
+    }
+
     public static function fromCollection(string $handle): self
     {
         return tap(new static)->collection($handle);
@@ -63,11 +67,6 @@ class Events
     public static function setting(string $key, $default = null): mixed
     {
         return Addon::get('transformstudios/events')->settings()->get($key, $default);
-    }
-
-    public static function timezone(): string
-    {
-        return static::setting('timezone', config('statamic.system.display_timezone') ?? config('app.timezone'));
     }
 
     private function __construct() {}
