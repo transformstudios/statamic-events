@@ -4,7 +4,12 @@ namespace TransformStudios\Events\Tests;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
+use Mockery;
+use Statamic\Addons\Addon;
+use Statamic\Addons\FileSettings;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Addon as AddonFacade;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
@@ -439,4 +444,32 @@ test('event with timezone offset appears on the correct UTC date', function () {
 
     expect($events1)->toHaveCount(0);
     expect($events2)->toHaveCount(1);
+});
+
+it('uses UTC when no app timezone set', function () {
+    expect(Events::defaultTimezone())->toBe('UTC');
+});
+
+it('uses app timezone when no display_timezone set', function () {
+    Config::set('app.timezone', 'America/New_York');
+
+    expect(Events::defaultTimezone())->toBe('America/New_York');
+});
+
+it('uses display timezone when no events timezone set', function () {
+    Config::set('statamic.system.display_timezone', 'America/Chicago');
+
+    expect(Events::defaultTimezone())->toBe('America/Chicago');
+});
+
+it('uses addon setting for default timezone', function () {
+    $eventsAddon = Addon::make('transformstudios/events');
+    $settings = new FileSettings($eventsAddon, ['timezone' => 'Australia/Adelaide']);
+
+    $addon = Mockery::mock();
+    $addon->shouldReceive('settings')->andReturn($settings);
+
+    AddonFacade::shouldReceive('get')->with('transformstudios/events')->andReturn($addon);
+
+    expect(Events::defaultTimezone())->toBe('Australia/Adelaide');
 });

@@ -29,7 +29,6 @@ tabs:
             field:
               dictionary: timezones
               max_items: 1
-              default: UTC
               type: dictionary
               display: Timezone
               full_width_setting: true
