@@ -24,10 +24,12 @@ class Events extends Tags
 
     public function between(): EntryCollection|array
     {
-        return $this->output($this->generator()->between(
+        $occurrences = $this->generator()->between(
             from: CarbonImmutable::parse($this->params->get('from', now()))->startOfDay(),
-            to: CarbonImmutable::parse($this->params->get('to'))->endOfDay()
-        ));
+            to: CarbonImmutable::parse($this->params->get('to'))->endOfDay(),
+            limit: $this->params->int('limit')
+        );
+        return $this->output($occurrences);
     }
 
     public function calendar(): Collection

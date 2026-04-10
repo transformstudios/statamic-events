@@ -62,9 +62,9 @@ abstract class Event
         };
     }
 
-    public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
+    public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to, int $limit = null): Collection
     {
-        return $this->collect($this->rule()->getOccurrencesBetween(begin: $from, end: $to));
+        return $this->collect($this->rule()->getOccurrencesBetween(begin: $from, end: $to, limit: $limit));
     }
 
     public function occursOnDate(string|CarbonInterface $date): bool

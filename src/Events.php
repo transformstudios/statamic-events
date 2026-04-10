@@ -145,7 +145,7 @@ class Events
         return $this;
     }
 
-    public function between(string|CarbonInterface $from, string|CarbonInterface $to): EntryCollection|LengthAwarePaginator
+    public function between(string|CarbonInterface $from, string|CarbonInterface $to, int $limit = null): EntryCollection|LengthAwarePaginator
     {
         return $this->output(
             type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry, collapseMultiDays: $this->collapseMultiDays)->occurrencesBetween(from: $from, to: $to)
