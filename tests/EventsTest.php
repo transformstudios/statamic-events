@@ -463,11 +463,10 @@ it('uses display timezone when no events timezone set', function () {
 });
 
 it('uses addon setting for default timezone', function () {
-    $eventsAddon = Addon::make('transformstudios/events');
-    $settings = new FileSettings($eventsAddon, ['timezone' => 'Australia/Adelaide']);
-
-    $addon = Mockery::mock();
-    $addon->shouldReceive('settings')->andReturn($settings);
+    $addon = tap(Mockery::mock(), fn ($mock) => $mock
+        ->shouldReceive('settings')
+        ->andReturn(new FileSettings(Addon::make('transformstudios/events'), ['timezone' => 'Australia/Adelaide']))
+    );
 
     AddonFacade::shouldReceive('get')->with('transformstudios/events')->andReturn($addon);
 
