@@ -59,11 +59,6 @@ class Events
         return tap(new static)->event($id);
     }
 
-    public static function collectionHandles(): Collection
-    {
-        return collect(static::setting('collections', ['events']))->keys();
-    }
-
     public static function setting(string $key, $default = null): mixed
     {
         return Addon::get('transformstudios/events')->settings()->get($key, $default);
