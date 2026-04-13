@@ -410,7 +410,7 @@ it('uses the current site locale to get days of week', function () {
     ]);
 });
 
-test('uses the timezone param when generating occurrences', function () {
+it('uses the timezone param when generating occurrences', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
     $this->tag
@@ -426,4 +426,33 @@ test('uses the timezone param when generating occurrences', function () {
 
     expect($occurrences)->toHaveCount(1)
         ->first()->start->timezone->getName()->toBe('America/Vancouver');
+});
+
+it('sets "spansDay"', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('recurring-event')
+        ->id('recurring-event')
+        ->data([
+            'title' => 'Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'from' => Carbon::now()->subDay(),
+            'timezone' => 'Europe/Kyiv',
+            'to' => Carbon::now()->addDays(2),
+        ]);
+
+    $occurrences = $this->tag->between();
+
+    expect($occurrences)->toHaveCount(1)
+        ->first()->spansDay->toBeTrue();
 });

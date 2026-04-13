@@ -167,10 +167,15 @@ class Events
         $occurrences = $this->entries()->occurrences(generator: $type);
 
         if (! is_null($this->timezone)) {
-            $occurrences->transform(fn (Entry $occurrence) => $occurrence
-                ->setSupplement('start', $occurrence->start->setTimezone($this->timezone))
-                ->setSupplement('end', $occurrence->end->setTimezone($this->timezone))
-            );
+            $occurrences->transform(function (Entry $occurrence) {
+                $start = $occurrence->start->setTimezone($this->timezone);
+                $end = $occurrence->end->setTimezone($this->timezone);
+
+                return $occurrence
+                    ->setSupplement('start', $start)
+                    ->setSupplement('end', $end)
+                    ->setSupplement('spansDay', !$start->isSameDay($end));
+            });
         }
 
         if ($this->offset) {
