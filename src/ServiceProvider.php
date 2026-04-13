@@ -16,7 +16,7 @@ class ServiceProvider extends AddonServiceProvider
 
         collect(Events::setting('collections', ['events']))
             ->each(function (string $collection) {
-                Collection::findByHandle($collection)->entryBlueprint()->ensureField(
+                Collection::findByHandle($collection)?->entryBlueprint()->ensureField(
                     'timezone',
                     [
                         'dictionary' => 'timezones',
