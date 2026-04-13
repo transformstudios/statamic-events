@@ -2,12 +2,8 @@
 
 namespace TransformStudios\Events;
 
-use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
-use Statamic\Fields\Field;
-use Statamic\Fields\Fields;
-use Statamic\Fields\Value;
-use Statamic\Fieldtypes\Dictionary;
+use Statamic\Facades\Field;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
 
@@ -15,27 +11,19 @@ class ServiceProvider extends AddonServiceProvider
 {
     public function bootAddon()
     {
-        // Fields::default('events_timezone', fn () => Statamic::displayTimezone());
-        collect(Events::setting('collections', [['collection' => 'events']]))
-            ->each(fn (array $collection) => Collection::computed(
-                $collection['collection'],
-                'timezone',
-                $this->timezone(...)
-            ));
-    }
+        Field::computedDefault('default-events-timezone', fn () => Statamic::displayTimezone());
+        Field::computedDefault('default-event-timezone', fn () => Events::defaultTimezone());
 
-    private function timezone(Entry $entry, $value): string|Value
-    {
-        $value ??= Events::defaultTimezone();
-
-        if ($entry->blueprint()->fields()->get('timezone')?->fieldtype() instanceof Dictionary) {
-            return $value;
-        }
-
-        return (new Field('timezone', ['type' => 'timezones', 'max_items' => 1]))
-            ->setValue($value)
-            ->setParent($entry)
-            ->augment()
-            ->value();
+        collect(Events::setting('collections', ['events']))
+            ->each(function (string $collection) {
+                Collection::findByHandle($collection)->entryBlueprint()->ensureField(
+                    'timezone',
+                    [
+                        'dictionary' => 'timezones',
+                        'max_items' => '1',
+                        'type' => 'dictionary',
+                        'default' => 'computed:default-event-timezone',
+                    ]);
+            });
     }
 }

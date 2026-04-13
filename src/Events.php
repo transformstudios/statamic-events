@@ -48,7 +48,8 @@ class Events
 
     public static function defaultTimezone(): string
     {
-        return static::setting('timezone', config('statamic.system.display_timezone') ?? config('app.timezone', 'UTC'));
+        // return static::setting('timezone', config('statamic.system.display_timezone') ?? config('app.timezone', 'UTC'));
+        return static::setting('timezone');
     }
 
     public static function fromCollection(string $handle): self
@@ -174,7 +175,7 @@ class Events
                 return $occurrence
                     ->setSupplement('start', $start)
                     ->setSupplement('end', $end)
-                    ->setSupplement('spansDay', !$start->isSameDay($end));
+                    ->setSupplement('spansDay', ! $start->isSameDay($end));
             });
         }
 

@@ -7,23 +7,11 @@ tabs:
           -
             handle: collections
             field:
-              type: grid
+              type: collections
               display: Collections
-              sortable: false
-              add_row: 'Add Collection'
-              full_width_setting: true
-              fields:
-                -
-                  handle: collection
-                  field:
-                    type: collections
-                    display: Collection
-                    width: 50
-                    mode: select
-                    max_items: 1
-              default:
-                -
-                  collection: events
+              width: 50
+              mode: select
+              default: events
           -
             handle: timezone
             field:
@@ -31,4 +19,5 @@ tabs:
               max_items: 1
               type: dictionary
               display: Timezone
-              full_width_setting: true
+              default: computed:default-events-timezone
+              width: 50

@@ -19,9 +19,9 @@ fields:
     field:
       dictionary: timezones
       max_items: 1
-      default: UTC
       type: dictionary
       display: Timezone
+      default: computed:default-event-timezone
       width: 50
   -
     handle: specific_days
