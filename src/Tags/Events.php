@@ -193,6 +193,9 @@ class Events extends Tags
             )->when(
                 value: $this->params->bool('collapse_multi_days'),
                 callback: fn (Generator $generator) => $generator->collapseMultiDays()
+            )->when(
+                value: $this->params->get('timezone'),
+                callback: fn (Generator $generator, string $tz) => $generator->timezone(timezone: $tz)
             );
     }
 

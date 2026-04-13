@@ -8,7 +8,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site as SiteFacade;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
-use TransformStudios\Events\Tags\Events;
+use TransformStudios\Events\Tags\Events as EventsTag;
 
 beforeEach(function () {
     Entry::make()
@@ -24,7 +24,7 @@ beforeEach(function () {
             'categories' => ['one'],
         ])->save();
 
-    $this->tag = app(Events::class);
+    $this->tag = app(EventsTag::class);
 });
 
 test('can generate between occurrences', function () {
@@ -408,4 +408,22 @@ it('uses the current site locale to get days of week', function () {
         'medium' => 'Sun',
         'long' => 'Sunday',
     ]);
+});
+
+test('uses the timezone param when generating occurrences', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'from' => Carbon::now()->subDay(),
+            'timezone' => 'America/Vancouver',
+            'to' => Carbon::now()->addDays(2),
+        ]);
+
+    $occurrences = $this->tag->between();
+
+    expect($occurrences)->toHaveCount(1)
+        ->first()->start->timezone->getName()->toBe('America/Vancouver');
 });

@@ -44,6 +44,8 @@ class Events
 
     private array $terms = [];
 
+    private ?string $timezone = null;
+
     public static function defaultTimezone(): string
     {
         return static::setting('timezone', config('statamic.system.display_timezone') ?? config('app.timezone', 'UTC'));
@@ -139,6 +141,13 @@ class Events
         return $this;
     }
 
+    public function timezone(string $timezone): self
+    {
+        $this->timezone = $timezone;
+
+        return $this;
+    }
+
     public function between(string|CarbonInterface $from, string|CarbonInterface $to): EntryCollection|LengthAwarePaginator
     {
         return $this->output(
@@ -156,6 +165,13 @@ class Events
     private function output(callable $type): EntryCollection|LengthAwarePaginator
     {
         $occurrences = $this->entries()->occurrences(generator: $type);
+
+        if (! is_null($this->timezone)) {
+            $occurrences->transform(fn (Entry $occurrence) => $occurrence
+                ->setSupplement('start', $occurrence->start->setTimezone($this->timezone))
+                ->setSupplement('end', $occurrence->end->setTimezone($this->timezone))
+            );
+        }
 
         if ($this->offset) {
             $occurrences = $occurrences->slice(offset: $this->offset);
