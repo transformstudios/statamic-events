@@ -2,8 +2,12 @@
 
 namespace TransformStudios\Events;
 
+use Statamic\Entries\Entry;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Field;
+use Statamic\Facades\Field as FieldFacade;
+use Statamic\Fields\Field;
+use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Dictionary;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
 
@@ -11,19 +15,29 @@ class ServiceProvider extends AddonServiceProvider
 {
     public function bootAddon()
     {
-        Field::computedDefault('default-events-timezone', fn () => Statamic::displayTimezone());
-        Field::computedDefault('default-event-timezone', fn () => Events::defaultTimezone());
+        FieldFacade::computedDefault('default-events-timezone', fn () => Statamic::displayTimezone());
+        FieldFacade::computedDefault('default-event-timezone', fn () => Events::defaultTimezone());
 
         collect(Events::setting('collections', ['events']))
-            ->each(function (string $collection) {
-                Collection::findByHandle($collection)?->entryBlueprint()->ensureField(
-                    'timezone',
-                    [
-                        'dictionary' => 'timezones',
-                        'max_items' => '1',
-                        'type' => 'dictionary',
-                        'default' => 'computed:default-event-timezone',
-                    ]);
-            });
+            ->each(fn (string $collection) => Collection::computed(
+                $collection,
+                'timezone',
+                $this->timezone(...)
+            ));
+    }
+
+    private function timezone(Entry $entry, $value): string|Value
+    {
+        $value ??= Events::defaultTimezone();
+
+        if ($entry->blueprint()->fields()->get('timezone')?->fieldtype() instanceof Dictionary) {
+            return $value;
+        }
+
+        return (new Field('timezone', ['type' => 'timezones', 'max_items' => 1]))
+            ->setValue($value)
+            ->setParent($entry)
+            ->augment()
+            ->value();
     }
 }
