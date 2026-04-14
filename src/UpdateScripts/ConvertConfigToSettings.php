@@ -3,7 +3,6 @@
 namespace TransformStudios\Events\UpdateScripts;
 
 use Illuminate\Support\Fluent;
-use Illuminate\Support\Str;
 use Statamic\Addons\Addon;
 use Statamic\Addons\Settings;
 use Statamic\Facades\Addon as AddonFacade;
@@ -56,21 +55,8 @@ class ConvertConfigToSettings extends UpdateScript
 
         $collections = collect([$config->collection => null])
             ->merge($config->collections)
-            ->map(function (array|string $collection, $handle) {
-                if (is_string($collection)) {
-                    return [
-                        'id' => Str::random(8),
-                        'collection' => $collection,
-                    ];
-                }
-
-                $collectionSetting = [
-                    'id' => Str::random(8),
-                    'collection' => $handle,
-                ];
-
-                return Arr::removeNullValues($collectionSetting);
-            })->values()
+            ->map(fn (array|string $collection, $handle) => is_string($collection) ? $collection : $handle)
+            ->values()
             ->all();
 
         $timezone = $config->timezone;

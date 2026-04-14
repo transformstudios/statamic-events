@@ -4,7 +4,6 @@ namespace TransformStudios\Events;
 
 use Carbon\CarbonInterface;
 use Exception;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Conditionable;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
@@ -45,6 +44,14 @@ class Events
 
     private array $terms = [];
 
+    private ?string $timezone = null;
+
+    public static function defaultTimezone(): string
+    {
+        // return static::setting('timezone', config('statamic.system.display_timezone') ?? config('app.timezone', 'UTC'));
+        return static::setting('timezone');
+    }
+
     public static function fromCollection(string $handle): self
     {
         return tap(new static)->collection($handle);
@@ -55,19 +62,9 @@ class Events
         return tap(new static)->event($id);
     }
 
-    public static function collectionHandles(): Collection
-    {
-        return collect(static::setting('collections', ['events']))->keys();
-    }
-
     public static function setting(string $key, $default = null): mixed
     {
         return Addon::get('transformstudios/events')->settings()->get($key, $default);
-    }
-
-    public static function timezone(): string
-    {
-        return static::setting('timezone', config('app.timezone'));
     }
 
     private function __construct() {}
@@ -145,6 +142,13 @@ class Events
         return $this;
     }
 
+    public function timezone(string $timezone): self
+    {
+        $this->timezone = $timezone;
+
+        return $this;
+    }
+
     public function between(string|CarbonInterface $from, string|CarbonInterface $to): EntryCollection|LengthAwarePaginator
     {
         return $this->output(
@@ -162,6 +166,18 @@ class Events
     private function output(callable $type): EntryCollection|LengthAwarePaginator
     {
         $occurrences = $this->entries()->occurrences(generator: $type);
+
+        if (! is_null($this->timezone)) {
+            $occurrences->transform(function (Entry $occurrence) {
+                $start = $occurrence->start->setTimezone($this->timezone);
+                $end = $occurrence->end->setTimezone($this->timezone);
+
+                return $occurrence
+                    ->setSupplement('start', $start)
+                    ->setSupplement('end', $end)
+                    ->setSupplement('spansDay', ! $start->isSameDay($end));
+            });
+        }
 
         if ($this->offset) {
             $occurrences = $occurrences->slice(offset: $this->offset);
@@ -200,7 +216,7 @@ class Events
     private function occurrences(callable $generator): EntryCollection
     {
         return $this->entries
-            ->filter(fn (Entry $occurrence) => $this->hasStartDate($occurrence))
+            ->filter(fn (Entry $event) => $this->hasStartDate($event))
             // take each event and generate the occurrences
             ->flatMap(callback: $generator)
             ->reject(fn (Entry $occurrence) => collect($occurrence->exclude_dates)

@@ -5,8 +5,10 @@ namespace TransformStudios\Events\Tests\Tags;
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Cascade;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Site as SiteFacade;
+use Statamic\Sites\Site;
 use Statamic\Support\Arr;
-use TransformStudios\Events\Tags\Events;
+use TransformStudios\Events\Tags\Events as EventsTag;
 
 beforeEach(function () {
     Entry::make()
@@ -22,7 +24,7 @@ beforeEach(function () {
             'categories' => ['one'],
         ])->save();
 
-    $this->tag = app(Events::class);
+    $this->tag = app(EventsTag::class);
 });
 
 test('can generate between occurrences', function () {
@@ -386,4 +388,71 @@ test('can offset single day occurrences', function () {
         ]);
 
     expect($this->tag->today())->toHaveCount(0);
+});
+
+it('sets the correct short form of the days of week', function () {
+    expect($this->tag->daysOfWeek())->pluck('short')->toMatchArray(['M', 'T', 'W', 'T', 'F', 'S', 'S']);
+});
+
+it('uses the current site locale to get days of week', function () {
+    SiteFacade::shouldReceive('current')
+        ->andReturn(new Site('default', [
+            'name' => 'Laravel',
+            'url' => '/',
+            'locale' => 'en_US',
+            'lang' => 'en',
+        ], true));
+
+    expect($this->tag->daysOfWeek())->first()->toBe([
+        'short' => 'S',
+        'medium' => 'Sun',
+        'long' => 'Sunday',
+    ]);
+});
+
+it('uses the timezone param when generating occurrences', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'from' => Carbon::now()->subDay(),
+            'timezone' => 'America/Vancouver',
+            'to' => Carbon::now()->addDays(2),
+        ]);
+
+    $occurrences = $this->tag->between();
+
+    expect($occurrences)->toHaveCount(1)
+        ->first()->start->timezone->getName()->toBe('America/Vancouver');
+});
+
+it('sets "spansDay"', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('recurring-event')
+        ->id('recurring-event')
+        ->data([
+            'title' => 'Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'from' => Carbon::now()->subDay(),
+            'timezone' => 'Europe/Kyiv',
+            'to' => Carbon::now()->addDays(2),
+        ]);
+
+    $occurrences = $this->tag->between();
+
+    expect($occurrences)->toHaveCount(1)
+        ->first()->spansDay->toBeTrue();
 });

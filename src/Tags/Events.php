@@ -5,6 +5,8 @@ namespace TransformStudios\Events\Tags;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use Carbon\CarbonPeriod;
+use Carbon\CarbonPeriodImmutable;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Query\Builder;
@@ -12,6 +14,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Compare;
+use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\OutputsItems;
@@ -32,19 +35,56 @@ class Events extends Tags
 
     public function calendar(): Collection
     {
+        $currentLocale = CarbonImmutable::getLocale();
+        CarbonImmutable::setLocale(Site::current()->locale());
+
         $month = $this->params->get('month', now()->englishMonth);
         $year = $this->params->get('year', now()->year);
 
-        $from = parse_date($month.' '.$year)->startOfMonth()->startOfWeek();
-        $to = parse_date($month.' '.$year)->endOfMonth()->endOfWeek();
+        $from = parse_date($month . ' ' . $year)->startOfMonth()->startOfWeek();
+        $to = parse_date($month . ' ' . $year)->endOfMonth()->endOfWeek();
 
         $occurrences = $this
             ->generator()
             ->between(from: $from, to: $to)
-            ->groupBy(fn (Entry $occurrence) => $occurrence->start->toDateString())
-            ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
+            ->groupBy(function (Entry $occurrence) {
+                $periodInTimezone = CarbonPeriodImmutable::between(
+                    $occurrence->start->setTimezone($this->params->get('timezone') ?? Generator::defaultTimezone())->startOfDay(),
+                    $occurrence->end->setTimezone($this->params->get('timezone') ?? Generator::defaultTimezone())->endOfDay()
+                );
 
-        return $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
+                return collect($periodInTimezone->toArray())
+                    ->map(fn (CarbonImmutable $date) => $date->toDateString())
+                    ->all();
+            })
+            ->map(fn(EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
+
+        $days = $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
+
+        CarbonImmutable::setLocale($currentLocale);
+
+        return $days;
+    }
+
+    public function daysOfWeek(): Collection
+    {
+        /*
+            have to do this because Statamic sets the Carbon locale
+            to the `lang` of the site, instead of the `locale`
+        */
+        $currentLocale = Carbon::getLocale();
+        Carbon::setLocale(Site::current()->locale());
+
+        $days = collect(CarbonPeriod::dates(now()->startOfWeek(), now()->endOfWeek()))
+            ->map(fn (Carbon $date) => [
+                'short' => $date->format('D')[0],
+                'medium' => $date->format('D'),
+                'long' => $date->format('l'),
+            ]);
+
+        Carbon::setLocale($currentLocale);
+
+        return $days;
     }
 
     public function downloadLink(): string
@@ -153,6 +193,9 @@ class Events extends Tags
             )->when(
                 value: $this->params->bool('collapse_multi_days'),
                 callback: fn (Generator $generator) => $generator->collapseMultiDays()
+            )->when(
+                value: $this->params->get('timezone'),
+                callback: fn (Generator $generator, string $tz) => $generator->timezone(timezone: $tz)
             );
     }
 

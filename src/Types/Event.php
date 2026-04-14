@@ -14,7 +14,7 @@ use Statamic\Entries\Entry;
 
 abstract class Event
 {
-    abstract protected function rule(): RRuleInterface;
+    abstract protected function rule(bool $useEnd = false): RRuleInterface;
 
     public function __construct(protected Entry $event) {}
 
@@ -76,7 +76,7 @@ abstract class Event
 
     public function nextOccurrences(int $limit = 1): Collection
     {
-        return $this->collect($this->rule()->getOccurrencesAfter(date: now(), inclusive: true, limit: $limit));
+        return $this->collect($this->rule(true)->getOccurrencesAfter(date: now(), inclusive: true, limit: $limit));
     }
 
     public function startTime(): string

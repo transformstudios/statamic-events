@@ -2,8 +2,14 @@
 
 namespace TransformStudios\Events\Tests;
 
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
+use Mockery;
+use Statamic\Addons\Addon;
+use Statamic\Addons\FileSettings;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Addon as AddonFacade;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Events;
@@ -385,4 +391,84 @@ test('can filter our events with no start date', function () {
         ->upcoming(5);
 
     expect($occurrences)->toBeEmpty();
+});
+
+test('app and event in same timezone ', function () {
+    $date = CarbonImmutable::createFromDate(2026, 2, 28);
+    Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $date->toDateString(),
+            'start_time' => '05:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $events1 = Events::fromCollection('events')->between($date->startOfMonth(), $date->endOfMonth());
+    $events2 = Events::fromCollection('events')->between($date->startOfMonth(), $date->endOfMonth()->endOfWeek());
+
+    expect($events1)->toHaveCount(1);
+    expect($events2)->toHaveCount(1);
+});
+
+test('app and event in different timezone', function () {
+    $date = CarbonImmutable::createFromDate(2026, 2, 28);
+    Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $date->toDateString(),
+            'timezone' => 'America/Los_Angeles',
+            'start_time' => '05:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $events1 = Events::fromCollection('events')->between($date->startOfMonth(), $date->endOfMonth());
+    $events2 = Events::fromCollection('events')->between($date->startOfMonth(), $date->endOfMonth()->endOfWeek());
+
+    expect($events1)->toHaveCount(1);
+    expect($events2)->toHaveCount(1);
+});
+
+test('event with timezone offset appears on the correct UTC date', function () {
+    $date = CarbonImmutable::createFromDate(2026, 2, 28);
+    Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => $date->toDateString(),
+            'timezone' => 'America/Los_Angeles',
+            'start_time' => '22:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $events1 = Events::fromCollection('events')->between($date->startOfDay(), $date->endOfDay());
+    $events2 = Events::fromCollection('events')->between($date->startOfDay()->addDay(), $date->endOfDay()->addDay());
+
+    expect($events1)->toHaveCount(0);
+    expect($events2)->toHaveCount(1);
+});
+
+it('uses UTC when no app timezone set', function () {
+    expect(Events::defaultTimezone())->toBe('UTC');
+});
+
+it('uses app timezone when no display_timezone set', function () {
+    Config::set('app.timezone', 'America/New_York');
+
+    expect(Events::defaultTimezone())->toBe('America/New_York');
+});
+
+it('uses display timezone when no events timezone set', function () {
+    Config::set('statamic.system.display_timezone', 'America/Chicago');
+
+    expect(Events::defaultTimezone())->toBe('America/Chicago');
+});
+
+it('uses addon setting for default timezone', function () {
+    $addon = tap(Mockery::mock(), fn ($mock) => $mock
+        ->shouldReceive('settings')
+        ->andReturn(new FileSettings(Addon::make('transformstudios/events'), ['timezone' => 'Australia/Adelaide']))
+    );
+
+    AddonFacade::shouldReceive('get')->with('transformstudios/events')->andReturn($addon);
+
+    expect(Events::defaultTimezone())->toBe('Australia/Adelaide');
 });
