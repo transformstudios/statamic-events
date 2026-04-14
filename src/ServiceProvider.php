@@ -34,7 +34,7 @@ class ServiceProvider extends AddonServiceProvider
             return $value;
         }
 
-        return (new Field('timezone', ['type' => 'timezones', 'max_items' => 1]))
+        return (new Field('timezone', ['dictionary' => 'timezones', 'max_items' => '1', 'type' => 'dictionary']))
             ->setValue($value)
             ->setParent($entry)
             ->augment()
