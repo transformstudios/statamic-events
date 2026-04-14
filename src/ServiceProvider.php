@@ -3,7 +3,7 @@
 namespace TransformStudios\Events;
 
 use Statamic\Facades\Collection;
-use Statamic\Facades\Field as FieldFacade;
+use Statamic\Facades\Field;
 use Statamic\Providers\AddonServiceProvider;
 use Statamic\Statamic;
 
@@ -11,8 +11,8 @@ class ServiceProvider extends AddonServiceProvider
 {
     public function bootAddon()
     {
-        FieldFacade::computedDefault('default-events-timezone', fn () => Statamic::displayTimezone());
-        FieldFacade::computedDefault('default-event-timezone', fn () => Events::defaultTimezone());
+        Field::computedDefault('default-events-timezone', fn () => Statamic::displayTimezone());
+        Field::computedDefault('default-event-timezone', fn () => Events::defaultTimezone());
 
         // has to be in booted so that the `events::event` fieldset is properly registered and loaded
         $this->booted(function () {
