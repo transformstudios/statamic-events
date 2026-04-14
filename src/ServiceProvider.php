@@ -14,16 +14,19 @@ class ServiceProvider extends AddonServiceProvider
         Field::computedDefault('default-events-timezone', fn () => Statamic::displayTimezone());
         Field::computedDefault('default-event-timezone', fn () => Events::defaultTimezone());
 
-        collect(Events::setting('collections', ['events']))
-            ->each(function (string $collection) {
-                Collection::findByHandle($collection)?->entryBlueprint()->ensureField(
-                    'timezone',
-                    [
-                        'dictionary' => 'timezones',
-                        'max_items' => '1',
-                        'type' => 'dictionary',
-                        'default' => 'computed:default-event-timezone',
-                    ]);
-            });
+        // has to be in booted so that the `events::event` fieldset is properly registered and loaded
+        $this->booted(function () {
+            collect(Events::setting('collections', ['events']))
+                ->each(function (string $collection) {
+                    Collection::findByHandle($collection)?->entryBlueprint()->ensureField(
+                        'timezone',
+                        [
+                            'dictionary' => 'timezones',
+                            'max_items' => '1',
+                            'type' => 'dictionary',
+                            'default' => 'computed:default-event-timezone',
+                        ]);
+                });
+        });
     }
 }
