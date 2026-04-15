@@ -428,7 +428,7 @@ it('uses the timezone param when generating occurrences', function () {
         ->first()->start->timezone->getName()->toBe('America/Vancouver');
 });
 
-it('sets "spans_days"', function () {
+it('sets "spanning"', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
     Entry::make()
@@ -454,5 +454,5 @@ it('sets "spans_days"', function () {
     $occurrences = $this->tag->between();
 
     expect($occurrences)->toHaveCount(1)
-        ->first()->spans_days->toBeTrue();
+        ->first()->spanning->toBeTrue();
 });

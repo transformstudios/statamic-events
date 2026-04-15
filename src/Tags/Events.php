@@ -47,16 +47,7 @@ class Events extends Tags
         $occurrences = $this
             ->generator()
             ->between(from: $from, to: $to)
-            ->groupBy(function (Entry $occurrence) {
-                $periodInTimezone = CarbonPeriodImmutable::between(
-                    $occurrence->start->setTimezone($this->params->get('timezone') ?? Generator::defaultTimezone())->startOfDay(),
-                    $occurrence->end->setTimezone($this->params->get('timezone') ?? Generator::defaultTimezone())->endOfDay()
-                );
-
-                return collect($periodInTimezone->toArray())
-                    ->map(fn (CarbonImmutable $date) => $date->toDateString())
-                    ->all();
-            })
+            ->groupBy($this->spanningDays())
             ->map(fn(EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
         $days = $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
@@ -194,7 +185,7 @@ class Events extends Tags
                 value: $this->params->bool('collapse_multi_days'),
                 callback: fn (Generator $generator) => $generator->collapseMultiDays()
             )->when(
-                value: $this->params->get('timezone'),
+                value: $this->params->get('timezone', Generator::defaultTimezone()),
                 callback: fn (Generator $generator, string $tz) => $generator->timezone(timezone: $tz)
             );
     }
@@ -251,5 +242,17 @@ class Events extends Tags
         return collect($this->explodeTerms($terms))
             ->map(fn (Term|string $term) => $this->getTermId(handle: $handle, term: $term))
             ->all();
+    }
+
+    private function spanningDays(): \Closure
+    {
+        return function (Entry $occurrence) {
+            $spanningDays = CarbonPeriodImmutable::between(
+                $occurrence->start->startOfDay(),
+                $occurrence->end->endOfDay()
+            )->toArray();
+
+            return collect($spanningDays)->map(fn(CarbonImmutable $date) => $date->toDateString())->all();
+        };
     }
 }
