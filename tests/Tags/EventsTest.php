@@ -454,5 +454,5 @@ it('sets "spans_days"', function () {
     $occurrences = $this->tag->between();
 
     expect($occurrences)->toHaveCount(1)
-        ->first()->spanning_days->toBeTrue();
+        ->first()->spans_days->toBeTrue();
 });
