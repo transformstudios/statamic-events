@@ -77,9 +77,9 @@ class Events extends Tags
 
         $days = collect(CarbonPeriod::dates(now()->startOfWeek(), now()->endOfWeek()))
             ->map(fn (Carbon $date) => [
-                'short' => $date->format('D')[0],
-                'medium' => $date->format('D'),
-                'long' => $date->format('l'),
+                'short' => $date->translatedFormat('D')[0],
+                'medium' => $date->translatedFormat('D'),
+                'long' => $date->translatedFormat('l'),
             ]);
 
         Carbon::setLocale($currentLocale);
