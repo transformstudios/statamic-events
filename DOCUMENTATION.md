@@ -1,6 +1,5 @@
 Table Of Contents:
 
-* [Upgrading](https://github.com/transformstudios/statamic-events/blob/master/UPGRADING.md)
 * [Configuration](#configuration)
 * [Fieldset](#fieldset)
 * [Fields](#fields)
@@ -10,7 +9,7 @@ Table Of Contents:
 
 If you'd like to have a different event timezone default than the app default (usually UTC), update it via the CP. This is used on individual events that do not have a timezone set (see Fieldset below).
 
-The default collection for your events is `events`, if you use a different one, publish the config file and then update it via the CP.
+The default collection for your events is `events`, if you use a different one, update it in the addon settings.
 
 For the ICS downloads, it will use `address`, `coordinates`, and `description` fields if they exist. If your field is named something else, use a [Computed Value](https://statamic.dev/computed-values). `coordinates` must be a keyed array:
 ```
@@ -74,13 +73,18 @@ days:
 
 **Common Parameters**
 
-All of the above (except Download Link) have a `site` parameter you can pass the handle of the site to get the events from. It defaults to your default site. **Note**: if you use Livewire you may need to set this from Antlers, using `{site:handle}`
+All of the above (except Download Link) have :
+* `site` - handle of the site to get the events from. It defaults to your default site. **Note**: if you use Livewire you may need to set this from Antlers, using `{site:handle}`
+* `timezone` - all occurrences will be shifted to this timezone
 
 **Additional Variables** (normal entry data is available)
 
-* `start` - Carbon date/time of the occurrence start
-* `end` - Carbon date/time of the occurrence end. Note if it's an all date event this will be set to 11:59:59pm
-* `has_end_time` - Boolean that indicates if this occurrence has a set end time. In All Day events, this is `false`
+* `start` - Carbon date/time - occurrence start
+* `end` - Carbon date/time - occurrence end. Note if it's an all date event this will be set to 11:59:59pm
+* `has_end_time` - Boolean - `true` if occurrence has a set end time. In All Day events, this is `false`
+* `spanning` - Boolean - `true` if occurrence spans multiple days
+* `spanning_start` - Boolean - `true` if `spanning` and this is the first one
+* `spanning_end` - Boolean - `true` if `spanning` and this is the last one
 * when it is a multi-day event, there is also an array of `days` that contains:
   * `start`
   * `end`
