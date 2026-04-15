@@ -174,7 +174,7 @@ class Events
                 return $occurrence
                     ->setSupplement('start', $start)
                     ->setSupplement('end', $end)
-                    ->setSupplement('spans_days', ! $start->isSameDay($end));
+                    ->setSupplement('spanning', ! $start->isSameDay($end));
             });
         }
 
