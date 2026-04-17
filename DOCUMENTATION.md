@@ -82,9 +82,6 @@ All of the above (except Download Link) have :
 * `start` - Carbon date/time - occurrence start
 * `end` - Carbon date/time - occurrence end. Note if it's an all date event this will be set to 11:59:59pm
 * `has_end_time` - Boolean - `true` if occurrence has a set end time. In All Day events, this is `false`
-* `spanning` - Boolean - `true` if occurrence spans multiple days
-* `spanning_start` - Boolean - `true` if `spanning` and this is the first one
-* `spanning_end` - Boolean - `true` if `spanning` and this is the last one
 * when it is a multi-day event, there is also an array of `days` that contains:
   * `start`
   * `end`
@@ -159,7 +156,12 @@ Parameters:
 
 Output:
 
-A collection of dates, each one containing either `no_results` or `occurrences`, which list all the event occurrences on that particular date.
+A collection of dates, each one containing either `no_results` or `occurrences`, which list all the event occurrences on that particular date. In each occurence, in addition to the usual variables there are:
+* `spanning` - Boolean - `true` if occurrence spans multiple days
+* `spanning_start` - Boolean - `true` if `spanning` and this is the first one in a span
+* `spanning_end` - Boolean - `true` if `spanning` and this is the last one in a span
+
+Those can be used to style/handle occurrences that span days.
 
 *Example*:
 
