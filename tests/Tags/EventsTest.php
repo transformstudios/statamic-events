@@ -456,3 +456,34 @@ it('sets "spanning"', function () {
     expect($occurrences)->toHaveCount(1)
         ->first()->spanning->toBeTrue();
 });
+
+it('sets "spanning-start" and "spanning-end"', function () {
+    Carbon::setTestNow(Carbon::parse('April 16 10:00am'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('single-event')
+        ->id('single-event')
+        ->data([
+            'title' => 'Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $this->tag
+        ->setContext([])
+        ->setParameters(['timezone' => 'Europe/Kyiv']);
+
+    $days = $this->tag->calendar();
+    $firstSpanningOccurrence = $days[17]['occurrences'][1];
+    $secondSpanningOccurrence = $days[18]['occurrences'][0];
+
+    ray($days, $firstSpanningOccurrence);
+    expect($firstSpanningOccurrence)
+        ->spanning_start->toBeTrue()
+        ->spanning_end->toBeFalse();
+    // expect($secondSpanningOccurrence)
+    //     ->spanning_start->toBeFalse()
+    //     ->spanning_end->toBeTrue();
+});
