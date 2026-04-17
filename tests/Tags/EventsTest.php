@@ -96,7 +96,7 @@ test('can generate calendar occurrences', function () {
     $occurrences = $this->tag->calendar();
 
     expect($occurrences)->toHaveCount(42);
-    expect(Arr::get($occurrences, '5.dates'))->toHaveCount(2);
+    expect(Arr::get($occurrences, '5.occurrences'))->toHaveCount(2);
     expect(Arr::get($occurrences, '6.no_results'))->toBeTrue();
 });
 
