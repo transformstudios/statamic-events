@@ -7,6 +7,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
 use Carbon\CarbonPeriodImmutable;
+use Closure;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Query\Builder;
@@ -41,23 +42,14 @@ class Events extends Tags
         $month = $this->params->get('month', now()->englishMonth);
         $year = $this->params->get('year', now()->year);
 
-        $from = parse_date($month . ' ' . $year)->startOfMonth()->startOfWeek();
-        $to = parse_date($month . ' ' . $year)->endOfMonth()->endOfWeek();
+        $from = parse_date($month.' '.$year)->startOfMonth()->startOfWeek();
+        $to = parse_date($month.' '.$year)->endOfMonth()->endOfWeek();
 
         $occurrences = $this
             ->generator()
             ->between(from: $from, to: $to)
-            ->groupBy(function (Entry $occurrence) {
-                $periodInTimezone = CarbonPeriodImmutable::between(
-                    $occurrence->start->setTimezone($this->params->get('timezone') ?? Generator::defaultTimezone())->startOfDay(),
-                    $occurrence->end->setTimezone($this->params->get('timezone') ?? Generator::defaultTimezone())->endOfDay()
-                );
-
-                return collect($periodInTimezone->toArray())
-                    ->map(fn (CarbonImmutable $date) => $date->toDateString())
-                    ->all();
-            })
-            ->map(fn(EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
+            ->groupBy($this->spanningDays())
+            ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
         $days = $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
 
@@ -77,9 +69,9 @@ class Events extends Tags
 
         $days = collect(CarbonPeriod::dates(now()->startOfWeek(), now()->endOfWeek()))
             ->map(fn (Carbon $date) => [
-                'short' => $date->format('D')[0],
-                'medium' => $date->format('D'),
-                'long' => $date->format('l'),
+                'short' => $date->translatedFormat('D')[0],
+                'medium' => $date->translatedFormat('D'),
+                'long' => $date->translatedFormat('l'),
             ]);
 
         Carbon::setLocale($currentLocale);
@@ -144,12 +136,27 @@ class Events extends Tags
         return $this->output($occurrences->take($limit));
     }
 
+    private function addSpanningStartEnd(string $date, EntryCollection $occurrences): EntryCollection
+    {
+        return $occurrences->map(function (Entry $occurrence) use ($date) {
+            if (! $occurrence->spanning) {
+                return $occurrence;
+            }
+
+            $carbonDate = Carbon::parse($date)->shiftTimezone($occurrence->start->timezone);
+            $occurrence
+                ->setSupplement('spanning_start', $occurrence->start->isSameDay($carbonDate))
+                ->setSupplement('spanning_end', $occurrence->end->isSameDay($carbonDate));
+
+            return clone $occurrence;
+        });
+    }
+
     private function day(string $date, EntryCollection $occurrences): array
     {
         return [
             'date' => $date,
-            'dates' => $occurrences,
-            'occurrences' => $occurrences,
+            'occurrences' => $this->addSpanningStartEnd($date, $occurrences),
         ];
     }
 
@@ -194,7 +201,7 @@ class Events extends Tags
                 value: $this->params->bool('collapse_multi_days'),
                 callback: fn (Generator $generator) => $generator->collapseMultiDays()
             )->when(
-                value: $this->params->get('timezone'),
+                value: $this->params->get('timezone', Generator::defaultTimezone()),
                 callback: fn (Generator $generator, string $tz) => $generator->timezone(timezone: $tz)
             );
     }
@@ -251,5 +258,17 @@ class Events extends Tags
         return collect($this->explodeTerms($terms))
             ->map(fn (Term|string $term) => $this->getTermId(handle: $handle, term: $term))
             ->all();
+    }
+
+    private function spanningDays(): Closure
+    {
+        return function (Entry $occurrence) {
+            $spanningDays = CarbonPeriodImmutable::between(
+                $occurrence->start->startOfDay(),
+                $occurrence->end->endOfDay()
+            )->toArray();
+
+            return collect($spanningDays)->map(fn (CarbonImmutable $date) => $date->toDateString())->all();
+        };
     }
 }
