@@ -141,14 +141,16 @@ class Events extends Tags
         return [
             'date' => $date,
             'occurrences' => $occurrences->map(function (Entry $occurrence) use ($date): Entry {
-                if ($occurrence->spanning) {
-                    $carbonDate = Carbon::parse($date)->shiftTimezone($occurrence->start->timezone);
-                    $occurrence
-                        ->setSupplement('spanning_start', $occurrence->start->isSameDay($carbonDate))
-                        ->setSupplement('spanning_end', $occurrence->end->isSameDay($carbonDate));
+                if (!$occurrence->spanning) {
+                    return $occurrence;
                 }
 
-                return $occurrence;
+                $carbonDate = Carbon::parse($date)->shiftTimezone($occurrence->start->timezone);
+                $occurrence
+                    ->setSupplement('spanning_start', $occurrence->start->isSameDay($carbonDate))
+                    ->setSupplement('spanning_end', $occurrence->end->isSameDay($carbonDate));
+
+                return clone $occurrence;
             })->values(),
         ];
     }
