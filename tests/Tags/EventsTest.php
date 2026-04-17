@@ -476,14 +476,14 @@ it('sets "spanning-start" and "spanning-end"', function () {
         ->setParameters(['timezone' => 'Europe/Kyiv']);
 
     $days = $this->tag->calendar();
-    $firstSpanningOccurrence = $days[17]['occurrences'][1];
+    $firstSpanningOccurrence = $days[17]['occurrences'][0];
     $secondSpanningOccurrence = $days[18]['occurrences'][0];
 
-    ray($days, $firstSpanningOccurrence);
     expect($firstSpanningOccurrence)
         ->spanning_start->toBeTrue()
         ->spanning_end->toBeFalse();
-    // expect($secondSpanningOccurrence)
-    //     ->spanning_start->toBeFalse()
-    //     ->spanning_end->toBeTrue();
+
+     expect($secondSpanningOccurrence)
+         ->spanning_start->toBeFalse()
+         ->spanning_end->toBeTrue();
 });
