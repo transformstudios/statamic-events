@@ -96,7 +96,7 @@ test('can generate calendar occurrences', function () {
     $occurrences = $this->tag->calendar();
 
     expect($occurrences)->toHaveCount(42);
-    expect(Arr::get($occurrences, '5.dates'))->toHaveCount(2);
+    expect(Arr::get($occurrences, '5.occurrences'))->toHaveCount(2);
     expect(Arr::get($occurrences, '6.no_results'))->toBeTrue();
 });
 
@@ -455,4 +455,35 @@ it('sets "spanning"', function () {
 
     expect($occurrences)->toHaveCount(1)
         ->first()->spanning->toBeTrue();
+});
+
+it('sets "spanning-start" and "spanning-end"', function () {
+    Carbon::setTestNow(Carbon::parse('April 16 10:00am'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('single-event')
+        ->id('single-event')
+        ->data([
+            'title' => 'Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $this->tag
+        ->setContext([])
+        ->setParameters(['timezone' => 'Europe/Kyiv']);
+
+    $days = $this->tag->calendar();
+    $firstSpanningOccurrence = $days[17]['occurrences'][0];
+    $secondSpanningOccurrence = $days[18]['occurrences'][0];
+
+    expect($firstSpanningOccurrence)
+        ->spanning_start->toBeTrue()
+        ->spanning_end->toBeFalse();
+
+     expect($secondSpanningOccurrence)
+         ->spanning_start->toBeFalse()
+         ->spanning_end->toBeTrue();
 });
