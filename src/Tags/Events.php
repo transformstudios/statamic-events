@@ -42,14 +42,14 @@ class Events extends Tags
         $month = $this->params->get('month', now()->englishMonth);
         $year = $this->params->get('year', now()->year);
 
-        $from = parse_date($month.' '.$year)->startOfMonth()->startOfWeek();
-        $to = parse_date($month.' '.$year)->endOfMonth()->endOfWeek();
+        $from = parse_date($month . ' ' . $year)->startOfMonth()->startOfWeek();
+        $to = parse_date($month . ' ' . $year)->endOfMonth()->endOfWeek();
 
         $occurrences = $this
             ->generator()
             ->between(from: $from, to: $to)
             ->groupBy($this->spanningDays())
-            ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
+            ->map(fn(EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
         $days = $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
 
@@ -153,7 +153,7 @@ class Events extends Tags
 
         return [
             'date' => $date,
-            'dates'=> $occurrences,
+            'dates' => $occurrences,
             'occurrences' => $occurrences,
         ];
     }
@@ -266,7 +266,7 @@ class Events extends Tags
                 $occurrence->end->endOfDay()
             )->toArray();
 
-            return collect($spanningDays)->map(fn (CarbonImmutable $date) => $date->toDateString())->all();
+            return collect($spanningDays)->map(fn(CarbonImmutable $date) => $date->toDateString())->all();
         };
     }
 }
