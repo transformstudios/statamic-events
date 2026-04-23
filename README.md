@@ -7,6 +7,7 @@ Dates, timezones, and calendars are hard. Events makes recurring, multi-day, and
 - **Drop-In Event Fieldset** – Start fast with a ready-to-use fieldset that handles recurrence, multi-day events, and timezones.
 - **Render Calendars with Minimal Code** – Generate calendar views and event listings using simple template tags.
 - **Add to Calendar (ICS)** – Let users download events and add them directly to their calendar.
+
 ---
 
 ## How It Works
