@@ -1,21 +1,27 @@
-![Statamic 4.0+](https://img.shields.io/badge/Statamic-4.0+-FF269E?style=flat-square&link=https://statamic.com)
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/transformstudios/events?style=flat-square)](https://packagist.org/packages/transformstudios/events)
+## Meet Events
 
-Events is a Statamic v4 addon/tag that allows you to create a calendar of events or list the next few upcoming events.
+Dates, timezones, and calendars are hard. Events makes recurring, multi-day, and single events in Statamic easy. It provides a structured, battle-tested system for managing and displaying event data that respects timezones and removes the need to build complex date logic from scratch.
 
-It supports:
+### Key Benefits
 
-* multi-day events
-* recurring events - daily, weekly, monthly, annually, every "x"
+- **Render Calendars with Minimal Code** – Generate calendar views and event listings using simple template tags.
+- **Drop-In Event Fieldset** – Start fast with a ready-to-use fieldset that handles recurrence, multi-day events, and timezones.
+- **Add to Calendar (ICS)** – Let users download events and add them directly to their calendar.
 
-It uses an existing collection (assuming it has the right fields in it), so you can use all the normal Statamic capabilities.
+---
 
-Please let us know if you have questions or suggestions.
+## How It Works
 
-Future ideas:
+After installing via Composer, create or use a standard Statamic collection with structured event fields. You can use the provided [sample fieldset](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml) to get started quickly.
 
-* support subscribing to an events feed
+Once configured, use simple template tags like:
 
-## Documentation
+`events:upcoming`, `events:between`, `events:calendar`, and `events:today`
 
-We've written [some documentation](https://statamic.com/addons/transform/events/docs) to help you out when using this boilerplate.
+to query and display event data in your templates.
+
+These tags return normalized event data so you can build anything from simple lists to full calendar interfaces. We also provide an [example calendar](https://github.com/transformstudios/statamic-events/blob/main/calendar.html) to help you get there faster.
+
+### Full Documentation
+
+For detailed setup, configuration, and usage instructions, view the [full Statamic Events addon docs](https://statamic.com/addons/transform/events/docs).

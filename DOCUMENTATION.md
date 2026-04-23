@@ -1,56 +1,115 @@
-Table Of Contents:
+## Installation
 
-* [Configuration](#configuration)
-* [Fieldset](#fieldset)
-* [Fields](#fields)
-* [Usage](#usage)
+Install via Composer:
+
+```bash
+composer require transformstudios/events
+```
+
+### Quick Start
+
+Get up and running in three steps:
+
+1. Create or use a Statamic collection (default: `events`)
+2. Import the provided fieldset: `events::event`
+3. Add a template:
+
+```antlers
+{{ events:upcoming limit="5" }}
+  {{ title }} – {{ start }}
+{{ /events:upcoming }}
+```
+
+You now have a working event listing.
+
+---
 
 ## Configuration
 
-If you'd like to have a different event timezone default than the app default (usually UTC), update it via the CP. This is used on individual events that do not have a timezone set (see Fieldset below).
+### Default Timezone
 
-The default collection for your events is `events`, if you use a different one, update it in the addon settings.
+By default, events use your application timezone (typically UTC).
 
-For the ICS downloads, it will use `address`, `coordinates`, and `description` fields if they exist. If your field is named something else, use a [Computed Value](https://statamic.dev/computed-values). `coordinates` must be a keyed array:
-```
+You can override this in the Control Panel. This value is used when an event does not have a timezone set.
+
+### Collection
+
+The default collection is `events`.
+
+If you are using a different Statamic collection, update it in the addon settings.
+
+### ICS Downloads
+
+ICS downloads use the following fields if they exist:
+
+- `address`  
+- `coordinates`  
+- `description`
+
+The `coordinates` field must be a keyed array:
+
+```php
 'coordinates' => [
     'latitude' => 40,
     'longitude' => 50,
 ],
 ```
 
+If your field names differ from the defaults above, use a [Computed Value](https://statamic.dev/content-modeling/computed-values#defining-computed-values) to map them.
+
+---
+
 ## Fieldset
 
-In your collection's blueprint, make sure you have fields like in our sample [fieldset](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml).
+Your collection blueprint must include the required event fields for Events to work correctly.
 
-You can also use our sample fieldset by importing `events::event`.
+You can:
+
+- Define fields manually  
+- Import the provided fieldset: `events::event`  
+
+Using the sample fieldset is the fastest way to get started.
+
+---
 
 ## Fields
 
-### Single Day Events
+### Single-Day Events
 
-* `start_date` - **Required** - Start date of the event.
-* `start_time` - **Optional (see `all_day`)** - Start time of the event.
-* `end_time` - **Optional (see `all_day`)** - Start date of the event.
-* `all_day` - **Optional** - boolean. If this is `true`, then neither `start_time` nor `end_time` are required
+| Field        | Required | Description |
+|-------------|----------|-------------|
+| `start_date` | Yes      | Start date of the event |
+| `start_time` | No       | Start time (not required if `all_day` is true) |
+| `end_time`   | No       | End time |
+| `all_day`    | No       | If true, times are not required |
 
 ### Recurring Events
 
-* all the single day fields
-* `recurrence` - **Optional** - One of `daily`, `weekly`, `monthly`, `annually`, `every`
-* `specific_days` - **Optional** - when `recurrence` is `monthly`, you can choose options like every 3rd Tuesday, etc. You can have more than one.
-* `interval` - **Optional** - required if `recurrence` is `every` and indicates the frequency of the event
-* `period` - **Optional** - required if `recurrence` is `every` and indicates the period of recurrence. One of `days`, `weeks`, `months`, `years`
-* `end_date` - **Optional** - when is the last event. If `recurrence` is set and this is not, the event goes on forever
-* `exclude_dates` - **Optional** - a grid of `date`s that should NOT be included in the list of occurrences
+Extends single-day events with recurrence rules:
 
-### Multi-Day Events:
+| Field            | Description |
+|------------------|-------------|
+| `recurrence`     | `daily`, `weekly`, `monthly`, `annually`, `every` |
+| `specific_days`  | For rules like “3rd Tuesday” |
+| `interval`       | Required when using `every` |
+| `period`         | `days`, `weeks`, `months`, `years` |
+| `end_date`       | Optional end to recurrence |
+| `exclude_dates`  | Dates to exclude from occurrences |
 
-* all the single day fields
-* `multi_day` - boolean. When true, `start_date`, `start_time`, `end_time`, `recurrence`, `end_date` are not used
-* `days` - **Required** - array of days:
+If no `end_date` is set, the event continues indefinitely.
 
-```
+### Multi-Day Events
+
+Use this when events span specific dates.
+
+| Field       | Required | Description |
+|------------|----------|-------------|
+| `multi_day` | Yes      | Enables multi-day mode |
+| `days`      | Yes      | Array of event days |
+
+Example:
+
+```yaml
 multi_day: true
 days:
   -
@@ -61,195 +120,134 @@ days:
     date: '2019-11-24'
     start_time: '11:00'
     end_time: '15:00'
-  -
-    date: '2019-11-25'
-    start_time: '11:00'
-    end_time: '15:00'
 ```
+
+When `multi_day` is enabled, standard single-day and recurrence fields are ignored.
+
+---
 
 ## Usage
 
-### Tags (Between, Calendar, Download Link, In, Today, Upcoming)
+### Available Tags
 
-**Common Parameters**
+- `events:between`
+- `events:calendar`
+- `events:in`
+- `events:today`
+- `events:upcoming`
+- `events:download_link`
 
-All of the above (except Download Link) have :
-* `site` - handle of the site to get the events from. It defaults to your default site. **Note**: if you use Livewire you may need to set this from Antlers, using `{site:handle}`
-* `timezone` - all occurrences will be shifted to this timezone
+These tags return event occurrences (individual dates generated from your events).
 
-**Additional Variables** (normal entry data is available)
+### Common Parameters
 
-* `start` - Carbon date/time - occurrence start
-* `end` - Carbon date/time - occurrence end. Note if it's an all date event this will be set to 11:59:59pm
-* `has_end_time` - Boolean - `true` if occurrence has a set end time. In All Day events, this is `false`
-* when it is a multi-day event, there is also an array of `days` that contains:
-  * `start`
-  * `end`
-  * `has_end_time`
+| Parameter  | Description |
+|------------|-------------|
+| `site`     | Site handle (defaults to current site) |
+| `timezone` | Adjusts all occurrences to this timezone |
 
-**Pagination**
+### Returned Data
 
-Only supported on `between`, `in`, & `today` tags.
-If you want to paginate the results, add `paginate="xx"`, where `xx` is the number of items per page, to the tag. The tag will look for a `page` query parameter and paginate appropriately.
+Each occurrence includes:
 
-The output is identical to the `collection` tag [pagination](https://statamic.dev/tags/collection#pagination).
+| Field           | Description |
+|-----------------|-------------|
+| `start`         | Start datetime |
+| `end`           | End datetime |
+| `has_end_time`  | Boolean |
 
-*Example*
-```
-{{ events:between collection="events" from="Jan 1 2022" to="March 31 2022" paginate="2" }}
-  {{ results }}
-    ...entry data as explained above
-  {{ /results }}
-  {{ pagination }}
-    {{ if prev_page }}<a href="{{ prev_page }}">Previous</a>{{ /if }}
-    {{ if next_page }}<a href="{{ next_page }}">Next</a>{{ /if }}
-  {{ /pagination }}
-{{ /events:between }}
-```
+Multi-day events also include a `days` array with per-day data.
 
-**Filtering**
+### Pagination
 
-Currently only simple taxonomy filtering is supported, using the same syntax as the `collection` tag:
+Supported on:
 
-```
-{{ events:between from="Jan 1 2022" to="March 31 2022" taxonomy:categories="harry-potter" }}
-...
-{{ /events:between }}
+- `between`
+- `in`
+- `today`
+
+Example:
+
+```antlers
+paginate="10"
 ```
 
-**Sorting**
+### Filtering
 
-By default the occurrenes are sorted in ascending order, to get them in descending order, use `sort="desc"` on any of the tags.
+Supports taxonomy filtering using standard Statamic syntax:
 
-### Between Tag
-
-Tag pair that returns a range of dates.
-3 required params, `collection`, `from` & `to`.
-
-* `collection` - optional - which collection has the events, defaults to 'events'
-* `from` - optional, date to start from, defaults to 'now'
-* `to` - required, date to end at
-
-*Example*:
-
-```
-{{ events:between collection="events" from="Jan 1 2022" to="March 31 2022" }}
-  {{ if no_results }}
-    {{# whatever you need to when for an empty day #}}
-  {{ else }}
-    {{ start }} {{ end }} {{ has_end_time }}
-    ...other entry data...
-  {{ /if }}
-{{ /events:between }}
+```antlers
+taxonomy:categories="example"
 ```
 
-### Calendar
+### Sorting
 
-Tag pair that returns an entire month of dates, starting on the beginning of the week and ending on the end of the week.
-This means, for example, that April 2022's calendar starts on March 27th and ends on May 7th.
+Default: ascending  
+To reverse:
 
-Parameters:
-
-* `collection` - optional - which collection has the events, defaults to 'events'
-* `month` - optional, defaults to current month
-* `year` - optional, defaults to the current year
-
-Output:
-
-A collection of dates, each one containing either `no_results` or `occurrences`, which list all the event occurrences on that particular date. In each occurence, in addition to the usual variables there are:
-* `spanning` - Boolean - `true` if occurrence spans multiple days
-* `spanning_start` - Boolean - `true` if `spanning` and this is the first one in a span
-* `spanning_end` - Boolean - `true` if `spanning` and this is the last one in a span
-
-Those can be used to style/handle occurrences that span days.
-
-*Example*:
-
-```
-{{ events:calendar month="october" }}
-  {{ date }} {{# date of event #}}
-  {{ if no_results }}
-    {{# whatever you need to when for an empty day #}}
-  {{ else }}
-    {{ occurrences }}
-      {{ start }} {{ end }} {{ has_end_time }}
-      ...other entry data...
-    {{ /occurrences }}
-  {{ /if }}
-{{ /events:calendar }}
+```antlers
+sort="desc"
 ```
 
-Full example [here](https://github.com/transformstudios/statamic-events/blob/master/calendar.html).
+---
 
+## Tag Reference
 
-### In
+### events:between
 
-Tag pair that returns a range of dates 2 required params, `collection` & `next`
+Returns events within a date range.
 
-* `collection` - optional - which collection has the events, defaults to 'events'
-* `next` - a period that is [parsable](https://www.php.net/manual/en/datetime.formats.relative.php) by DateTime. Examples include `'2 weeks'`, `'90 days'`
+**Parameters:**
+- `collection` (optional)
+- `from` (optional, defaults to now)
+- `to` (required)
 
-*Example*:
+### events:calendar
 
-```
-{{ events:in collection="events" next="90 days" }}
-  {{ if no_results }}
-    {{# whatever you need to when for an empty day #}}
-  {{ else }}
-    {{ start }} {{ end }} {{ has_end_time }}
-    ...other entry data...
-  {{ /if }}
-{{ /events:in }}
-```
+Returns a full calendar grid for a given month.
 
-### Today
+Each day contains either:
+- `no_results`
+- `occurrences`
 
-Tag pair that returns occurrences today:
+Additional flags:
+- `spanning`
+- `spanning_start`
+- `spanning_end`
 
-* `collection` - optional - which collection has the events, defaults to 'events'
-* `ignore_past` - boolean, optional, defaults to `false`. When true only current or future occurrences are shown.
+### events:in
 
-Data and templating like the `events:in` tag
+Returns events within a future time window.
 
-### Upcoming
+Example:
 
-Tag pair that returns the next X event dates.
-
-* `collection` - optional - which collection has the events, defaults to 'events'
-* `event` - optional - if used, it gets occurrences from the given event only, and ignores `collection` parameter
-* `limit` - required, number of occurrences to return
-* `collapse_multi_days` - optional, only relevant on multi-day, all-day events. When `true`, multi-day events will only show up once in the event list.
-* `offset` – optional – if used, it skips a specified number of occurrences.
-
-*Example*:
-
-```
-{{ events:upcoming collection="events" limit="2" }}
-  {{ start }} {{ end }} {{ has_end_time }}
-  ...other entry data
-{{ /events:upcoming }}
+```antlers
+next="90 days"
 ```
 
-### Download Links
+### events:today
 
-Single Tag returns a url to the event data and add it to your calendar. The following fields will be added to the ICS if they exist:
-  * `location` (see config above)
-  * `description`
-  * `link`
+Returns events occurring today.
 
-Parameters:
+Optional:
+- `ignore_past="true"`
 
-* `collection` - required if `date` but not `event` is passed in. Defaults to `events`.
-* `date` - if `event` is included, download the ICS for the event on that date, otherwise download all events on that day
-* `event` - download all occurrences of the event, unless `date` is include (see above)
+### events:upcoming
 
-The download will be the slugified title, unless there are multiple events, in which case it will be `events`.
+Returns the next set of event occurrences.
 
-*Example*:
+**Parameters:**
+- `limit` (required)
+- `collection` (optional)
+- `event` (optional)
+- `collapse_multi_days` (optional)
+- `offset` (optional)
 
-```
-<a
-    download="event-{{ date format='Ymd' }}.ics"
-    href="{{ events:download_link event="some-id" date="{{ get:date }}" {{# getting the date from the `date` query param #}}
-}}">Download to your calendar</a>
-```
+### events:download_link
+
+Generates an ICS download link.
+
+Includes:
+- `location`
+- `description`
+- `link`
