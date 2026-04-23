@@ -22,8 +22,6 @@ to query and display event data in your templates.
 
 These tags return normalized event data so you can build anything from simple lists to full calendar interfaces. We also provide an [example calendar](https://github.com/transformstudios/statamic-events/blob/main/calendar.html) to help you get there faster.
 
----
+### Full Documentation
 
-## Documentation
-
-For full setup, configuration, and usage details, view the [full Statamic Events addon docs](https://statamic.com/addons/transform/events/docs).
+For detailed setup, configuration, and usage instructions, view the [full Statamic Events addon docs](https://statamic.com/addons/transform/events/docs).
