@@ -1,5 +1,27 @@
 # Changelog
 
+## v6.0 - 2026-04-23
+
+### 🔥 Breaking
+
+- `dates` variable in the events:calendar has been removed
+- `location` setting has been removed
+- Addon settings are used instead of config file (should be migrated)
+- Requires Statamic v6
+
+### 🚀 New
+
+- Ability to shift all occurrences to the same timezone when using the tags
+- `weekDays` tag that returns translated (based on current site's locale) days of the week.
+- Timezone blueprint field is now a Dictionary
+- Timezone defaults to Events default timezone, falling back to Statamic's `display_timezone` then the `app.timezone` then `UTC`
+- Added `spanning`, `spanning_start` & `spanning_end` for occurrences that span across days
+
+### 🧰 Maintenance
+
+- Update docs [@edalzell](https://github.com/edalzell) (#151)
+- Update test matrix for Statamic v6 [@marcorieser](https://github.com/marcorieser) (#153)
+
 ## v5.8.3 - 2025-08-29
 
 ### 🐛 Fixed
