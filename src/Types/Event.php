@@ -112,7 +112,7 @@ abstract class Event
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
 
-        if (! is_null($address = $this->event->address ?? $this->event->location)) {
+        if (! is_null($address = $this->event->address ?? $this->event->get('location'))) {
             $iCalEvent->address($address);
         }
 
