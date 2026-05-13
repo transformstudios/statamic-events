@@ -1,5 +1,15 @@
 # Changelog
 
+## v6.0.1 - 2026-05-13
+
+### 🐛 Fixed
+
+- Fix ICS location data [@edalzell](https://github.com/edalzell) (#158)
+
+### 🧰 Maintenance
+
+- Update GitHub Action Versions [@edalzell](https://github.com/edalzell) (#157)
+
 ## v6.0 - 2026-04-23
 
 ### 🔥 Breaking
