@@ -19,7 +19,6 @@ use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\OutputsItems;
-use Statamic\Tags\Parameters;
 use Statamic\Tags\Tags;
 use TransformStudios\Events\Events as Generator;
 
@@ -176,10 +175,6 @@ class Events extends Tags
 
     private function generator(): Generator
     {
-        /**
-         * @var Parameters
-         */
-
         $generator = $this->params->has('event') ?
             Generator::fromEntry($this->params->get('event')) :
             Generator::fromCollection($this->params->get('collection', 'events'));
