@@ -1,5 +1,15 @@
 # Changelog
 
+## v6.1.0 - 2026-06-04
+
+### 🚀 New
+
+- Add `month` parameter to `in_month` modifier [@marcorieser](https://github.com/marcorieser) (#163)
+
+### 🧰 Maintenance
+
+- Update GitHub Action Versions [@edalzell](https://github.com/edalzell) (#165)
+
 ## v6.0.1 - 2026-05-13
 
 ### 🐛 Fixed
