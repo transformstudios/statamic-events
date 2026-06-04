@@ -19,6 +19,7 @@ use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\OutputsItems;
+use Statamic\Tags\Parameters;
 use Statamic\Tags\Tags;
 use TransformStudios\Events\Events as Generator;
 
@@ -175,34 +176,26 @@ class Events extends Tags
 
     private function generator(): Generator
     {
-        $generator = $this->params->has('event') ?
-            Generator::fromEntry($this->params->get('event')) :
-            Generator::fromCollection($this->params->get('collection', 'events'));
+        /**
+         * @var Parameters
+         */
+        $params = $this->params->except(['paginate', 'limit', 'offset', 'chunk', 'sort']);
+
+        $generator = new Generator($params);
 
         return $generator
+            ->collapseMultiDays($this->params->bool('collapse_multi_days'))
+            ->offset(offset: $this->params->int('offset'))
+            ->pagination(page: Paginator::resolveCurrentPage(), perPage: $this->params->int('paginate'))
             ->site($this->params->get('site'))
             ->sort($this->params->get('sort', 'asc'))
+            ->timezone(timezone: $this->params->get('timezone', Generator::defaultTimezone()))
             ->when(
                 value: $this->parseTerms(),
                 callback: fn (Generator $generator, array $terms) => $generator->terms(terms: $terms)
             )->when(
                 value: $this->parseFilters(),
                 callback: fn (Generator $generator, array $filters) => $generator->filters(filters: $filters)
-            )->when(
-                value: $this->params->int('offset'),
-                callback: fn (Generator $generator, int $offset) => $generator->offset(offset: $offset)
-            )->when(
-                value: $this->params->int('paginate'),
-                callback: fn (Generator $generator, int $perPage) => $generator->pagination(
-                    page: Paginator::resolveCurrentPage(),
-                    perPage: $perPage
-                )
-            )->when(
-                value: $this->params->bool('collapse_multi_days'),
-                callback: fn (Generator $generator) => $generator->collapseMultiDays()
-            )->when(
-                value: $this->params->get('timezone', Generator::defaultTimezone()),
-                callback: fn (Generator $generator, string $tz) => $generator->timezone(timezone: $tz)
             );
     }
 

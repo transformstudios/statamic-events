@@ -51,14 +51,12 @@ class Events
         return static::setting('timezone');
     }
 
-    public static function fromCollection(string $handle): self
+    public function __construct(private $collectionParams)
     {
-        return tap(new static)->collection($handle);
-    }
-
-    public static function fromEntry(string $id): self
-    {
-        return tap(new static)->event($id);
+        match (true) {
+            $collectionParams->has('event') => $this->event($collectionParams->get('event')),
+            default => $this->collection($collectionParams->get('collection', 'events')),
+        };
     }
 
     public static function setting(string $key, $default = null): mixed
@@ -66,11 +64,9 @@ class Events
         return Addon::get('transformstudios/events')->settings()->get($key, $default);
     }
 
-    private function __construct() {}
-
-    public function collapseMultiDays(): self
+    public function collapseMultiDays(bool $collapseMultiDays): self
     {
-        $this->collapseMultiDays = true;
+        $this->collapseMultiDays = $collapseMultiDays;
 
         return $this;
     }
@@ -107,15 +103,19 @@ class Events
 
     public function offset(int $offset): self
     {
-        $this->offset = $offset;
+        if ($offset > 0) {
+            $this->offset = $offset;
+        }
 
         return $this;
     }
 
     public function pagination(int $page = 1, int $perPage = 10): self
     {
-        $this->page = $page;
-        $this->perPage = $perPage;
+        if ($perPage > 0) {
+            $this->page = $page;
+            $this->perPage = $perPage;
+        }
 
         return $this;
     }
