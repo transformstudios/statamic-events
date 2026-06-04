@@ -8,14 +8,11 @@ use Statamic\Support\Arr;
 
 class InMonth extends Modifier
 {
-    public function index($value, $params, $context)
+    public function index($value, $params, $context): bool
     {
-        $month = parse_date(
-            Arr::get($context, 'get.month', CarbonImmutable::now()->englishMonth).
-            ' '.
-            Arr::get($context, 'get.year', CarbonImmutable::now()->year)
-        )->month;
+        $month = $params[0] ?? Arr::get($context, 'get.month') ?? CarbonImmutable::now()->englishMonth;
+        $year = CarbonImmutable::now()->year;
 
-        return CarbonImmutable::parse($value)->month == $month;
+        return CarbonImmutable::parse($value)->month === parse_date("$month $year")->month;
     }
 }
