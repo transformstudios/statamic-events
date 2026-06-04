@@ -179,9 +179,10 @@ class Events extends Tags
         /**
          * @var Parameters
          */
-        $params = $this->params->except(['paginate', 'limit', 'offset', 'chunk', 'sort']);
 
-        $generator = new Generator($params);
+        $generator = $this->params->has('event') ?
+            Generator::fromEntry($this->params->get('event')) :
+            Generator::fromCollection($this->params->get('collection', 'events'));
 
         return $generator
             ->collapseMultiDays($this->params->bool('collapse_multi_days'))

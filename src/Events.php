@@ -51,18 +51,22 @@ class Events
         return static::setting('timezone');
     }
 
-    public function __construct(private $collectionParams)
+    public static function fromCollection(string $handle): self
     {
-        match (true) {
-            $collectionParams->has('event') => $this->event($collectionParams->get('event')),
-            default => $this->collection($collectionParams->get('collection', 'events')),
-        };
+        return tap(new static)->collection($handle);
+    }
+
+    public static function fromEntry(string $id): self
+    {
+        return tap(new static)->event($id);
     }
 
     public static function setting(string $key, $default = null): mixed
     {
         return Addon::get('transformstudios/events')->settings()->get($key, $default);
     }
+
+    private function __construct() {}
 
     public function collapseMultiDays(bool $collapseMultiDays): self
     {
