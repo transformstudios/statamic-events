@@ -68,7 +68,7 @@ class Events
 
     private function __construct() {}
 
-    public function collapseMultiDays(bool $collapseMultiDays): self
+    public function collapseMultiDays(?bool $collapseMultiDays = true): self
     {
         $this->collapseMultiDays = $collapseMultiDays;
 
