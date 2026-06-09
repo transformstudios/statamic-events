@@ -68,9 +68,9 @@ class Events
 
     private function __construct() {}
 
-    public function collapseMultiDays(): self
+    public function collapseMultiDays(?bool $collapseMultiDays = true): self
     {
-        $this->collapseMultiDays = true;
+        $this->collapseMultiDays = $collapseMultiDays;
 
         return $this;
     }
@@ -107,15 +107,19 @@ class Events
 
     public function offset(int $offset): self
     {
-        $this->offset = $offset;
+        if ($offset > 0) {
+            $this->offset = $offset;
+        }
 
         return $this;
     }
 
     public function pagination(int $page = 1, int $perPage = 10): self
     {
-        $this->page = $page;
-        $this->perPage = $perPage;
+        if ($perPage > 0) {
+            $this->page = $page;
+            $this->perPage = $perPage;
+        }
 
         return $this;
     }
