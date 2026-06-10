@@ -175,6 +175,7 @@ class Events extends Tags
 
     private function generator(): Generator
     {
+        return new Generator($this->params);
         $generator = $this->params->has('event') ?
             Generator::fromEntry($this->params->get('event')) :
             Generator::fromCollection($this->params->get('collection', 'events'));
@@ -183,7 +184,6 @@ class Events extends Tags
             ->collapseMultiDays($this->params->bool('collapse_multi_days'))
             ->offset(offset: $this->params->int('offset'))
             ->pagination(page: Paginator::resolveCurrentPage(), perPage: $this->params->int('paginate'))
-            ->site($this->params->get('site'))
             ->sort($this->params->get('sort', 'asc'))
             ->timezone(timezone: $this->params->get('timezone', Generator::defaultTimezone()))
             ->when(

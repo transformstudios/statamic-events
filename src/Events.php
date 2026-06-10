@@ -4,24 +4,20 @@ namespace TransformStudios\Events;
 
 use Carbon\CarbonInterface;
 use Exception;
-use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Addon;
 use Statamic\Facades\Cascade;
-use Statamic\Facades\Entry as EntryFacade;
-use Statamic\Facades\Site;
 use Statamic\Fields\Values;
 use Statamic\Support\Arr;
-use Statamic\Tags\Concerns\QueriesConditions;
+use Statamic\Tags\Parameters;
 use TransformStudios\Events\Types\MultiDayEvent;
 
 class Events
 {
-    use Conditionable;
-    use QueriesConditions;
-
     private bool $collapseMultiDays = false;
 
     private ?string $collection = null;
@@ -30,11 +26,13 @@ class Events
 
     private ?string $event = null;
 
-    private array $filters = [];
+    // private array $filters = [];
 
     private ?int $offset = null;
 
     private ?int $page = null;
+
+    private Collection $params;
 
     private ?int $perPage = null;
 
@@ -42,7 +40,7 @@ class Events
 
     private string $sort = 'asc';
 
-    private array $terms = [];
+    // private array $terms = [];
 
     private ?string $timezone = null;
 
@@ -53,20 +51,36 @@ class Events
 
     public static function fromCollection(string $handle): self
     {
-        return tap(new static)->collection($handle);
+        return tap(new static(collect()))->collection($handle);
     }
 
     public static function fromEntry(string $id): self
     {
-        return tap(new static)->event($id);
+        return tap(new static(collect()))->event($id);
+    }
+
+    public function __construct(Collection $params)
+    {
+        if ($params->has('event')) {
+            $this->event($params->get('event'));
+        }
+
+        $this->params = $params;
+
+        $this
+            ->collection($params->get('collection', 'events'))
+            ->collapseMultiDays(boolval($params->get('collapse_multi_days')))
+            ->offset(offset: intval($params->get('offset')))
+            ->pagination(page: Paginator::resolveCurrentPage(), perPage: intval($params->get('paginate')))
+            ->params($params)
+            ->sort($params->get('sort', 'asc'))
+            ->timezone(timezone: $params->get('timezone', static::defaultTimezone()));
     }
 
     public static function setting(string $key, $default = null): mixed
     {
         return Addon::get('transformstudios/events')->settings()->get($key, $default);
     }
-
-    private function __construct() {}
 
     public function collapseMultiDays(?bool $collapseMultiDays = true): self
     {
@@ -120,6 +134,13 @@ class Events
             $this->page = $page;
             $this->perPage = $perPage;
         }
+
+        return $this;
+    }
+
+    public function params(Collection $params): self
+    {
+        $this->params = $params;
 
         return $this;
     }
@@ -191,22 +212,11 @@ class Events
 
     private function entries(): self
     {
-        $query = EntryFacade::query()
-            ->when(
-                $this->event,
-                fn ($query, $id) => $query->where('id', $id),
-                fn ($query) => $query->where('collection', $this->collection)
-            )->where('site', $this->site ?? Site::current()->handle())
-            ->whereStatus('published')
-            ->when($this->terms, fn ($query, $terms) => $query->whereTaxonomyIn($terms));
-
-        collect($this->filters)->each(function ($value, $fieldCondition) use ($query) {
-            [$field, $condition] = explode(':', $fieldCondition);
-
-            $this->queryCondition(query: $query, field: $field, condition: $condition, value: $value);
-        });
-
-        $this->entries = $query->get();
+        $params = $this->params->all();
+        if ($this->collection) {
+            $params['collection'] = $this->collection;
+        }
+        $this->entries = (new Entries(new Parameters($params)))->get();
 
         return $this;
     }
