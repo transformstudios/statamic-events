@@ -212,8 +212,7 @@ class Events
 
     private function entries(): self
     {
-        $params = $this->params->all();
-        $this->entries = (new Entries(new Parameters($params)))->get();
+        $this->entries = (new Entries($this->params))->get();
 
         return $this;
     }
