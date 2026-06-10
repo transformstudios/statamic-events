@@ -59,18 +59,13 @@ class Events
 
     public function __construct(Parameters $params)
     {
-        if ($params->has('event')) {
-            $this->event($params->get('event'));
-        }
-
-        $this->params = $params;
-
         $this
+            ->params($params) // gotta be first cuz some of the later one push to it
             ->collection($params->get('collection', 'events'))
             ->collapseMultiDays($params->bool('collapse_multi_days'))
+            ->event($params->get('event'))
             ->offset(offset: $params->int('offset'))
             ->pagination(page: Paginator::resolveCurrentPage(), perPage: $params->int('paginate'))
-            ->params($params)
             ->sort($params->get('sort', 'asc'))
             ->timezone(timezone: $params->get('timezone', static::defaultTimezone()));
     }
@@ -95,9 +90,11 @@ class Events
         return $this;
     }
 
-    public function event($id): self
+    public function event(?string $id = null): self
     {
-        $this->event = $id;
+        if (! is_null($id)) {
+            $this->event = $id;
+        }
 
         return $this;
     }
