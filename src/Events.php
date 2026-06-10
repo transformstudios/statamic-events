@@ -32,7 +32,7 @@ class Events
 
     private ?int $page = null;
 
-    private Collection $params;
+    private Parameters $params;
 
     private ?int $perPage = null;
 
@@ -51,15 +51,15 @@ class Events
 
     public static function fromCollection(string $handle): self
     {
-        return tap(new static(collect()))->collection($handle);
+        return new static(new Parameters(['collection' => $handle]));
     }
 
     public static function fromEntry(string $id): self
     {
-        return tap(new static(collect()))->event($id);
+        return new static(new Parameters(['event' => $id]));
     }
 
-    public function __construct(Collection $params)
+    public function __construct(Parameters $params)
     {
         if ($params->has('event')) {
             $this->event($params->get('event'));
@@ -69,9 +69,9 @@ class Events
 
         $this
             ->collection($params->get('collection', 'events'))
-            ->collapseMultiDays(boolval($params->get('collapse_multi_days')))
-            ->offset(offset: intval($params->get('offset')))
-            ->pagination(page: Paginator::resolveCurrentPage(), perPage: intval($params->get('paginate')))
+            ->collapseMultiDays($params->bool('collapse_multi_days'))
+            ->offset(offset: $params->int('offset'))
+            ->pagination(page: Paginator::resolveCurrentPage(), perPage: $params->int('paginate'))
             ->params($params)
             ->sort($params->get('sort', 'asc'))
             ->timezone(timezone: $params->get('timezone', static::defaultTimezone()));
@@ -213,9 +213,6 @@ class Events
     private function entries(): self
     {
         $params = $this->params->all();
-        if ($this->collection) {
-            $params['collection'] = $this->collection;
-        }
         $this->entries = (new Entries(new Parameters($params)))->get();
 
         return $this;
