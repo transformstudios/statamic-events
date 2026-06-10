@@ -90,6 +90,7 @@ class Events
     public function collection(string $handle): self
     {
         $this->collection = $handle;
+        $this->params->put('collection', $handle);
 
         return $this;
     }
