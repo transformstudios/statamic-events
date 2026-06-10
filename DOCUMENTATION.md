@@ -42,8 +42,8 @@ If you are using a different Statamic collection, update it in the addon setting
 
 ICS downloads use the following fields if they exist:
 
-- `address`  
-- `coordinates`  
+- `address`
+- `coordinates`
 - `description`
 
 The `coordinates` field must be a keyed array:
@@ -65,8 +65,8 @@ Your collection blueprint must include the required event fields for Events to w
 
 You can:
 
-- Define fields manually  
-- Import the provided fieldset: `events::event`  
+- Define fields manually
+- Import the provided fieldset: `events::event`
 
 Using the sample fieldset is the fastest way to get started.
 
@@ -174,15 +174,15 @@ paginate="10"
 
 ### Filtering
 
-Supports taxonomy filtering using standard Statamic syntax:
+Supports both standard conditions and taxonomy filtering using standard Statamic syntax:
 
 ```antlers
-taxonomy:categories="example"
+taxonomy:categories:not="example" title:contains="awesome"
 ```
 
 ### Sorting
 
-Default: ascending  
+Default: ascending
 To reverse:
 
 ```antlers
