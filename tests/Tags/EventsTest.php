@@ -239,7 +239,39 @@ test('can generate upcoming occurrences with taxonomy terms', function () {
 
     $occurrences = $this->tag->between();
 
-    expect($occurrences)->toHaveCount(1);
+    expect($occurrences)
+        ->toHaveCount(1)
+        ->first()->title->toBe('Recurring Event');
+});
+
+test('can generate upcoming occurrences without taxonomy terms', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('single-event')
+        ->id('single-event')
+        ->data([
+            'title' => 'Single Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '17:00',
+            'end_time' => '19:00',
+        ])->save();
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'from' => Carbon::now()->toDateString(),
+            'to' => Carbon::now()->addDay()->toDateString(),
+            'taxonomy:categories:not' => 'one',
+        ]);
+
+    $occurrences = $this->tag->between();
+
+    expect($occurrences)
+        ->toHaveCount(1)
+        ->first()->title->toBe('Single Event');
 });
 
 test('can generate upcoming occurrences with filter', function () {
@@ -483,7 +515,7 @@ it('sets "spanning-start" and "spanning-end"', function () {
         ->spanning_start->toBeTrue()
         ->spanning_end->toBeFalse();
 
-     expect($secondSpanningOccurrence)
-         ->spanning_start->toBeFalse()
-         ->spanning_end->toBeTrue();
+    expect($secondSpanningOccurrence)
+        ->spanning_start->toBeFalse()
+        ->spanning_end->toBeTrue();
 });
