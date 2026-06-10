@@ -38,8 +38,6 @@ class Events
 
     private string $sort = 'asc';
 
-    // private array $terms = [];
-
     private ?string $timezone = null;
 
     public static function defaultTimezone(): string
