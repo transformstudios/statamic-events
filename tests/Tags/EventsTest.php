@@ -214,6 +214,34 @@ test('can paginate upcoming occurrences', function () {
     expect($pagination['paginate']['next_page'])->toEqual('/events?page=2');
 });
 
+test('can paginate between occurrences', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'from' => now()->subDay(),
+            'to' => now()->addWeeks(4),
+            'paginate' => 2,
+        ]);
+
+    Cascade::partialMock()->shouldReceive('get')
+        ->with('uri')
+        ->andReturn('/events');
+
+    $pagination = $this->tag->between();
+
+    expect($pagination)
+        ->toHaveKey('results')
+        ->toHaveKey('paginate')
+        ->toHaveKey('total_results');
+
+    expect($pagination['results'])->toHaveCount(2);
+    expect($pagination['total_results'])->toEqual(2);
+    expect($pagination['paginate']['next_page'])->toEqual('/events?page=2');
+});
+
 test('can generate upcoming occurrences with taxonomy terms', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -274,7 +302,7 @@ test('can generate upcoming occurrences without taxonomy terms', function () {
         ->first()->title->toBe('Single Event');
 });
 
-test('can generate upcoming occurrences with filter', function () {
+test('can generate between occurrences with filter', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
     Entry::make()
