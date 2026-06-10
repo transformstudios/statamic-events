@@ -27,6 +27,22 @@ beforeEach(function () {
     $this->tag = app(EventsTag::class);
 });
 
+test('can generate between occurrences of a specific event', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'event' => 'recurring-event',
+            'from' => Carbon::now(),
+            'to' => Carbon::now()->addWeek(3),
+        ]);
+
+    $occurrences = $this->tag->between();
+
+    expect($occurrences)->toHaveCount(4);
+});
+
 test('can generate between occurrences', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
