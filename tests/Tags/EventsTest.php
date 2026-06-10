@@ -483,7 +483,7 @@ it('sets "spanning-start" and "spanning-end"', function () {
         ->spanning_start->toBeTrue()
         ->spanning_end->toBeFalse();
 
-     expect($secondSpanningOccurrence)
-         ->spanning_start->toBeFalse()
-         ->spanning_end->toBeTrue();
+    expect($secondSpanningOccurrence)
+        ->spanning_start->toBeFalse()
+        ->spanning_end->toBeTrue();
 });
