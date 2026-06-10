@@ -26,8 +26,6 @@ class Events
 
     private ?string $event = null;
 
-    // private array $filters = [];
-
     private ?int $offset = null;
 
     private ?int $page = null;
@@ -114,7 +112,7 @@ class Events
 
     public function filter(string $fieldCondition, $value): self
     {
-        $this->filters[$fieldCondition] = $value;
+        $this->params->put($fieldCondition, $value);
 
         return $this;
     }
