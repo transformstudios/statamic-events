@@ -8,16 +8,13 @@ use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
 use Carbon\CarbonPeriodImmutable;
 use Closure;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Compare;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\Tags\Concerns\OutputsItems;
 use Statamic\Tags\Tags;
 use TransformStudios\Events\Events as Generator;
@@ -176,28 +173,6 @@ class Events extends Tags
     private function generator(): Generator
     {
         return new Generator($this->params);
-        $generator = $this->params->has('event') ?
-            Generator::fromEntry($this->params->get('event')) :
-            Generator::fromCollection($this->params->get('collection', 'events'));
-
-        return $generator
-            ->collapseMultiDays($this->params->bool('collapse_multi_days'))
-            ->offset(offset: $this->params->int('offset'))
-            ->pagination(page: Paginator::resolveCurrentPage(), perPage: $this->params->int('paginate'))
-            ->sort($this->params->get('sort', 'asc'))
-            ->timezone(timezone: $this->params->get('timezone', Generator::defaultTimezone()))
-            ->when(
-                value: $this->parseTerms(),
-                callback: fn (Generator $generator, array $terms) => $generator->terms(terms: $terms)
-            )->when(
-                value: $this->parseFilters(),
-                callback: fn (Generator $generator, array $filters) => $generator->filters(filters: $filters)
-            );
-    }
-
-    private function getTermId(string $handle, Term|string $term): string
-    {
-        return $term instanceof Term ? $term->id() : Str::of($handle)->append('::', $term);
     }
 
     private function makeEmptyDates(CarbonInterface $from, CarbonInterface $to): Collection
@@ -217,36 +192,6 @@ class Events extends Tags
         }
 
         return $dates;
-    }
-
-    private function parseFilters(): array
-    {
-        return collect($this->params)
-            ->filter(fn ($value, $key) => Str::contains($key, ':') && ! Str::startsWith($key, 'taxonomy:'))
-            ->all();
-    }
-
-    private function parseTerms(): array
-    {
-        $taxonomyParams = collect($this->params)
-            ->filter(fn ($value, $key) => Str::startsWith($key, 'taxonomy:'));
-
-        if ($taxonomyParams->filter()->isEmpty()) {
-            return [];
-        }
-
-        return $taxonomyParams
-            ->flatMap(fn ($terms, $key) => $this->parseTermIds($key, $terms))
-            ->all();
-    }
-
-    private function parseTermIds(string $key, array|Builder|string $terms): array
-    {
-        [$ignore, $handle] = explode(':', $key);
-
-        return collect($this->explodeTerms($terms))
-            ->map(fn (Term|string $term) => $this->getTermId(handle: $handle, term: $term))
-            ->all();
     }
 
     private function spanningDays(): Closure
