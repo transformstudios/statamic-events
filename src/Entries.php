@@ -8,7 +8,7 @@ use Statamic\Tags\Collection\Entries as BaseEntries;
 class Entries extends BaseEntries
 {
     // we don't support these
-    protected $ignoredParams = ['as', 'from', 'order_by', 'since', 'sort', 'until'];
+    protected $ignoredParams = ['as', 'from', 'offset', 'order_by', 'paginate', 'limit', 'since', 'sort', 'until'];
 
     /*
         Same as the parent but removed the queries we don't support
