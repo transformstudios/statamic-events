@@ -1,5 +1,18 @@
 # Changelog
 
+## v6.1.1 - 2026-06-10
+
+### 🐛 Fixed
+
+- Fix `isRecurring()` for recurring `every` x events [@edalzell](https://github.com/edalzell) (#171)
+- Update docs for filtering [@edalzell](https://github.com/edalzell) (#169)
+- Properly support collection conditions and taxonomy filtering [@edalzell](https://github.com/edalzell) (#168)
+
+### 🧰 Maintenance
+
+- Document `event` parameter [@edalzell](https://github.com/edalzell) (#172)
+- Add test to confirm `paginate` works with `events:between` tag [@edalzell](https://github.com/edalzell) (#170)
+
 ## v6.1.0 - 2026-06-04
 
 ### 🚀 New
