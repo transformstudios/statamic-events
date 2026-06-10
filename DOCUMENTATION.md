@@ -198,7 +198,8 @@ sort="desc"
 Returns events within a date range.
 
 **Parameters:**
-- `collection` (optional)
+- `collection` (optional, defaults to 'events')
+- `event` (optional) Pass `id` of the event you want occurrences for
 - `from` (optional, defaults to now)
 - `to` (required)
 
@@ -219,6 +220,10 @@ Additional flags:
 
 Returns events within a future time window.
 
+**Parameters:**
+- `collection` (optional, defaults to 'events')
+- `event` (optional) Pass `id` of the event you want occurrences for
+
 Example:
 
 ```antlers
@@ -229,8 +234,10 @@ next="90 days"
 
 Returns events occurring today.
 
-Optional:
-- `ignore_past="true"`
+**Parameters:**
+- `collection` (optional, defaults to 'events')
+- `event` (optional) Pass `id` of the event you want occurrences for
+- `ignore_past` (optional, defaults to 'false')
 
 ### events:upcoming
 
@@ -238,14 +245,17 @@ Returns the next set of event occurrences.
 
 **Parameters:**
 - `limit` (required)
-- `collection` (optional)
-- `event` (optional)
+- `collection` (optional, defaults to 'events')
+- `event` (optional) Pass `id` of the event you want occurrences for
 - `collapse_multi_days` (optional)
 - `offset` (optional)
 
 ### events:download_link
 
 Generates an ICS download link.
+
+**Parameters:**
+- `date` date get occurrences to download
 
 Includes:
 - `location`
