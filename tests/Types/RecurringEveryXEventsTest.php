@@ -22,7 +22,10 @@ test('can create every xevent', function () {
 
     $event = EventFactory::createFromEntry($recurringEntry);
 
-    expect($event)->toBeInstanceOf(RecurringEvent::class);
+    expect($event)
+        ->toBeInstanceOf(RecurringEvent::class)
+        ->isRecurring()->toBeTrue()
+        ->isMultiDay()->toBeFalse();
 });
 
 test('no occurences when now after end date', function () {

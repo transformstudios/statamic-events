@@ -57,7 +57,7 @@ abstract class Event
     {
         // this is a select field so you have to get its value
         return match ($this->recurrence?->value()) {
-            'daily', 'weekly', 'monthly', 'yearly' => true,
+            'daily', 'weekly', 'monthly', 'yearly', 'every' => true,
             default => false,
         };
     }
