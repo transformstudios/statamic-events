@@ -159,7 +159,13 @@ class Events
 
     public function terms(string|array $terms): self
     {
-        $this->terms = Arr::wrap($terms);
+        // these will be term ids, `taxonomy-handle::term`
+        // need to be added to the parameters like `[taxonomy:taxonomy-handle => term]`
+        foreach (Arr::wrap($terms) as $termId) {
+            [$taxonomy, $term] = explode('::', $termId);
+
+            $this->params->put('taxonomy:'.$taxonomy, $term);
+        }
 
         return $this;
     }
