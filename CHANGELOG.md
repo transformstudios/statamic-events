@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.1.2 - 2026-07-16
+
+### 🐛 Fixed
+
+- Fix `event` filtering on tags [@edalzell](https://github.com/edalzell) (#174)
+
 ## v6.1.1 - 2026-06-10
 
 ### 🐛 Fixed
