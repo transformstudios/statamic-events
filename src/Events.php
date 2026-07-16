@@ -34,8 +34,6 @@ class Events
 
     private ?int $perPage = null;
 
-    private ?string $site = null;
-
     private string $sort = 'asc';
 
     private ?string $timezone = null;
@@ -48,11 +46,6 @@ class Events
     public static function fromCollection(string $handle): self
     {
         return new static(new Parameters(['collection' => $handle]));
-    }
-
-    public static function fromEntry(string $id): self
-    {
-        return new static(new Parameters(['event' => $id]));
     }
 
     public function __construct(Parameters $params)
@@ -102,15 +95,6 @@ class Events
         return $this;
     }
 
-    public function filters(array $filters): self
-    {
-        foreach ($filters as $fieldCondition => $value) {
-            $this->filter($fieldCondition, $value);
-        }
-
-        return $this;
-    }
-
     public function filter(string $fieldCondition, $value): self
     {
         $this->params->put($fieldCondition, $value);
@@ -140,13 +124,6 @@ class Events
     public function params(Collection $params): self
     {
         $this->params = $params;
-
-        return $this;
-    }
-
-    public function site(?string $handle = null): self
-    {
-        $this->site = $handle;
 
         return $this;
     }

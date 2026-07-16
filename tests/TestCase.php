@@ -7,7 +7,6 @@ use Statamic\Facades\Collection as CollectionFacade;
 use Statamic\Facades\Fieldset;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
-use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
 use Statamic\Statamic;
 use Statamic\Testing\AddonTestCase;
@@ -20,11 +19,7 @@ abstract class TestCase extends AddonTestCase
 
     protected string $addonServiceProvider = ServiceProvider::class;
 
-    protected $shouldFakeVersion = true;
-
     protected Collection $collection;
-
-    protected Blueprint $blueprint;
 
     protected function setUp(): void
     {

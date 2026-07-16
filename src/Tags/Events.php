@@ -9,10 +9,8 @@ use Carbon\CarbonPeriod;
 use Carbon\CarbonPeriodImmutable;
 use Closure;
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Query\Builder;
 use Statamic\Entries\Entry;
 use Statamic\Entries\EntryCollection;
-use Statamic\Facades\Compare;
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Tags\Concerns\OutputsItems;
@@ -155,19 +153,6 @@ class Events extends Tags
             'date' => $date,
             'occurrences' => $this->addSpanningStartEnd($date, $occurrences),
         ];
-    }
-
-    private function explodeTerms(array|Builder|string $terms): array
-    {
-        if (is_string($terms)) {
-            return array_filter(explode('|', $terms));
-        }
-
-        if (Compare::isQueryBuilder($terms)) {
-            return $terms->get();
-        }
-
-        return $terms;
     }
 
     private function generator(): Generator
