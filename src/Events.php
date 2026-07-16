@@ -48,6 +48,11 @@ class Events
         return new static(new Parameters(['collection' => $handle]));
     }
 
+    public static function fromEntry(string $id): self
+    {
+        return new static(new Parameters(['event' => $id]));
+    }
+
     public function __construct(Parameters $params)
     {
         throw_if(
