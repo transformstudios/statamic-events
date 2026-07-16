@@ -57,6 +57,11 @@ class Events
 
     public function __construct(Parameters $params)
     {
+        throw_if(
+            $params->has('collection') && $params->has('event'),
+            new Exception('The [collection] and [event] parameters cannot be used together.')
+        );
+
         $this
             ->params($params) // gotta be first cuz some of the later one push to it
             ->collection($params->get('collection', 'events'))
