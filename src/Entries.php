@@ -17,10 +17,10 @@ class Entries extends BaseEntries
     protected function query()
     {
         $query = Entry::query()
-            ->whereIn('collection', $this->collections->map->handle()->all())
             ->when(
                 $this->params->get('event'),
-                fn ($query, $id) => $query->whereIn('id', Arr::wrap($id))
+                fn ($query, $id) => $query->whereIn('id', Arr::wrap($id)),
+                fn ($query) => $query->whereIn('collection', $this->collections->map->handle()->all())
             );
 
         $this->querySite($query);

@@ -193,13 +193,18 @@ sort="desc"
 
 ## Tag Reference
 
+> **Note:** `collection` and `event` are mutually exclusive. Pass `collection` to
+> list occurrences from a whole collection, or `event` to get occurrences for a
+> single entry — not both. Using them together throws an exception. (This does not
+> apply to `events:download_link`, which accepts both.)
+
 ### events:between
 
 Returns events within a date range.
 
 **Parameters:**
-- `collection` (optional, defaults to 'events')
-- `event` (optional) Pass `id` of the event you want occurrences for
+- `collection` (optional, defaults to 'events'; cannot be combined with `event`)
+- `event` (optional) Pass `id` of the event you want occurrences for; cannot be combined with `collection`
 - `from` (optional, defaults to now)
 - `to` (required)
 
@@ -221,8 +226,8 @@ Additional flags:
 Returns events within a future time window.
 
 **Parameters:**
-- `collection` (optional, defaults to 'events')
-- `event` (optional) Pass `id` of the event you want occurrences for
+- `collection` (optional, defaults to 'events'; cannot be combined with `event`)
+- `event` (optional) Pass `id` of the event you want occurrences for; cannot be combined with `collection`
 
 Example:
 
@@ -235,8 +240,8 @@ next="90 days"
 Returns events occurring today.
 
 **Parameters:**
-- `collection` (optional, defaults to 'events')
-- `event` (optional) Pass `id` of the event you want occurrences for
+- `collection` (optional, defaults to 'events'; cannot be combined with `event`)
+- `event` (optional) Pass `id` of the event you want occurrences for; cannot be combined with `collection`
 - `ignore_past` (optional, defaults to 'false')
 
 ### events:upcoming
@@ -245,8 +250,8 @@ Returns the next set of event occurrences.
 
 **Parameters:**
 - `limit` (required)
-- `collection` (optional, defaults to 'events')
-- `event` (optional) Pass `id` of the event you want occurrences for
+- `collection` (optional, defaults to 'events'; cannot be combined with `event`)
+- `event` (optional) Pass `id` of the event you want occurrences for; cannot be combined with `collection`
 - `collapse_multi_days` (optional)
 - `offset` (optional)
 

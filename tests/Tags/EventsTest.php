@@ -55,6 +55,17 @@ test('can generate between occurrences of a specific event', function () {
     expect($occurrences)->toHaveCount(4);
 });
 
+test('throws when both collection and event params are used', function () {
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'event' => 'recurring-event',
+        ]);
+
+    $this->tag->between();
+})->throws(\Exception::class, 'The [collection] and [event] parameters cannot be used together.');
+
 test('can generate between occurrences', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
