@@ -30,6 +30,18 @@ beforeEach(function () {
 test('can generate between occurrences of a specific event', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
+    Entry::make()
+        ->collection('events')
+        ->slug('single-event')
+        ->id('single-event')
+        ->data([
+            'title' => 'Single Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'categories' => ['one'],
+        ])->save();
+
     $this->tag
         ->setContext([])
         ->setParameters([
