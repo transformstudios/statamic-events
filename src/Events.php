@@ -245,10 +245,9 @@ class Events
     }
 
     /*
-        Generating occurrences means augmenting every entry, which is by far the most
-        expensive part of this whole pipeline. Most collections are mostly made up of
-        events that finished long ago, so skip those up front using only raw values -
-        augmenting an entry here just to decide whether to skip it would defeat the point.
+        Generating occurrences means augmenting, which is expenseve, every entry. Most
+        collections are mostly made up of events that finished long ago, so skip those up
+        front using only raw values
     */
     private function hasEnded(Entry $event, string|CarbonInterface $from): bool
     {
@@ -256,11 +255,11 @@ class Events
             return false;
         }
 
-        $from = is_string($from) ? CarbonImmutable::parse($from) : $from;
+        $from = is_string($from) ? CarbonImmutable::parse($from) : $from->toImmutable();
 
         // an event's last day runs until midnight in its own timezone, which we don't
         // know without augmenting, so leave a couple of days of slack to cover any offset
-        return $lastDate->lt($from->copy()->subDays(2)->startOfDay());
+        return $lastDate->lt($from->subDays(2)->startOfDay());
     }
 
     private function lastPossibleDate(Entry $event): ?CarbonImmutable
