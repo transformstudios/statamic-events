@@ -245,7 +245,7 @@ class Events
     }
 
     /*
-        Generating occurrences means augmenting, which is expenseve, every entry. Most
+        Generating occurrences means augmenting, which is expensive, every entry. Most
         collections are mostly made up of events that finished long ago, so skip those up
         front using only raw values
     */
