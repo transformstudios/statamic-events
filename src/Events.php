@@ -2,6 +2,7 @@
 
 namespace TransformStudios\Events;
 
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Exception;
 use Illuminate\Pagination\Paginator;
@@ -181,20 +182,22 @@ class Events
     public function between(string|CarbonInterface $from, string|CarbonInterface $to): EntryCollection|LengthAwarePaginator
     {
         return $this->output(
-            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry, collapseMultiDays: $this->collapseMultiDays)->occurrencesBetween(from: $from, to: $to)
+            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry, collapseMultiDays: $this->collapseMultiDays)->occurrencesBetween(from: $from, to: $to),
+            from: $from
         );
     }
 
     public function upcoming(int $limit = 1): EntryCollection|LengthAwarePaginator
     {
         return $this->output(
-            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry, collapseMultiDays: $this->collapseMultiDays)->nextOccurrences(limit: $limit)
+            type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry, collapseMultiDays: $this->collapseMultiDays)->nextOccurrences(limit: $limit),
+            from: now()
         );
     }
 
-    private function output(callable $type): EntryCollection|LengthAwarePaginator
+    private function output(callable $type, string|CarbonInterface $from): EntryCollection|LengthAwarePaginator
     {
-        $occurrences = $this->entries()->occurrences(generator: $type);
+        $occurrences = $this->entries()->occurrences(generator: $type, from: $from);
 
         if (! is_null($this->timezone)) {
             $occurrences->transform(function (Entry $occurrence) {
@@ -227,9 +230,10 @@ class Events
         return EventFactory::getTypeClass(event: $occurrence) === MultiDayEvent::class;
     }
 
-    private function occurrences(callable $generator): EntryCollection
+    private function occurrences(callable $generator, string|CarbonInterface $from): EntryCollection
     {
         return $this->entries
+            ->reject(fn (Entry $event) => $this->hasEnded(event: $event, from: $from))
             ->filter(fn (Entry $event) => $this->hasStartDate($event))
             // take each event and generate the occurrences
             ->flatMap(callback: $generator)
@@ -238,6 +242,57 @@ class Events
                 ->contains(fn (Values $dateRow) => $dateRow->date->isSameDay($occurrence->start))
             )->sortBy(callback: fn (Entry $occurrence) => $occurrence->start, descending: $this->sort === 'desc')
             ->values();
+    }
+
+    /*
+        Generating occurrences means augmenting every entry, which is by far the most
+        expensive part of this whole pipeline. Most collections are mostly made up of
+        events that finished long ago, so skip those up front using only raw values -
+        augmenting an entry here just to decide whether to skip it would defeat the point.
+    */
+    private function hasEnded(Entry $event, string|CarbonInterface $from): bool
+    {
+        if (is_null($lastDate = $this->lastPossibleDate($event))) {
+            return false;
+        }
+
+        $from = is_string($from) ? CarbonImmutable::parse($from) : $from;
+
+        // an event's last day runs until midnight in its own timezone, which we don't
+        // know without augmenting, so leave a couple of days of slack to cover any offset
+        return $lastDate->lt($from->copy()->subDays(2)->startOfDay());
+    }
+
+    private function lastPossibleDate(Entry $event): ?CarbonImmutable
+    {
+        $recurrence = $event->get('recurrence');
+
+        if ($recurrence === 'multi_day' || $event->get('multi_day')) {
+            $dates = collect($event->get('days'))->pluck('date')->filter();
+
+            return $dates->isEmpty() ? null : $this->parseDate($dates->max());
+        }
+
+        if (in_array($recurrence, ['daily', 'weekly', 'monthly', 'every'])) {
+            // no end date means it recurs forever
+            return $this->parseDate($event->get('end_date'));
+        }
+
+        return $this->parseDate($event->get('start_date'));
+    }
+
+    // a date we can't read is one we can't rule out, so let it through to the generator
+    private function parseDate($date): ?CarbonImmutable
+    {
+        if (blank($date)) {
+            return null;
+        }
+
+        try {
+            return CarbonImmutable::parse($date);
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     private function hasStartDate(Entry $occurrence): bool
