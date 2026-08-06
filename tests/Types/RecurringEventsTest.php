@@ -9,6 +9,22 @@ use TransformStudios\Events\Events;
 use TransformStudios\Events\Types\RecurringEvent;
 use TransformStudios\Events\Types\SingleDayEvent;
 
+test('falls back to default timezone when entry has invalid timezone value', function () {
+    $recurringEntry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'recurrence' => 'daily',
+            'end_date' => Carbon::now()->addDays(2)->toDateString(),
+            'timezone' => 'est',
+        ]);
+
+    $event = EventFactory::createFromEntry($recurringEntry);
+
+    expect($event->nextOccurrences())->not->toBeEmpty();
+});
+
 test('can create recurring event', function () {
     $recurringEntry = Entry::make()
         ->collection('events')
