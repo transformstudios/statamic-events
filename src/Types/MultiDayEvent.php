@@ -25,7 +25,7 @@ class MultiDayEvent extends Event
             ->sortBy('date')
             ->map(fn (Values $day) => new Day(
                 $day->all(),
-                $this->timezone['name'],
+                $this->timezoneName(),
                 $day->all_day || $this->isAllDay(),
             ));
     }

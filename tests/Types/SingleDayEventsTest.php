@@ -30,6 +30,22 @@ test('can create single event', function () {
     expect($event->end()->timezone)->toEqual(new CarbonTimeZone('America/Vancouver'));
 });
 
+test('falls back to default timezone when entry has invalid timezone value', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'timezone' => 'est',
+        ]);
+
+    $event = EventFactory::createFromEntry($entry);
+
+    expect($event->start()->timezone)->toEqual(new CarbonTimeZone('UTC'));
+    expect($event->end()->timezone)->toEqual(new CarbonTimeZone('UTC'));
+});
+
 test('can create single all day event', function () {
     $entry = Entry::make()
         ->collection('events')

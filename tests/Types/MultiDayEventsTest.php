@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Tests\Types;
 
 use Carbon\Carbon;
+use Carbon\CarbonTimeZone;
 use Statamic\Facades\Entry;
 use TransformStudios\Events\EventFactory;
 use TransformStudios\Events\Types\MultiDayEvent;
@@ -116,4 +117,24 @@ test('day is all day when no start and end time', function () {
     $days = $this->allDayEvent->days();
 
     expect($days[0]->isAllDay())->toBeTrue();
+});
+
+test('falls back to default timezone when entry has invalid timezone value', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->data([
+            'recurrence' => 'multi_day',
+            'days' => [
+                [
+                    'date' => '2019-11-23',
+                    'start_time' => '19:00',
+                    'end_time' => '21:00',
+                ],
+            ],
+            'timezone' => 'est',
+        ]);
+
+    $event = EventFactory::createFromEntry($entry);
+
+    expect($event->start()->timezone)->toEqual(new CarbonTimeZone('UTC'));
 });

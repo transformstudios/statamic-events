@@ -61,7 +61,7 @@ class RecurringEvent extends Event
         ];
 
         if ($end = $this->end_date) {
-            $rule['until'] = CarbonImmutable::parse($end)->shiftTimezone($this->timezone['name'])->endOfDay();
+            $rule['until'] = CarbonImmutable::parse($end)->shiftTimezone($this->timezoneName())->endOfDay();
         }
 
         if (! empty($days = $this->onSpecificDays())) {

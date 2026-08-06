@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use RRule\RRuleInterface;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
+use TransformStudios\Events\Events;
 
 abstract class Event
 {
@@ -87,14 +88,14 @@ abstract class Event
     public function start(): CarbonImmutable
     {
         return CarbonImmutable::parse($this->start_date)
-            ->shiftTimezone($this->timezone['name'])
+            ->shiftTimezone($this->timezoneName())
             ->setTimeFromTimeString($this->startTime());
     }
 
     public function end(): CarbonImmutable
     {
         return CarbonImmutable::parse($this->start_date)
-            ->shiftTimezone($this->timezone['name'])
+            ->shiftTimezone($this->timezoneName())
             ->setTimeFromTimeString($this->endTime());
     }
 
@@ -165,14 +166,19 @@ abstract class Event
     {
         $carbon = is_string($date) ? CarbonImmutable::parse($date) : $date;
 
-        return $carbon->shiftTimezone($this->timezone['name']);
+        return $carbon->shiftTimezone($this->timezoneName());
+    }
+
+    protected function timezoneName(): string
+    {
+        return Arr::get($this->timezone->data(), 'name') ?? Events::defaultTimezone();
     }
 
     private function collect(array $dates): Collection
     {
         return collect($dates)
             ->map(fn (DateTimeInterface $date) => $this->supplement(
-                date: CarbonImmutable::parse($date, $this->timezone['name'])
+                date: CarbonImmutable::parse($date, $this->timezoneName())
             ))->filter();
     }
 }
