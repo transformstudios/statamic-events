@@ -55,7 +55,7 @@ class RecurringEvent extends Event
     protected function rule(bool $useEnd = false): RRuleInterface
     {
         $rule = [
-            'dtstart' => $this->end(),
+            'dtstart' => $useEnd ? $this->end() : $this->start(),
             'freq' => $this->frequency(),
             'interval' => $this->interval(),
         ];

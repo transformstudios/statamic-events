@@ -139,6 +139,41 @@ test('can generate calendar occurrences', function () {
     expect(Arr::get($occurrences, '6.no_results'))->toBeTrue();
 });
 
+test('calendar does not leak a stray day for a daily recurring event with no explicit times', function () {
+    Carbon::setTestNow('aug 1, 2026 10:00');
+
+    Entry::all()->each->delete();
+
+    Entry::make()
+        ->collection('events')
+        ->slug('recurring-event-no-times')
+        ->data([
+            'title' => 'Recurring Event - No Times',
+            'start_date' => '2026-07-11',
+            'end_date' => '2026-08-01',
+            'recurrence' => 'daily',
+            'timezone' => 'America/Los_Angeles',
+        ])->save();
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'month' => 'August',
+            'year' => 2026,
+        ]);
+
+    $days = collect($this->tag->calendar());
+
+    expect($days->count() % 7)->toBe(0);
+
+    $first = Carbon::parse($days->first()['date']);
+
+    $days->values()->each(
+        fn ($day, $i) => expect($day['date'])->toBe($first->copy()->addDays($i)->toDateString())
+    );
+});
+
 test('can generate in occurrences', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
