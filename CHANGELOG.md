@@ -1,5 +1,16 @@
 # Changelog
 
+## v6.1.3 - 2026-08-07
+
+### 🐛 Fixed
+
+- Fix invalid timezone value [@marcorieser](https://github.com/marcorieser) (#180)
+- Performance improvements - skipping already finished events [@edalzell](https://github.com/edalzell) (#177)
+
+### 🧰 Maintenance
+
+- Add laravel/pao for agent-optimized test output [@edalzell](https://github.com/edalzell) (#178)
+
 ## v6.1.2 - 2026-07-16
 
 ### 🐛 Fixed
