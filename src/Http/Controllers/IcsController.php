@@ -3,6 +3,7 @@
 namespace TransformStudios\Events\Http\Controllers;
 
 use Carbon\CarbonImmutable;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -25,8 +26,13 @@ class IcsController extends Controller
 
     public function __invoke(Request $request)
     {
+        try {
+            $date = $request->filled('date') ? CarbonImmutable::parse($request->input('date')) : null;
+        } catch (InvalidFormatException $e) {
+            abort(404, 'Event not found');
+        }
+
         $handle = $request->string('collection', 'events');
-        $date = $request->has('date') ? CarbonImmutable::parse($request->get('date')) : null;
         $eventId = $request->string('event');
         $entry = null;
 
