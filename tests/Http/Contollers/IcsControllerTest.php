@@ -172,7 +172,7 @@ test('can create single day multiday event ics file', function () {
     $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
 });
 
-test('throws404 error when event does not occur on date', function () {
+test('throws 404 error when event does not occur on date', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
     $this->get(route('statamic.events.ics.show', [
@@ -181,11 +181,18 @@ test('throws404 error when event does not occur on date', function () {
     ]))->assertStatus(404);
 });
 
-test('throws404 error when event does not exist', function () {
+test('throws 404 error when event does not exist', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
     $this->get(route('statamic.events.ics.show', [
         'date' => now()->addDay()->toDateString(),
         'event' => 'does-not-exist',
+    ]))->assertStatus(404);
+});
+
+test('throws 404 error when date is invalid', function () {
+    $this->get(route('statamic.events.ics.show', [
+        'date' => 'not-a-date',
+        'event' => 'the-id',
     ]))->assertStatus(404);
 });
