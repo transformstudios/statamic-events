@@ -74,22 +74,22 @@ class RecurringEvent extends Event
     private function frequency(): int
     {
         return match ($this->recurrence->value()) {
-            'daily' => Rrule::DAILY,
-            'weekly' => Rrule::WEEKLY,
-            'monthly' => Rrule::MONTHLY,
-            'yearly' => Rrule::YEARLY,
+            'daily' => RRule::DAILY,
+            'weekly' => RRule::WEEKLY,
+            'monthly' => RRule::MONTHLY,
+            'yearly' => RRule::YEARLY,
             'every' => $this->periodToFrequency(),
-            default => Rrule::DAILY
+            default => RRule::DAILY
         };
     }
 
     private function frequencyToRecurrence(): RecurrenceFrequency
     {
         return match ($this->frequency()) {
-            Rrule::DAILY => RecurrenceFrequency::Daily,
-            Rrule::WEEKLY => RecurrenceFrequency::Weekly,
-            Rrule::MONTHLY => RecurrenceFrequency::Monthly,
-            Rrule::YEARLY => RecurrenceFrequency::Yearly,
+            RRule::DAILY => RecurrenceFrequency::Daily,
+            RRule::WEEKLY => RecurrenceFrequency::Weekly,
+            RRule::MONTHLY => RecurrenceFrequency::Monthly,
+            RRule::YEARLY => RecurrenceFrequency::Yearly,
             default => RecurrenceFrequency::Daily
         };
     }
@@ -97,11 +97,11 @@ class RecurringEvent extends Event
     private function periodToFrequency(): int
     {
         return match ($this->period->value()) {
-            'days' => Rrule::DAILY,
-            'weeks' => Rrule::WEEKLY,
-            'months' => Rrule::MONTHLY,
-            'years' => Rrule::YEARLY,
-            default => Rrule::DAILY
+            'days' => RRule::DAILY,
+            'weeks' => RRule::WEEKLY,
+            'months' => RRule::MONTHLY,
+            'years' => RRule::YEARLY,
+            default => RRule::DAILY
         };
     }
 
