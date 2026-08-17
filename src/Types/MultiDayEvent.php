@@ -64,7 +64,7 @@ class MultiDayEvent extends Event
             ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
             ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
 
-        if (! is_null($address = $this->event->address ?? $this->event->location)) {
+        if ($address = $this->icsAddress()) {
             $iCalEvent->address($address);
         }
 

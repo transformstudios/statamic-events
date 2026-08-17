@@ -113,7 +113,7 @@ abstract class Event
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
 
-        if (! is_null($address = $this->event->address ?? $this->event->get('location'))) {
+        if ($address = $this->icsAddress()) {
             $iCalEvent->address($address);
         }
 
@@ -146,11 +146,20 @@ abstract class Event
             return $link;
         }
 
-        if (is_null($location = $this->event->location)) {
+        $location = $this->event->get('location');
+
+        if (! is_string($location)) {
             return null;
         }
 
         return Str::isUrl($location) ? $location : null;
+    }
+
+    protected function icsAddress(): ?string
+    {
+        $address = $this->event->address ?? $this->event->get('location');
+
+        return is_string($address) && $address !== '' ? $address : null;
     }
 
     protected function supplement(CarbonInterface $date): ?Entry
