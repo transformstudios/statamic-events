@@ -1,5 +1,16 @@
 # Changelog
 
+## v6.1.4 - 2026-08-18
+
+### 🐛 Fixed
+
+- Return 404 with invalid date when downloading ICS file [@edalzell](https://github.com/edalzell) (#182)
+- Only pass string addresses to ICS downloads [@adnankussair](https://github.com/adnankussair) (#184)
+
+### 🧰 Maintenance
+
+- Normalize RRule constant casing [@adnankussair](https://github.com/adnankussair) (#185)
+
 ## v6.1.3 - 2026-08-07
 
 ### 🐛 Fixed
