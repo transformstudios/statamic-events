@@ -196,3 +196,117 @@ test('throws 404 error when date is invalid', function () {
         'event' => 'the-id',
     ]))->assertStatus(404);
 });
+
+test('can create ics when location is a group without address', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('grouped-location-event')
+        ->id('the-grouped-location-id')
+        ->data([
+            'title' => 'Grouped Location Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'location' => [
+                'details' => 'Virtual',
+                'coordinates' => [
+                    'latitude' => 40,
+                    'longitude' => 50,
+                ],
+            ],
+            'description' => 'The description',
+        ])->save();
+
+    $response = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'the-grouped-location-id',
+    ]))->assertDownload('grouped-location-event.ics');
+
+    $content = $response->streamedContent();
+
+    $this->assertStringNotContainsString('LOCATION:', $content);
+    $this->assertStringContainsString('DESCRIPTION:The description', $content);
+});
+
+test('falls back to string location when address is missing', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('location-fallback-event')
+        ->id('the-location-fallback-id')
+        ->data([
+            'title' => 'Location Fallback Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'location' => 'The Location',
+            'description' => 'The description',
+        ])->save();
+
+    $response = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'the-location-fallback-id',
+    ]))->assertDownload('location-fallback-event.ics');
+
+    $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
+});
+
+test('can create recurring ics when location is a group without address', function () {
+    Carbon::setTestNow(now()->addDay()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('grouped-recurring-event')
+        ->id('the-grouped-recurring-id')
+        ->data([
+            'title' => 'Grouped Recurring Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'weekly',
+            'location' => [
+                'details' => 'Virtual',
+            ],
+            'description' => 'The description',
+        ])->save();
+
+    $response = $this->get(route('statamic.events.ics.show', [
+        'event' => 'the-grouped-recurring-id',
+    ]))->assertDownload('grouped-recurring-event.ics');
+
+    $this->assertStringNotContainsString('LOCATION:', $response->streamedContent());
+});
+
+test('can create multi-day ics when location is a group without address', function () {
+    Carbon::setTestNow(now());
+
+    Entry::make()
+        ->slug('grouped-multi-day-event')
+        ->collection('events')
+        ->id('the-grouped-multi-day-id')
+        ->data([
+            'title' => 'Grouped Multi-day Event',
+            'multi_day' => true,
+            'location' => [
+                'details' => 'Virtual',
+            ],
+            'description' => 'The description',
+            'days' => [
+                [
+                    'date' => now()->toDateString(),
+                    'start_time' => '19:00',
+                    'end_time' => '21:00',
+                ],
+            ],
+        ])->save();
+
+    $response = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'the-grouped-multi-day-id',
+    ]))->assertDownload('grouped-multi-day-event.ics');
+
+    $this->assertStringNotContainsString('LOCATION:', $response->streamedContent());
+});

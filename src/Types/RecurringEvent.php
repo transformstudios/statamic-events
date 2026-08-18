@@ -33,7 +33,7 @@ class RecurringEvent extends Event
             ->endsAt($this->end())
             ->rrule($this->spatieRule());
 
-        if (! is_null($address = $this->event->address ?? $this->event->location)) {
+        if ($address = $this->icsAddress()) {
             $iCalEvent->address($address);
         }
 
