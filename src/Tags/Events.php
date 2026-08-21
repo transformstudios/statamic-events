@@ -38,9 +38,10 @@ class Events extends Tags
 
         $month = $this->params->get('month', now()->englishMonth);
         $year = $this->params->get('year', now()->year);
+        $timezone = $this->params->get('timezone', Generator::defaultTimezone());
 
-        $from = parse_date($month.' '.$year)->startOfMonth()->startOfWeek();
-        $to = parse_date($month.' '.$year)->endOfMonth()->endOfWeek();
+        $from = parse_date($month.' '.$year)->shiftTimezone($timezone)->startOfMonth()->startOfWeek();
+        $to = parse_date($month.' '.$year)->shiftTimezone($timezone)->endOfMonth()->endOfWeek();
 
         $occurrences = $this
             ->generator()
