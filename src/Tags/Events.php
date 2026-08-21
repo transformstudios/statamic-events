@@ -38,17 +38,22 @@ class Events extends Tags
 
         $month = $this->params->get('month', now()->englishMonth);
         $year = $this->params->get('year', now()->year);
+        $timezone = $this->params->get('timezone', Generator::defaultTimezone());
 
-        $from = parse_date($month.' '.$year)->startOfMonth()->startOfWeek();
-        $to = parse_date($month.' '.$year)->endOfMonth()->endOfWeek();
+        $from = parse_date($month.' '.$year)->shiftTimezone($timezone)->startOfMonth()->startOfWeek();
+        $to = parse_date($month.' '.$year)->shiftTimezone($timezone)->endOfMonth()->endOfWeek();
+
+        $emptyDates = $this->makeEmptyDates(from: $from, to: $to);
 
         $occurrences = $this
             ->generator()
             ->between(from: $from, to: $to)
             ->groupBy($this->spanningDays())
+            // Drop days outside the grid so merge() can't append stray cells.
+            ->only($emptyDates->keys())
             ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
-        $days = $this->output($this->makeEmptyDates(from: $from, to: $to)->merge($occurrences)->values());
+        $days = $this->output($emptyDates->merge($occurrences)->values());
 
         CarbonImmutable::setLocale($currentLocale);
 

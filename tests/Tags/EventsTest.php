@@ -174,6 +174,107 @@ test('calendar does not leak a stray day for a daily recurring event with no exp
     );
 });
 
+test('calendar does not leak a stray day when the timezone is behind the app timezone', function () {
+    Carbon::setTestNow('september 1, 2026 10:00');
+
+    Entry::all()->each->delete();
+
+    // 1:30am UTC on the first day of the grid is the evening of the day before in Los Angeles
+    Entry::make()
+        ->collection('events')
+        ->slug('sunset-special')
+        ->data([
+            'title' => 'Sunset Special',
+            'start_date' => '2026-08-31',
+            'start_time' => '01:30',
+            'end_time' => '04:30',
+        ])->save();
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'month' => 'September',
+            'year' => 2026,
+            'timezone' => 'America/Los_Angeles',
+        ]);
+
+    $days = collect($this->tag->calendar());
+
+    expect($days->pluck('date'))->not->toContain('2026-08-30');
+
+    expect($days->count() % 7)->toBe(0);
+
+    $first = Carbon::parse($days->first()['date']);
+
+    $days->values()->each(
+        fn ($day, $i) => expect($day['date'])->toBe($first->copy()->addDays($i)->toDateString())
+    );
+});
+
+test('calendar does not leak a stray day for an occurrence spanning past the last day of the grid', function () {
+    Carbon::setTestNow('september 1, 2026 10:00');
+
+    Entry::all()->each->delete();
+
+    // in Kyiv this runs from 11pm on the last day of the grid until 2am the day after it
+    Entry::make()
+        ->collection('events')
+        ->slug('overnight-special')
+        ->data([
+            'title' => 'Overnight Special',
+            'start_date' => '2026-10-04',
+            'start_time' => '20:00',
+            'end_time' => '23:00',
+        ])->save();
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'month' => 'September',
+            'year' => 2026,
+            'timezone' => 'Europe/Kyiv',
+        ]);
+
+    $days = collect($this->tag->calendar());
+
+    expect($days->pluck('date'))->not->toContain('2026-10-05');
+
+    expect($days->count() % 7)->toBe(0);
+
+    $first = Carbon::parse($days->first()['date']);
+
+    $days->values()->each(
+        fn ($day, $i) => expect($day['date'])->toBe($first->copy()->addDays($i)->toDateString())
+    );
+});
+
+test('calendar grid stays whole across a daylight saving change', function () {
+    Carbon::setTestNow('november 1, 2026 10:00');
+
+    Entry::all()->each->delete();
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'month' => 'November',
+            'year' => 2026,
+            'timezone' => 'America/Los_Angeles',
+        ]);
+
+    $days = collect($this->tag->calendar());
+
+    expect($days->count() % 7)->toBe(0);
+
+    $first = Carbon::parse($days->first()['date']);
+
+    $days->values()->each(
+        fn ($day, $i) => expect($day['date'])->toBe($first->copy()->addDays($i)->toDateString())
+    );
+});
+
 test('can generate in occurrences', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
