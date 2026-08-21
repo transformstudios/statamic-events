@@ -49,6 +49,7 @@ class Events extends Tags
             ->generator()
             ->between(from: $from, to: $to)
             ->groupBy($this->spanningDays())
+            // Drop days outside the grid so merge() can't append stray cells.
             ->only($emptyDates->keys())
             ->map(fn (EntryCollection $occurrences, string $date) => $this->day(date: $date, occurrences: $occurrences));
 
