@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.1.5 - 2026-08-21
+
+### 🐛 Fixed
+
+- Fix stray calendar cells [@marcorieser](https://github.com/marcorieser) (#187)
+
 ## v6.1.4 - 2026-08-18
 
 ### 🐛 Fixed
