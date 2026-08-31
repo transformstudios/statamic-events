@@ -264,20 +264,21 @@ class Events
 
     private function lastPossibleDate(Entry $event): ?CarbonImmutable
     {
-        $recurrence = $event->get('recurrence');
+        // value() inherits from the origin so localized stubs still resolve dates
+        $recurrence = $event->value('recurrence');
 
-        if ($recurrence === 'multi_day' || $event->get('multi_day')) {
-            $dates = collect($event->get('days'))->pluck('date')->filter();
+        if ($recurrence === 'multi_day' || $event->value('multi_day')) {
+            $dates = collect($event->value('days'))->pluck('date')->filter();
 
             return $dates->isEmpty() ? null : $this->parseDate($dates->max());
         }
 
         if (in_array($recurrence, ['daily', 'weekly', 'monthly', 'every'])) {
             // no end date means it recurs forever
-            return $this->parseDate($event->get('end_date'));
+            return $this->parseDate($event->value('end_date'));
         }
 
-        return $this->parseDate($event->get('start_date'));
+        return $this->parseDate($event->value('start_date'));
     }
 
     // a date we can't read is one we can't rule out, so let it through to the generator
@@ -306,7 +307,7 @@ class Events
             }
         }
 
-        return $occurrence->has('start_date');
+        return filled($occurrence->value('start_date'));
     }
 
     private function paginate(EntryCollection $occurrences): LengthAwarePaginator
