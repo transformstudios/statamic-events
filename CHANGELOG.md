@@ -1,5 +1,16 @@
 # Changelog
 
+## v6.1.6 - 2026-09-02
+
+### 🐛 Fixed
+
+- Collapse multi-day events to a single occurrence [@edalzell](https://github.com/edalzell) (#198)
+- Include localized events that inherit dates from origin [@edalzell](https://github.com/edalzell) (#197)
+
+### 🧰 Maintenance
+
+- Drop unused spatie/calendar-links dependency [@edalzell](https://github.com/edalzell) (#189)
+
 ## v6.1.5 - 2026-08-21
 
 ### 🐛 Fixed
