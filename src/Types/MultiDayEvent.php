@@ -45,6 +45,16 @@ class MultiDayEvent extends Event
         return $this->days->last()->end();
     }
 
+    public function nextOccurrences(int $limit = 1): Collection
+    {
+        return $this->uniqueCollapsedOccurrences(parent::nextOccurrences($limit));
+    }
+
+    public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
+    {
+        return $this->uniqueCollapsedOccurrences(parent::occurrencesBetween($from, $to));
+    }
+
     public function start(): CarbonImmutable
     {
         return $this->days->first()->start();
@@ -138,5 +148,14 @@ class MultiDayEvent extends Event
     private function getDayFromDate(CarbonInterface $date): ?Day
     {
         return $this->days->first(fn (Day $day, int $index) => $this->collapseMultiDays ? $index == 0 : $date->isSameDay($day->start()));
+    }
+
+    private function uniqueCollapsedOccurrences(Collection $occurrences): Collection
+    {
+        if (! $this->collapseMultiDays) {
+            return $occurrences;
+        }
+
+        return $occurrences->unique(fn (Entry $occurrence) => $occurrence->id())->values();
     }
 }
