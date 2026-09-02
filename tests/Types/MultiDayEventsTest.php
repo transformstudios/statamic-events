@@ -36,6 +36,7 @@ beforeEach(function () {
             'timezone' => 'America/Vancouver',
         ]);
 
+    $this->entry = $entry;
     $this->event = EventFactory::createFromEntry($entry);
 
     $noEndTimeEntry = Entry::make()
@@ -111,6 +112,36 @@ test('can generate next occurrence if before', function () {
 test('can generate next occurrence if during', function () {
     Carbon::setTestNowAndTimezone('2019-11-24 10:00', 'America/Vancouver');
     expect($this->event->nextOccurrences()[0]->start)->toEqual(Carbon::parse('2019-11-24')->setTimeFromTimeString('11:00:00'));
+});
+
+test('can collapse a multi day event into one occurrence', function () {
+    $event = EventFactory::createFromEntry($this->entry, collapseMultiDays: true);
+
+    $occurrences = $event->occurrencesBetween(
+        Carbon::parse('2019-11-23')->startOfDay(),
+        Carbon::parse('2019-11-25')->endOfDay(),
+    );
+
+    expect($occurrences)->toHaveCount(1)
+        ->and($occurrences->first()->start)->toEqual(Carbon::parse('2019-11-23 19:00')->shiftTimezone('America/Vancouver'))
+        ->and($occurrences->first()->end)->toEqual(Carbon::parse('2019-11-25 15:00')->shiftTimezone('America/Vancouver'));
+});
+
+test('can collapse upcoming multi day occurrences', function () {
+    Carbon::setTestNowAndTimezone('2019-11-22', 'America/Vancouver');
+
+    $event = EventFactory::createFromEntry($this->entry, collapseMultiDays: true);
+
+    expect($event->nextOccurrences(3))->toHaveCount(1);
+});
+
+test('does not collapse a multi day event by default', function () {
+    $occurrences = $this->event->occurrencesBetween(
+        Carbon::parse('2019-11-23')->startOfDay(),
+        Carbon::parse('2019-11-25')->endOfDay(),
+    );
+
+    expect($occurrences)->toHaveCount(3);
 });
 
 test('day is all day when no start and end time', function () {
