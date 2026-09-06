@@ -1,5 +1,17 @@
 # Changelog
 
+## v6.1.7 - 2026-09-06
+
+### 🐛 Fixed
+
+- Ignore empty or invalid timezone tag params [@edalzell](https://github.com/edalzell) (#199)
+
+### 🧰 Maintenance
+
+- Check maintainers with RELEASE_TOKEN [@edalzell](https://github.com/edalzell) (#202)
+- Bump the github-actions group with 3 updates [@[dependabot[bot]](https://github.com/apps/dependabot)](https://github.com/[dependabot[bot]](https://github.com/apps/dependabot)) (#201)
+- Release via PR instead of pushing main [@edalzell](https://github.com/edalzell) (#200)
+
 ## v6.1.6 - 2026-09-02
 
 ### 🐛 Fixed
