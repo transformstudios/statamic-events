@@ -65,7 +65,7 @@ class Events
             config('statamic.system.display_timezone'),
             config('app.timezone'),
             'UTC',
-        ])->first(fn (mixed $candidate) => static::isValidTimezone($candidate)) ?? 'UTC';
+        ])->first(fn (mixed $candidate) => static::isValidTimezone($candidate));
     }
 
     public function __construct(Parameters $params)
