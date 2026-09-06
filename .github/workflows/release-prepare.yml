@@ -1,0 +1,28 @@
+name: Release Prepare
+
+on:
+  workflow_dispatch:
+
+jobs:
+  authorize:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Require transformstudios/maintainers
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          state=$(gh api "orgs/transformstudios/teams/maintainers/memberships/${GITHUB_ACTOR}" --jq .state 2>/dev/null || true)
+          if [ "$state" != "active" ]; then
+            echo "::error::Only @transformstudios/maintainers can run Release Prepare (actor: ${GITHUB_ACTOR})"
+            exit 1
+          fi
+
+  prepare:
+    needs: authorize
+    uses: edalzell/github-workflows/.github/workflows/release-prepare.yml@5ebfc6714a6c4ca7f2434ff01736ea2405e1c323 # v1.3.1
+    permissions:
+      contents: write
+    secrets:
+      release_token: ${{ secrets.RELEASE_TOKEN }}
