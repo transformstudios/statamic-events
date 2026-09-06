@@ -44,10 +44,7 @@ class Events
 
     public static function defaultTimezone(): string
     {
-        return static::resolveTimezone(static::setting('timezone'))
-            ?? static::resolveTimezone(config('statamic.system.display_timezone'))
-            ?? static::resolveTimezone(config('app.timezone'))
-            ?? 'UTC';
+        return static::resolveTimezone();
     }
 
     public static function fromCollection(string $handle): self
@@ -60,19 +57,15 @@ class Events
         return new static(new Parameters(['event' => $id]));
     }
 
-    public static function resolveTimezone(mixed $timezone): ?string
+    public static function resolveTimezone(mixed $timezone = null): string
     {
-        if (! is_string($timezone) || ! filled($timezone)) {
-            return null;
-        }
-
-        try {
-            new DateTimeZone($timezone);
-        } catch (Exception) {
-            return null;
-        }
-
-        return $timezone;
+        return collect([
+            $timezone,
+            static::setting('timezone'),
+            config('statamic.system.display_timezone'),
+            config('app.timezone'),
+            'UTC',
+        ])->first(fn (mixed $candidate) => is_string($candidate) && filled($candidate) && static::isValidTimezone($candidate)) ?? 'UTC';
     }
 
     public function __construct(Parameters $params)
@@ -193,7 +186,7 @@ class Events
 
     public function timezone(?string $timezone = null): self
     {
-        $this->timezone = static::resolveTimezone($timezone) ?? static::defaultTimezone();
+        $this->timezone = static::resolveTimezone($timezone);
 
         return $this;
     }
@@ -212,6 +205,17 @@ class Events
             type: fn (Entry $entry) => EventFactory::createFromEntry(event: $entry, collapseMultiDays: $this->collapseMultiDays)->nextOccurrences(limit: $limit),
             from: now()
         );
+    }
+
+    private static function isValidTimezone(string $timezone): bool
+    {
+        try {
+            new DateTimeZone($timezone);
+        } catch (Exception) {
+            return false;
+        }
+
+        return true;
     }
 
     private function output(callable $type, string|CarbonInterface $from): EntryCollection|LengthAwarePaginator
