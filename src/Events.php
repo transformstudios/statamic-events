@@ -4,6 +4,7 @@ namespace TransformStudios\Events;
 
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use DateTimeZone;
 use Exception;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
@@ -43,7 +44,10 @@ class Events
 
     public static function defaultTimezone(): string
     {
-        return static::setting('timezone');
+        return static::resolveTimezone(static::setting('timezone'))
+            ?? static::resolveTimezone(config('statamic.system.display_timezone'))
+            ?? static::resolveTimezone(config('app.timezone'))
+            ?? 'UTC';
     }
 
     public static function fromCollection(string $handle): self
@@ -54,6 +58,21 @@ class Events
     public static function fromEntry(string $id): self
     {
         return new static(new Parameters(['event' => $id]));
+    }
+
+    public static function resolveTimezone(mixed $timezone): ?string
+    {
+        if (! is_string($timezone) || ! filled($timezone)) {
+            return null;
+        }
+
+        try {
+            new DateTimeZone($timezone);
+        } catch (Exception) {
+            return null;
+        }
+
+        return $timezone;
     }
 
     public function __construct(Parameters $params)
@@ -71,7 +90,7 @@ class Events
             ->offset(offset: $params->int('offset'))
             ->pagination(page: Paginator::resolveCurrentPage(), perPage: $params->int('paginate'))
             ->sort($params->get('sort', 'asc'))
-            ->timezone(timezone: $params->get('timezone', static::defaultTimezone()));
+            ->timezone(timezone: $params->get('timezone'));
     }
 
     public static function setting(string $key, $default = null): mixed
@@ -172,9 +191,9 @@ class Events
         return $this;
     }
 
-    public function timezone(string $timezone): self
+    public function timezone(?string $timezone = null): self
     {
-        $this->timezone = $timezone;
+        $this->timezone = static::resolveTimezone($timezone) ?? static::defaultTimezone();
 
         return $this;
     }

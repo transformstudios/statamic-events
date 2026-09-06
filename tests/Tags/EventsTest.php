@@ -8,6 +8,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Site as SiteFacade;
 use Statamic\Sites\Site;
 use Statamic\Support\Arr;
+use TransformStudios\Events\Events;
 use TransformStudios\Events\Tags\Events as EventsTag;
 
 beforeEach(function () {
@@ -661,6 +662,42 @@ it('uses the timezone param when generating occurrences', function () {
 
     expect($occurrences)->toHaveCount(1)
         ->first()->start->timezone->getName()->toBe('America/Vancouver');
+});
+
+it('falls back to the default timezone when the timezone param is empty', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'from' => Carbon::now()->subDay(),
+            'timezone' => '',
+            'to' => Carbon::now()->addDays(2),
+        ]);
+
+    $occurrences = $this->tag->between();
+
+    expect($occurrences)->toHaveCount(1)
+        ->first()->start->timezone->getName()->toBe(Events::defaultTimezone());
+});
+
+it('falls back to the default timezone when the timezone param is invalid', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    $this->tag
+        ->setContext([])
+        ->setParameters([
+            'collection' => 'events',
+            'from' => Carbon::now()->subDay(),
+            'timezone' => 'not-a-real-timezone',
+            'to' => Carbon::now()->addDays(2),
+        ]);
+
+    $occurrences = $this->tag->between();
+
+    expect($occurrences)->toHaveCount(1)
+        ->first()->start->timezone->getName()->toBe(Events::defaultTimezone());
 });
 
 it('sets "spanning"', function () {
