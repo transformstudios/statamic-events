@@ -113,7 +113,11 @@ abstract class Event
      */
     public function toICalendarEvents(): array
     {
-        return Arr::wrap($this->toICalendarEvent($this->start()));
+        if (! $event = $this->toICalendarEvent($this->start())) {
+            return [];
+        }
+
+        return [$event];
     }
 
     protected function buildICalendarEvent(string|CarbonInterface $date): ICalendarEvent
