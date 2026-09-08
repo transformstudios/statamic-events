@@ -310,3 +310,99 @@ test('can create multi-day ics when location is a group without address', functi
 
     $this->assertStringNotContainsString('LOCATION:', $response->streamedContent());
 });
+
+test('multi-day whole-event download includes location url description and geo on every day', function () {
+    Carbon::setTestNow(now());
+
+    Entry::make()
+        ->slug('multi-day-whole-event')
+        ->collection('events')
+        ->id('the-multi-day-whole-event')
+        ->data([
+            'title' => 'Multi-day Whole Event',
+            'multi_day' => true,
+            'address' => '123 Main St',
+            'link' => 'https://example.com/join',
+            'coordinates' => [
+                'latitude' => 40,
+                'longitude' => 50,
+            ],
+            'description' => 'The description',
+            'days' => [
+                [
+                    'date' => now()->toDateString(),
+                    'start_time' => '19:00',
+                    'end_time' => '21:00',
+                ],
+                [
+                    'date' => now()->addDay()->toDateString(),
+                    'start_time' => '11:00',
+                    'end_time' => '15:00',
+                ],
+            ],
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'event' => 'the-multi-day-whole-event',
+    ]))->assertDownload('multi-day-whole-event.ics')->streamedContent();
+
+    expect(substr_count($content, 'LOCATION:123 Main St'))->toBe(2)
+        ->and(substr_count($content, 'URL:https://example.com/join'))->toBe(2)
+        ->and(substr_count($content, 'DESCRIPTION:The description'))->toBe(2)
+        ->and(substr_count($content, 'GEO:40;50'))->toBe(2);
+});
+
+test('partial coordinates do not fatal and omit geo', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('partial-coords-event')
+        ->id('partial-coords-id')
+        ->data([
+            'title' => 'Partial Coords Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'address' => '123 Main St',
+            'coordinates' => [
+                'latitude' => 40,
+            ],
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'partial-coords-id',
+    ]))->assertDownload('partial-coords-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('LOCATION:123 Main St', $content);
+    $this->assertStringNotContainsString('GEO:', $content);
+});
+
+test('non-numeric coordinates do not fatal and omit geo', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('bad-coords-event')
+        ->id('bad-coords-id')
+        ->data([
+            'title' => 'Bad Coords Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'address' => '123 Main St',
+            'coordinates' => [
+                'latitude' => 'north',
+                'longitude' => 'west',
+            ],
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'bad-coords-id',
+    ]))->assertDownload('bad-coords-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('LOCATION:123 Main St', $content);
+    $this->assertStringNotContainsString('GEO:', $content);
+});

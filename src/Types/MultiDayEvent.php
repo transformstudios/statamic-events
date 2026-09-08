@@ -59,28 +59,12 @@ class MultiDayEvent extends Event
         $immutableDate = $this->toCarbonImmutable($date);
         $day = $this->getDayFromDate($immutableDate);
 
-        $iCalEvent = ICalendarEvent::create($this->event->title)
-            ->uniqueIdentifier($this->event->id())
-            ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
-            ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
-
-        if ($address = $this->icsAddress()) {
-            $iCalEvent->address($address);
-        }
-
-        if (! is_null($coords = $this->event->coordinates)) {
-            $iCalEvent->coordinates($coords['latitude'], $coords['longitude']);
-        }
-
-        if (! is_null($description = $this->event->description)) {
-            $iCalEvent->description($description);
-        }
-
-        if (! is_null($link = $this->eventUrl())) {
-            $iCalEvent->url($link);
-        }
-
-        return $iCalEvent;
+        return $this->decorate(
+            ICalendarEvent::create($this->event->title)
+                ->uniqueIdentifier($this->event->id())
+                ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
+                ->endsAt($immutableDate->setTimeFromTimeString($day->end()))
+        );
     }
 
     /**
@@ -89,7 +73,9 @@ class MultiDayEvent extends Event
     public function toICalendarEvents(): array
     {
         return collect($this->days)
-            ->map(fn (Day $day, int $index) => $day->toICalendarEvent($this->event->title, $index))
+            ->map(fn (Day $day, int $index) => $this->decorate(
+                $day->toICalendarEvent($this->event->title, $index)
+            ))
             ->all();
     }
 
