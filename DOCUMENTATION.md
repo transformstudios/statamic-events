@@ -40,11 +40,16 @@ If you are using a different Statamic collection, update it in the addon setting
 
 ### ICS Downloads
 
-ICS downloads use the following fields if they exist:
+ICS downloads read the following entry fields when present:
 
-- `address`
-- `coordinates`
-- `description`
+| ICS property | Source |
+|---|---|
+| `LOCATION` | `address`, falling back to `location` — only when the value is a string |
+| `URL` | `link`, falling back to `location` when that string is a URL |
+| `GEO` | `coordinates` (`latitude` / `longitude`) |
+| `DESCRIPTION` | `description` |
+
+A URL-valued `location` (with no separate `address` / `link`) currently emits **both** `LOCATION:` and `URL:`.
 
 The `coordinates` field must be a keyed array:
 
@@ -262,7 +267,4 @@ Generates an ICS download link.
 **Parameters:**
 - `date` date get occurrences to download
 
-Includes:
-- `location`
-- `description`
-- `link`
+Includes the fields documented under [ICS Downloads](#ics-downloads).
