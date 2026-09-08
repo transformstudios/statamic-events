@@ -105,15 +105,7 @@ abstract class Event
             return null;
         }
 
-        $immutableDate = $this->toCarbonImmutable($date);
-
-        return $this->decorate(
-            ICalendarEvent::create($this->event->title)
-                ->withoutTimezone()
-                ->uniqueIdentifier($this->event->id())
-                ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
-                ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()))
-        );
+        return $this->decorate($this->buildICalendarEvent($date));
     }
 
     /**
@@ -122,6 +114,17 @@ abstract class Event
     public function toICalendarEvents(): array
     {
         return Arr::wrap($this->toICalendarEvent($this->start()));
+    }
+
+    protected function buildICalendarEvent(string|CarbonInterface $date): ICalendarEvent
+    {
+        $immutableDate = $this->toCarbonImmutable($date);
+
+        return ICalendarEvent::create($this->event->title)
+            ->withoutTimezone()
+            ->uniqueIdentifier($this->event->id())
+            ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
+            ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
     }
 
     protected function decorate(ICalendarEvent $iCalEvent): ICalendarEvent

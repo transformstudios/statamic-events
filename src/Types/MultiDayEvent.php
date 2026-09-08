@@ -11,6 +11,7 @@ use RRule\RSet;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
 use Statamic\Fields\Values;
+use Statamic\Support\Str;
 use TransformStudios\Events\Day;
 
 class MultiDayEvent extends Event
@@ -60,33 +61,31 @@ class MultiDayEvent extends Event
         return $this->days->first()->start();
     }
 
-    public function toICalendarEvent(string|CarbonInterface $date): ?ICalendarEvent
-    {
-        if (! $this->occursOnDate($date)) {
-            return null;
-        }
-
-        $immutableDate = $this->toCarbonImmutable($date);
-        $day = $this->getDayFromDate($immutableDate);
-
-        return $this->decorate(
-            ICalendarEvent::create($this->event->title)
-                ->uniqueIdentifier($this->event->id())
-                ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
-                ->endsAt($immutableDate->setTimeFromTimeString($day->end()))
-        );
-    }
-
     /**
      * @return ICalendarEvent[]
      */
     public function toICalendarEvents(): array
     {
-        return collect($this->days)
-            ->map(fn (Day $day, int $index) => $this->decorate(
-                $day->toICalendarEvent($this->event->title, $index)
-            ))
+        return $this->days
+            ->values()
+            ->map(function (Day $day, int $index) {
+                $event = $this->toICalendarEvent($day->start());
+
+                return $event?->uniqueIdentifier(Str::slug($this->event->title).'-'.$index);
+            })
+            ->filter()
             ->all();
+    }
+
+    protected function buildICalendarEvent(string|CarbonInterface $date): ICalendarEvent
+    {
+        $immutableDate = $this->toCarbonImmutable($date);
+        $day = $this->getDayFromDate($immutableDate);
+
+        return ICalendarEvent::create($this->event->title)
+            ->uniqueIdentifier($this->event->id())
+            ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
+            ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
     }
 
     protected function rule(bool $useEnd = false): RRuleInterface

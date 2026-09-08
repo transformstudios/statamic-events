@@ -6,7 +6,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
 use RRule\RRule;
 use RRule\RRuleInterface;
-use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Spatie\IcalendarGenerator\Enums\RecurrenceFrequency;
 use Spatie\IcalendarGenerator\ValueObjects\RRule as ICalendarRule;
 
@@ -27,15 +26,11 @@ class RecurringEvent extends Event
      */
     public function toICalendarEvents(): array
     {
-        return [
-            $this->decorate(
-                ICalendarEvent::create($this->event->title)
-                    ->uniqueIdentifier($this->event->id())
-                    ->startsAt($this->start())
-                    ->endsAt($this->end())
-                    ->rrule($this->spatieRule())
-            ),
-        ];
+        if (! $event = $this->toICalendarEvent($this->start())) {
+            return [];
+        }
+
+        return [$event->rrule($this->spatieRule())];
     }
 
     protected function rule(bool $useEnd = false): RRuleInterface
