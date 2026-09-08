@@ -174,6 +174,7 @@ abstract class Event
         return is_string($address) && $address !== '' ? $address : null;
     }
 
+    // Entry::get() is untyped; keep mixed so a bad value can't TypeError the public ICS route.
     protected function hasValidCoordinates(mixed $coords): bool
     {
         return is_array($coords)
