@@ -7,7 +7,6 @@ use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use RRule\RRuleInterface;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
@@ -107,29 +106,13 @@ abstract class Event
 
         $immutableDate = $this->toCarbonImmutable($date);
 
-        $iCalEvent = ICalendarEvent::create($this->event->title)
-            ->withoutTimezone()
-            ->uniqueIdentifier($this->event->id())
-            ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
-            ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
-
-        if ($address = $this->icsAddress()) {
-            $iCalEvent->address($address);
-        }
-
-        if (! is_null($coords = $this->event->coordinates)) {
-            $iCalEvent->coordinates($coords['latitude'], $coords['longitude']);
-        }
-
-        if (! is_null($description = $this->event->description)) {
-            $iCalEvent->description($description);
-        }
-
-        if (! is_null($link = $this->eventUrl())) {
-            $iCalEvent->url($link);
-        }
-
-        return $iCalEvent;
+        return $this->decorate(
+            ICalendarEvent::create($this->event->title)
+                ->withoutTimezone()
+                ->uniqueIdentifier($this->event->id())
+                ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
+                ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()))
+        );
     }
 
     /**
@@ -140,26 +123,50 @@ abstract class Event
         return Arr::wrap($this->toICalendarEvent($this->start()));
     }
 
-    protected function eventUrl(): ?string
+    protected function decorate(ICalendarEvent $iCalEvent): ICalendarEvent
     {
-        if (! is_null($link = $this->event->link)) {
-            return $link;
+        if ($location = $this->icsLocation()) {
+            $iCalEvent->address($location);
         }
 
-        $location = $this->event->get('location');
-
-        if (! is_string($location)) {
-            return null;
+        if ($this->hasValidCoordinates($coords = $this->event->get('coordinates'))) {
+            $iCalEvent->coordinates((float) $coords['latitude'], (float) $coords['longitude']);
         }
 
-        return Str::isUrl($location) ? $location : null;
+        if (is_string($description = $this->event->get('description')) && $description !== '') {
+            $iCalEvent->description($description);
+        }
+
+        if ($url = $this->icsUrl()) {
+            $iCalEvent->url($url);
+        }
+
+        return $iCalEvent;
     }
 
-    protected function icsAddress(): ?string
+    protected function icsUrl(): ?string
     {
-        $address = $this->event->address ?? $this->event->get('location');
+        $url = $this->event->get('online_url');
 
-        return is_string($address) && $address !== '' ? $address : null;
+        return is_string($url) && $url !== '' ? $url : null;
+    }
+
+    protected function icsLocation(): ?string
+    {
+        $location = $this->event->get('location');
+
+        if (is_string($location) && $location !== '') {
+            return $location;
+        }
+
+        return $this->icsUrl();
+    }
+
+    protected function hasValidCoordinates(mixed $coords): bool
+    {
+        return is_array($coords)
+            && is_numeric($coords['latitude'] ?? null)
+            && is_numeric($coords['longitude'] ?? null);
     }
 
     protected function supplement(CarbonInterface $date): ?Entry

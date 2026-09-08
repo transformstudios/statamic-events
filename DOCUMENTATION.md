@@ -42,7 +42,8 @@ If you are using a different Statamic collection, update it in the addon setting
 
 ICS downloads use the following fields if they exist:
 
-- `address`
+- `location`
+- `online_url`
 - `coordinates`
 - `description`
 
@@ -73,6 +74,26 @@ Using the sample fieldset is the fastest way to get started.
 ---
 
 ## Fields
+
+### Location & Online URL
+
+`location` and `online_url` are independent and can be combined (hybrid events).
+
+| Field | Description |
+|-------|-------------|
+| `location` | Free text: a plain place description or a full address |
+| `online_url` | Join link for online or hybrid events (Zoom, livestream, etc.) |
+| `coordinates` | Optional `latitude` / `longitude` for ICS `GEO` |
+
+ICS mapping:
+
+| Event | `LOCATION:` | `URL:` | `GEO:` |
+|-------|-------------|--------|--------|
+| Physical only | `location` | — | `coordinates` |
+| Online only | `online_url` | `online_url` | — |
+| Hybrid | `location` | `online_url` | `coordinates` |
+
+A non-string `location` (for example a group field from another package) is skipped at runtime and never causes a download failure. For custom shapes, map into these handles with a [Computed Value](https://statamic.dev/content-modeling/computed-values#defining-computed-values).
 
 ### Single-Day Events
 
@@ -264,5 +285,37 @@ Generates an ICS download link.
 
 Includes:
 - `location`
+- `online_url`
+- `coordinates`
 - `description`
-- `link`
+
+---
+
+## Upgrading to 7.0
+
+**Back up your content before upgrading.** The 7.0 update script rewrites event entries in the collections configured in addon settings.
+
+### Field renames
+
+| Before | After |
+|--------|-------|
+| `address` | `location` |
+| `link` | `online_url` |
+| string `location` that is a URL | `online_url` |
+
+`location` remains for place text. The old URL-sniffing behaviour (`location` treated as a join link when it looked like a URL) is removed.
+
+### What the update script does automatically
+
+- `address` → `location`
+- `link` → `online_url`
+- URL-valued string `location` → `online_url`
+- Removes the old `address` / `link` handles after a successful migrate
+
+### What it skips (logged with entry IDs)
+
+- Non-string / array-shaped `location` (left completely untouched — another package may own that shape)
+- Both `address` and a non-URL `location` set
+- Both `link` and a URL-valued `location` set
+
+Those ambiguous entries need a manual resolve. Computed-value mappings are not rewritten by the script.

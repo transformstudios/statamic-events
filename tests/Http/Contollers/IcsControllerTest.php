@@ -15,8 +15,7 @@ beforeEach(function () {
             'start_date' => Carbon::now()->toDateString(),
             'start_time' => '11:00',
             'end_time' => '12:00',
-            'address' => '123 Main St',
-            'location' => 'The Location',
+            'location' => '123 Main St',
             'coordinates' => [
                 'latitude' => 40,
                 'longitude' => 50,
@@ -35,10 +34,147 @@ test('can create single day event ics file', function () {
 
     $content = $response->streamedContent();
 
-    $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $response->streamedContent());
+    $this->assertStringContainsString('DTSTART:'.now()->setTimeFromTimeString('11:00')->format('Ymd\THis'), $content);
     $this->assertStringContainsString('LOCATION:123 Main St', $content);
     $this->assertStringContainsString('DESCRIPTION:The description', $content);
     $this->assertStringContainsString('GEO:40;50', $content);
+    $this->assertStringNotContainsString('URL:', $content);
+});
+
+test('physical only maps location without url', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('physical-event')
+        ->id('physical-id')
+        ->data([
+            'title' => 'Physical Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'location' => 'Outside the side exit',
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'physical-id',
+    ]))->assertDownload('physical-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('LOCATION:Outside the side exit', $content);
+    $this->assertStringNotContainsString('URL:', $content);
+});
+
+test('online only maps online_url to location and url', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('online-event')
+        ->id('online-id')
+        ->data([
+            'title' => 'Online Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'online_url' => 'https://zoom.us/j/123',
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'online-id',
+    ]))->assertDownload('online-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('LOCATION:https://zoom.us/j/123', $content);
+    $this->assertStringContainsString('URL:https://zoom.us/j/123', $content);
+});
+
+test('hybrid maps location and online_url separately', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('hybrid-event')
+        ->id('hybrid-id')
+        ->data([
+            'title' => 'Hybrid Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'location' => '123 Main St, Surrey, BC',
+            'online_url' => 'https://zoom.us/j/456',
+            'coordinates' => [
+                'latitude' => 40,
+                'longitude' => 50,
+            ],
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'hybrid-id',
+    ]))->assertDownload('hybrid-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('LOCATION:123 Main St\\, Surrey\\, BC', $content);
+    $this->assertStringContainsString('URL:https://zoom.us/j/456', $content);
+    $this->assertStringContainsString('GEO:40;50', $content);
+});
+
+test('partial coordinates are not fatal and omit geo', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('partial-coords-event')
+        ->id('partial-coords-id')
+        ->data([
+            'title' => 'Partial Coords Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'location' => 'The Hall',
+            'coordinates' => [
+                'latitude' => 40,
+            ],
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'partial-coords-id',
+    ]))->assertDownload('partial-coords-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('LOCATION:The Hall', $content);
+    $this->assertStringNotContainsString('GEO:', $content);
+});
+
+test('non-string location is ignored rather than fatal', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('grouped-location-event')
+        ->id('the-grouped-location-id')
+        ->data([
+            'title' => 'Grouped Location Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'location' => [
+                'details' => 'Virtual',
+                'coordinates' => [
+                    'latitude' => 40,
+                    'longitude' => 50,
+                ],
+            ],
+            'description' => 'The description',
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'the-grouped-location-id',
+    ]))->assertDownload('grouped-location-event.ics')->streamedContent();
+
+    $this->assertStringNotContainsString('LOCATION:', $content);
+    $this->assertStringContainsString('DESCRIPTION:The description', $content);
 });
 
 test('can create single day recurring event ics file', function () {
@@ -172,6 +308,42 @@ test('can create single day multiday event ics file', function () {
     $this->assertStringContainsString('DESCRIPTION:The description', $response->streamedContent());
 });
 
+test('multi-day whole-event download includes location url and description', function () {
+    Carbon::setTestNow(now());
+
+    Entry::make()
+        ->slug('multi-day-whole-event')
+        ->collection('events')
+        ->id('the-multi-day-whole-event')
+        ->data([
+            'title' => 'Multi-day Whole Event',
+            'multi_day' => true,
+            'location' => 'The Hall',
+            'online_url' => 'https://zoom.us/j/789',
+            'description' => 'The description',
+            'days' => [
+                [
+                    'date' => now()->toDateString(),
+                    'start_time' => '19:00',
+                    'end_time' => '21:00',
+                ],
+                [
+                    'date' => now()->addDay()->toDateString(),
+                    'start_time' => '11:00',
+                    'end_time' => '15:00',
+                ],
+            ],
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'event' => 'the-multi-day-whole-event',
+    ]))->assertDownload('multi-day-whole-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('LOCATION:The Hall', $content);
+    $this->assertStringContainsString('URL:https://zoom.us/j/789', $content);
+    $this->assertStringContainsString('DESCRIPTION:The description', $content);
+});
+
 test('throws 404 error when event does not occur on date', function () {
     Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
 
@@ -195,118 +367,4 @@ test('throws 404 error when date is invalid', function () {
         'date' => 'not-a-date',
         'event' => 'the-id',
     ]))->assertStatus(404);
-});
-
-test('can create ics when location is a group without address', function () {
-    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
-
-    Entry::make()
-        ->collection('events')
-        ->slug('grouped-location-event')
-        ->id('the-grouped-location-id')
-        ->data([
-            'title' => 'Grouped Location Event',
-            'start_date' => Carbon::now()->toDateString(),
-            'start_time' => '11:00',
-            'end_time' => '12:00',
-            'location' => [
-                'details' => 'Virtual',
-                'coordinates' => [
-                    'latitude' => 40,
-                    'longitude' => 50,
-                ],
-            ],
-            'description' => 'The description',
-        ])->save();
-
-    $response = $this->get(route('statamic.events.ics.show', [
-        'date' => now()->toDateString(),
-        'event' => 'the-grouped-location-id',
-    ]))->assertDownload('grouped-location-event.ics');
-
-    $content = $response->streamedContent();
-
-    $this->assertStringNotContainsString('LOCATION:', $content);
-    $this->assertStringContainsString('DESCRIPTION:The description', $content);
-});
-
-test('falls back to string location when address is missing', function () {
-    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
-
-    Entry::make()
-        ->collection('events')
-        ->slug('location-fallback-event')
-        ->id('the-location-fallback-id')
-        ->data([
-            'title' => 'Location Fallback Event',
-            'start_date' => Carbon::now()->toDateString(),
-            'start_time' => '11:00',
-            'end_time' => '12:00',
-            'location' => 'The Location',
-            'description' => 'The description',
-        ])->save();
-
-    $response = $this->get(route('statamic.events.ics.show', [
-        'date' => now()->toDateString(),
-        'event' => 'the-location-fallback-id',
-    ]))->assertDownload('location-fallback-event.ics');
-
-    $this->assertStringContainsString('LOCATION:The Location', $response->streamedContent());
-});
-
-test('can create recurring ics when location is a group without address', function () {
-    Carbon::setTestNow(now()->addDay()->setTimeFromTimeString('10:00'));
-
-    Entry::make()
-        ->collection('events')
-        ->slug('grouped-recurring-event')
-        ->id('the-grouped-recurring-id')
-        ->data([
-            'title' => 'Grouped Recurring Event',
-            'start_date' => Carbon::now()->toDateString(),
-            'start_time' => '11:00',
-            'end_time' => '12:00',
-            'recurrence' => 'weekly',
-            'location' => [
-                'details' => 'Virtual',
-            ],
-            'description' => 'The description',
-        ])->save();
-
-    $response = $this->get(route('statamic.events.ics.show', [
-        'event' => 'the-grouped-recurring-id',
-    ]))->assertDownload('grouped-recurring-event.ics');
-
-    $this->assertStringNotContainsString('LOCATION:', $response->streamedContent());
-});
-
-test('can create multi-day ics when location is a group without address', function () {
-    Carbon::setTestNow(now());
-
-    Entry::make()
-        ->slug('grouped-multi-day-event')
-        ->collection('events')
-        ->id('the-grouped-multi-day-id')
-        ->data([
-            'title' => 'Grouped Multi-day Event',
-            'multi_day' => true,
-            'location' => [
-                'details' => 'Virtual',
-            ],
-            'description' => 'The description',
-            'days' => [
-                [
-                    'date' => now()->toDateString(),
-                    'start_time' => '19:00',
-                    'end_time' => '21:00',
-                ],
-            ],
-        ])->save();
-
-    $response = $this->get(route('statamic.events.ics.show', [
-        'date' => now()->toDateString(),
-        'event' => 'the-grouped-multi-day-id',
-    ]))->assertDownload('grouped-multi-day-event.ics');
-
-    $this->assertStringNotContainsString('LOCATION:', $response->streamedContent());
 });
