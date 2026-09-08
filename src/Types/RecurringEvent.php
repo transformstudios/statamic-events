@@ -27,29 +27,15 @@ class RecurringEvent extends Event
      */
     public function toICalendarEvents(): array
     {
-        $iCalEvent = ICalendarEvent::create($this->event->title)
-            ->uniqueIdentifier($this->event->id())
-            ->startsAt($this->start())
-            ->endsAt($this->end())
-            ->rrule($this->spatieRule());
-
-        if ($address = $this->icsAddress()) {
-            $iCalEvent->address($address);
-        }
-
-        if (! is_null($coords = $this->event->coordinates)) {
-            $iCalEvent->coordinates($coords['latitude'], $coords['longitude']);
-        }
-
-        if (! is_null($description = $this->event->description)) {
-            $iCalEvent->description($description);
-        }
-
-        if (! is_null($link = $this->eventUrl())) {
-            $iCalEvent->url($link);
-        }
-
-        return [$iCalEvent];
+        return [
+            $this->decorate(
+                ICalendarEvent::create($this->event->title)
+                    ->uniqueIdentifier($this->event->id())
+                    ->startsAt($this->start())
+                    ->endsAt($this->end())
+                    ->rrule($this->spatieRule())
+            ),
+        ];
     }
 
     protected function rule(bool $useEnd = false): RRuleInterface
