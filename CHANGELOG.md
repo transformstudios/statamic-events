@@ -1,5 +1,16 @@
 # Changelog
 
+## v6.2.0 - 2026-09-09
+
+### 🚀 New
+
+- Add online_url for Zoom and livestream links [@edalzell](https://github.com/edalzell) (#209)
+
+### 🐛 Fixed
+
+- Fix multi-day ICS downloads dropping location fields [@edalzell](https://github.com/edalzell) (#206)
+- Reconcile the contradicting ICS field docs [@edalzell](https://github.com/edalzell) (#205)
+
 ## v6.1.7 - 2026-09-06
 
 ### 🐛 Fixed
