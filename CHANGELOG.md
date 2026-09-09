@@ -15,6 +15,29 @@
 
 - PR-gated release on 6.x with workflows v1.4.0 [@edalzell](https://github.com/edalzell) (#213)
 
+## v6.1.7 - 2026-09-06
+
+### 🐛 Fixed
+
+- Ignore empty or invalid timezone tag params [@edalzell](https://github.com/edalzell) (#199)
+
+### 🧰 Maintenance
+
+- Check maintainers with RELEASE_TOKEN [@edalzell](https://github.com/edalzell) (#202)
+- Bump the github-actions group with 3 updates [@[dependabot[bot]](https://github.com/apps/dependabot)](https://github.com/[dependabot[bot]](https://github.com/apps/dependabot)) (#201)
+- Release via PR instead of pushing main [@edalzell](https://github.com/edalzell) (#200)
+
+## v6.1.6 - 2026-09-02
+
+### 🐛 Fixed
+
+- Collapse multi-day events to a single occurrence [@edalzell](https://github.com/edalzell) (#198)
+- Include localized events that inherit dates from origin [@edalzell](https://github.com/edalzell) (#197)
+
+### 🧰 Maintenance
+
+- Drop unused spatie/calendar-links dependency [@edalzell](https://github.com/edalzell) (#189)
+
 ## v6.1.5 - 2026-08-21
 
 ### 🐛 Fixed
