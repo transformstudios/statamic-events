@@ -45,11 +45,11 @@ ICS downloads read the following entry fields when present:
 | ICS property | Source |
 |---|---|
 | `LOCATION` | `address`, falling back to `location` — only when the value is a string |
-| `URL` | `link`, falling back to `location` when that string is a URL |
+| `URL` | `online_url`, then deprecated `link`, then deprecated `location` when that string is a URL |
 | `GEO` | `coordinates` (`latitude` / `longitude`) |
 | `DESCRIPTION` | `description` |
 
-A URL-valued `location` (with no separate `address` / `link`) currently emits **both** `LOCATION:` and `URL:`.
+A URL-valued `location` (with no separate `address` / `online_url` / `link`) currently emits **both** `LOCATION:` and `URL:`. Prefer `online_url` for join links; `link` and the URL-valued `location` fallback are deprecated and will be removed in 7.0.
 
 The `coordinates` field must be a keyed array:
 
@@ -78,6 +78,14 @@ Using the sample fieldset is the fastest way to get started.
 ---
 
 ## Fields
+
+### Location & Online URL
+
+| Field | Description |
+|-------|-------------|
+| `online_url` | Join link for online or hybrid events (Zoom, livestream, etc.). Optional; can be combined with a physical place once `location` is declared. |
+
+`link` is deprecated in favour of `online_url` and will be removed in 7.0.
 
 ### Single-Day Events
 

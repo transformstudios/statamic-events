@@ -406,3 +406,178 @@ test('non-numeric coordinates do not fatal and omit geo', function () {
     $this->assertStringContainsString('LOCATION:123 Main St', $content);
     $this->assertStringNotContainsString('GEO:', $content);
 });
+
+test('online_url emits URL', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('online-url-event')
+        ->id('online-url-id')
+        ->data([
+            'title' => 'Online URL Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'online_url' => 'https://zoom.us/j/123',
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'online-url-id',
+    ]))->assertDownload('online-url-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('URL:https://zoom.us/j/123', $content);
+});
+
+test('online_url wins over link when both are set', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('online-over-link-event')
+        ->id('online-over-link-id')
+        ->data([
+            'title' => 'Online Over Link Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'online_url' => 'https://zoom.us/j/123',
+            'link' => 'https://example.com/old-link',
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'online-over-link-id',
+    ]))->assertDownload('online-over-link-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('URL:https://zoom.us/j/123', $content);
+    $this->assertStringNotContainsString('URL:https://example.com/old-link', $content);
+});
+
+test('deprecated link alone still emits URL', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('link-only-event')
+        ->id('link-only-id')
+        ->data([
+            'title' => 'Link Only Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'link' => 'https://example.com/join',
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'link-only-id',
+    ]))->assertDownload('link-only-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('URL:https://example.com/join', $content);
+});
+
+test('deprecated URL-valued location alone still emits LOCATION and URL', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('url-location-event')
+        ->id('url-location-id')
+        ->data([
+            'title' => 'URL Location Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'location' => 'https://zoom.us/j/456',
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'url-location-id',
+    ]))->assertDownload('url-location-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('LOCATION:https://zoom.us/j/456', $content);
+    $this->assertStringContainsString('URL:https://zoom.us/j/456', $content);
+});
+
+test('online_url is included on all four download routes', function () {
+    Carbon::setTestNow(now());
+
+    Entry::make()
+        ->collection('events')
+        ->slug('online-single')
+        ->id('online-single-id')
+        ->data([
+            'title' => 'Online Single',
+            'start_date' => now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'online_url' => 'https://zoom.us/j/single',
+        ])->save();
+
+    Entry::make()
+        ->collection('events')
+        ->slug('online-recurring')
+        ->id('online-recurring-id')
+        ->data([
+            'title' => 'Online Recurring',
+            'start_date' => now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'weekly',
+            'online_url' => 'https://zoom.us/j/recurring',
+        ])->save();
+
+    Entry::make()
+        ->collection('events')
+        ->slug('online-multi-day')
+        ->id('online-multi-day-id')
+        ->data([
+            'title' => 'Online Multi Day',
+            'multi_day' => true,
+            'online_url' => 'https://zoom.us/j/multiday',
+            'days' => [
+                [
+                    'date' => now()->toDateString(),
+                    'start_time' => '19:00',
+                    'end_time' => '21:00',
+                ],
+                [
+                    'date' => now()->addDay()->toDateString(),
+                    'start_time' => '11:00',
+                    'end_time' => '15:00',
+                ],
+            ],
+        ])->save();
+
+    $single = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'online-single-id',
+    ]))->assertDownload('online-single.ics')->streamedContent();
+
+    $recurringDate = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'online-recurring-id',
+    ]))->assertDownload('online-recurring.ics')->streamedContent();
+
+    $recurringWhole = $this->get(route('statamic.events.ics.show', [
+        'event' => 'online-recurring-id',
+    ]))->assertDownload('online-recurring.ics')->streamedContent();
+
+    $multiDate = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'online-multi-day-id',
+    ]))->assertDownload('online-multi-day.ics')->streamedContent();
+
+    $multiWhole = $this->get(route('statamic.events.ics.show', [
+        'event' => 'online-multi-day-id',
+    ]))->assertDownload('online-multi-day.ics')->streamedContent();
+
+    $this->assertStringContainsString('URL:https://zoom.us/j/single', $single);
+    $this->assertStringContainsString('URL:https://zoom.us/j/recurring', $recurringDate);
+    $this->assertStringContainsString('URL:https://zoom.us/j/recurring', $recurringWhole);
+    $this->assertStringContainsString('URL:https://zoom.us/j/multiday', $multiDate);
+    expect(substr_count($multiWhole, 'URL:https://zoom.us/j/multiday'))->toBe(2);
+});

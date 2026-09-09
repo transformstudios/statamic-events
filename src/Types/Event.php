@@ -145,22 +145,28 @@ abstract class Event
             $iCalEvent->description($description);
         }
 
-        if (! is_null($link = $this->eventUrl())) {
-            $iCalEvent->url($link);
+        if (! is_null($url = $this->icsUrl())) {
+            $iCalEvent->url($url);
         }
 
         return $iCalEvent;
     }
 
-    protected function eventUrl(): ?string
+    protected function icsUrl(): ?string
     {
-        if (! is_null($link = $this->event->link)) {
+        if (is_string($url = $this->event->get('online_url')) && $url !== '') {
+            return $url;
+        }
+
+        // @deprecated Will be removed in 7.0. Use online_url.
+        if (is_string($link = $this->event->get('link')) && $link !== '') {
             return $link;
         }
 
+        // @deprecated Will be removed in 7.0. Use online_url.
         $location = $this->event->get('location');
 
-        if (! is_string($location)) {
+        if (! is_string($location) || $location === '') {
             return null;
         }
 
