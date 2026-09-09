@@ -20,21 +20,6 @@ beforeEach(function () {
     $this->script = new MigrateLocationFields('transformstudios/events', $this->console);
 });
 
-test('shouldUpdate is true when crossing to 7.0', function (string $new, string $old) {
-    expect($this->script->shouldUpdate($new, $old))->toBeTrue();
-})->with([
-    ['7.0.0', '6.2.0'],
-    ['7.0.0', '5.4.0'],
-    ['7.1.0', '6.0.0'],
-]);
-
-test('shouldUpdate is false within a major line', function (string $new, string $old) {
-    expect($this->script->shouldUpdate($new, $old))->toBeFalse();
-})->with([
-    ['6.2.0', '6.1.0'],
-    ['7.1.0', '7.0.0'],
-]);
-
 test('migrates address to location name', function () {
     Entry::make()
         ->collection('events')

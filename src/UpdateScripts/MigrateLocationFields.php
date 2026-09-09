@@ -2,7 +2,6 @@
 
 namespace TransformStudios\Events\UpdateScripts;
 
-use Composer\Semver\VersionParser;
 use Illuminate\Support\Str;
 use Statamic\Facades\Entry;
 use Statamic\UpdateScripts\UpdateScript;
@@ -12,13 +11,7 @@ class MigrateLocationFields extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        $parser = new VersionParser;
-        $version = $parser->normalize('7.0');
-        $newVersion = $parser->normalize($newVersion);
-        $oldVersion = $parser->normalize($oldVersion);
-
-        return version_compare($version, $newVersion, '<=')
-            && version_compare($version, $oldVersion, '>');
+        return $this->isUpdatingTo('7.0');
     }
 
     public function update()
