@@ -203,3 +203,19 @@ fields:
           field: 'events::event.all_day'
           config:
             width: 25
+  -
+    handle: location_section
+    field:
+      type: section
+      display: Location
+  -
+    handle: online_url
+    field:
+      type: text
+      input_type: url
+      display: 'Online URL'
+      localizable: false
+      validate:
+        - nullable
+        - url
+      instructions: 'Join link for online or hybrid events (Zoom, livestream, etc.).'
