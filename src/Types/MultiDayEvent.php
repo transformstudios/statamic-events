@@ -11,6 +11,7 @@ use RRule\RSet;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
 use Statamic\Fields\Values;
+use Statamic\Support\Str;
 use TransformStudios\Events\Day;
 
 class MultiDayEvent extends Event
@@ -45,42 +46,19 @@ class MultiDayEvent extends Event
         return $this->days->last()->end();
     }
 
+    public function nextOccurrences(int $limit = 1): Collection
+    {
+        return $this->uniqueCollapsedOccurrences(parent::nextOccurrences($limit));
+    }
+
+    public function occurrencesBetween(string|CarbonInterface $from, string|CarbonInterface $to): Collection
+    {
+        return $this->uniqueCollapsedOccurrences(parent::occurrencesBetween($from, $to));
+    }
+
     public function start(): CarbonImmutable
     {
         return $this->days->first()->start();
-    }
-
-    public function toICalendarEvent(string|CarbonInterface $date): ?ICalendarEvent
-    {
-        if (! $this->occursOnDate($date)) {
-            return null;
-        }
-
-        $immutableDate = $this->toCarbonImmutable($date);
-        $day = $this->getDayFromDate($immutableDate);
-
-        $iCalEvent = ICalendarEvent::create($this->event->title)
-            ->uniqueIdentifier($this->event->id())
-            ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
-            ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
-
-        if ($address = $this->icsAddress()) {
-            $iCalEvent->address($address);
-        }
-
-        if (! is_null($coords = $this->event->coordinates)) {
-            $iCalEvent->coordinates($coords['latitude'], $coords['longitude']);
-        }
-
-        if (! is_null($description = $this->event->description)) {
-            $iCalEvent->description($description);
-        }
-
-        if (! is_null($link = $this->eventUrl())) {
-            $iCalEvent->url($link);
-        }
-
-        return $iCalEvent;
     }
 
     /**
@@ -88,9 +66,26 @@ class MultiDayEvent extends Event
      */
     public function toICalendarEvents(): array
     {
-        return collect($this->days)
-            ->map(fn (Day $day, int $index) => $day->toICalendarEvent($this->event->title, $index))
+        return $this->days
+            ->values()
+            ->map(function (Day $day, int $index) {
+                $event = $this->toICalendarEvent($day->start());
+
+                return $event?->uniqueIdentifier(Str::slug($this->event->title).'-'.$index);
+            })
+            ->filter()
             ->all();
+    }
+
+    protected function buildICalendarEvent(string|CarbonInterface $date): ICalendarEvent
+    {
+        $immutableDate = $this->toCarbonImmutable($date);
+        $day = $this->getDayFromDate($immutableDate);
+
+        return ICalendarEvent::create($this->event->title)
+            ->uniqueIdentifier($this->event->id())
+            ->startsAt($immutableDate->setTimeFromTimeString($day->start()))
+            ->endsAt($immutableDate->setTimeFromTimeString($day->end()));
     }
 
     protected function rule(bool $useEnd = false): RRuleInterface
@@ -138,5 +133,14 @@ class MultiDayEvent extends Event
     private function getDayFromDate(CarbonInterface $date): ?Day
     {
         return $this->days->first(fn (Day $day, int $index) => $this->collapseMultiDays ? $index == 0 : $date->isSameDay($day->start()));
+    }
+
+    private function uniqueCollapsedOccurrences(Collection $occurrences): Collection
+    {
+        if (! $this->collapseMultiDays) {
+            return $occurrences;
+        }
+
+        return $occurrences->unique(fn (Entry $occurrence) => $occurrence->id())->values();
     }
 }

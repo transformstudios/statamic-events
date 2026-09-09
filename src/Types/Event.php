@@ -105,20 +105,40 @@ abstract class Event
             return null;
         }
 
+        return $this->decorate($this->buildICalendarEvent($date));
+    }
+
+    /**
+     * @return ICalendarEvent[]
+     */
+    public function toICalendarEvents(): array
+    {
+        if (! $event = $this->toICalendarEvent($this->start())) {
+            return [];
+        }
+
+        return [$event];
+    }
+
+    protected function buildICalendarEvent(string|CarbonInterface $date): ICalendarEvent
+    {
         $immutableDate = $this->toCarbonImmutable($date);
 
-        $iCalEvent = ICalendarEvent::create($this->event->title)
+        return ICalendarEvent::create($this->event->title)
             ->withoutTimezone()
             ->uniqueIdentifier($this->event->id())
             ->startsAt($immutableDate->setTimeFromTimeString($this->startTime()))
             ->endsAt($immutableDate->setTimeFromTimeString($this->endTime()));
+    }
 
+    protected function decorate(ICalendarEvent $iCalEvent): ICalendarEvent
+    {
         if ($address = $this->icsAddress()) {
             $iCalEvent->address($address);
         }
 
-        if (! is_null($coords = $this->event->coordinates)) {
-            $iCalEvent->coordinates($coords['latitude'], $coords['longitude']);
+        if ($this->hasValidCoordinates($coords = $this->event->get('coordinates'))) {
+            $iCalEvent->coordinates((float) $coords['latitude'], (float) $coords['longitude']);
         }
 
         if (! is_null($description = $this->event->description)) {
@@ -130,14 +150,6 @@ abstract class Event
         }
 
         return $iCalEvent;
-    }
-
-    /**
-     * @return ICalendarEvent[]
-     */
-    public function toICalendarEvents(): array
-    {
-        return Arr::wrap($this->toICalendarEvent($this->start()));
     }
 
     protected function eventUrl(): ?string
@@ -160,6 +172,14 @@ abstract class Event
         $address = $this->event->address ?? $this->event->get('location');
 
         return is_string($address) && $address !== '' ? $address : null;
+    }
+
+    // Entry::get() is untyped; keep mixed so a bad value can't TypeError the public ICS route.
+    protected function hasValidCoordinates(mixed $coords): bool
+    {
+        return is_array($coords)
+            && is_numeric($coords['latitude'] ?? null)
+            && is_numeric($coords['longitude'] ?? null);
     }
 
     protected function supplement(CarbonInterface $date): ?Entry
