@@ -145,14 +145,14 @@ abstract class Event
             $iCalEvent->description($description);
         }
 
-        if (! is_null($url = $this->icsUrl())) {
+        if (! is_null($url = $this->eventUrl())) {
             $iCalEvent->url($url);
         }
 
         return $iCalEvent;
     }
 
-    protected function icsUrl(): ?string
+    protected function eventUrl(): ?string
     {
         if (is_string($url = $this->event->get('online_url')) && $url !== '') {
             return $url;
