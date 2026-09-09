@@ -21,7 +21,7 @@ jobs:
 
   prepare:
     needs: authorize
-    uses: edalzell/github-workflows/.github/workflows/release-prepare.yml@5ebfc6714a6c4ca7f2434ff01736ea2405e1c323 # v1.3.1
+    uses: edalzell/github-workflows/.github/workflows/release-prepare.yml@9f72f0b77303abff9903b16da75346b1eb1c3785 # v1.4.0
     permissions:
       contents: write
     secrets:
