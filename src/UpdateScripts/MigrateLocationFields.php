@@ -41,7 +41,9 @@ class MigrateLocationFields extends UpdateScript
         $data = $entry->data()->all();
         $location = Arr::get($data, 'location');
 
-        // Prime/foreign group: leave location alone; move link → online_url if needed.
+        // Prime/Simple shape, e.g. location: { details, coordinates } — Events must not
+        // reshape that group (prime#834 owns it). Only move a leftover Events link:
+        //   link: https://…  →  online_url: https://…
         if (is_array($location)) {
             if (! $this->filledString($data, 'link') || $this->filledString($data, 'online_url')) {
                 return;
@@ -52,6 +54,11 @@ class MigrateLocationFields extends UpdateScript
             return;
         }
 
+        // Events legacy → nested group, e.g.
+        //   address: '123 Main St' + coordinates: { lat, lng }
+        //     → location: { name: '123 Main St', coordinates: { lat, lng } }
+        //   location: 'City Hall'  →  location: { name: 'City Hall' }
+        //   location: 'https://zoom…' alone is not a name — stripped here, becomes online_url below
         $name = $this->resolveName($data);
         $coordinates = $this->resolveCoordinates($data);
 
@@ -62,10 +69,12 @@ class MigrateLocationFields extends UpdateScript
             $entry->remove('location');
         }
 
+        // link / URL-valued location / existing online_url → online_url
         if (! is_null($onlineUrl = $this->resolveOnlineUrl($data))) {
             $entry->set('online_url', $onlineUrl);
         }
 
+        // Drop legacy top-level handles now that values live under location / online_url
         foreach (['address', 'link', 'coordinates'] as $handle) {
             if (array_key_exists($handle, $data)) {
                 $entry->remove($handle);
