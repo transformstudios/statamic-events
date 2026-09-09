@@ -1,12 +1,12 @@
 name: PR Labeler
+
 on:
   pull_request:
-    types: [opened]
+    types: [opened, reopened, synchronize]
 
 jobs:
-  pr-labeler:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: TimonVS/pr-labeler-action@v5.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  label:
+    uses: edalzell/github-workflows/.github/workflows/label-pr.yml@9f72f0b77303abff9903b16da75346b1eb1c3785 # v1.4.0
+    permissions:
+      contents: read
+      pull-requests: write
