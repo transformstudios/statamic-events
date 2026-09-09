@@ -41,9 +41,8 @@ class MigrateLocationFields extends UpdateScript
         $data = $entry->data()->all();
         $location = Arr::get($data, 'location');
 
-        // Prime/Simple shape, e.g. location: { details, coordinates } — Events must not
-        // reshape that group (prime#834 owns it). Only move a leftover Events link:
-        //   link: https://…  →  online_url: https://…
+        // Array-shaped location (another package's group) — do not reshape it.
+        // Only move a leftover Events link: link: https://… → online_url: https://…
         if (is_array($location)) {
             if (! $this->filledString($data, 'link') || $this->filledString($data, 'online_url')) {
                 return;
