@@ -250,6 +250,33 @@ test('leaves array-shaped location untouched', function () {
         ->and($entry->get('link'))->toBeNull();
 });
 
+test('does not save entries with nothing to migrate', function () {
+    Entry::make()
+        ->collection('events')
+        ->slug('noop-event')
+        ->id('noop-id')
+        ->data([
+            'title' => 'Noop Event',
+            'start_date' => now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+        ])->save();
+
+    $saved = 0;
+    \Statamic\Facades\Entry::find('noop-id');
+    \Illuminate\Support\Facades\Event::listen(\Statamic\Events\EntrySaved::class, function ($event) use (&$saved) {
+        if ($event->entry->id() === 'noop-id') {
+            $saved++;
+        }
+    });
+
+    $this->script->update();
+
+    expect($saved)->toBe(0)
+        ->and(Entry::find('noop-id')->get('location'))->toBeNull()
+        ->and(Entry::find('noop-id')->get('online_url'))->toBeNull();
+});
+
 test('migrates localized entries', function () {
     Site::setSites([
         'default' => ['name' => 'English', 'locale' => 'en_US', 'url' => '/'],

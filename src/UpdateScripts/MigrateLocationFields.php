@@ -60,27 +60,34 @@ class MigrateLocationFields extends UpdateScript
         //   location: 'https://zoom…' alone is not a name — stripped here, becomes online_url below
         $name = $this->resolveName($data);
         $coordinates = $this->resolveCoordinates($data);
+        $changed = false;
 
         if (! is_null($name) || ! is_null($coordinates)) {
             $group = array_filter(compact('name', 'coordinates'), fn ($value) => ! is_null($value));
             $entry->set('location', $group);
+            $changed = true;
         } elseif (is_string($location)) {
             $entry->remove('location');
+            $changed = true;
         }
 
         // link / URL-valued location / existing online_url → online_url
-        if (! is_null($onlineUrl = $this->resolveOnlineUrl($data))) {
+        if (! is_null($onlineUrl = $this->resolveOnlineUrl($data)) && Arr::get($data, 'online_url') !== $onlineUrl) {
             $entry->set('online_url', $onlineUrl);
+            $changed = true;
         }
 
         // Drop legacy top-level handles now that values live under location / online_url
         foreach (['address', 'link', 'coordinates'] as $handle) {
             if (array_key_exists($handle, $data)) {
                 $entry->remove($handle);
+                $changed = true;
             }
         }
 
-        $entry->save();
+        if ($changed) {
+            $entry->save();
+        }
     }
 
     private function processEntry(Entry $entry): ?string
