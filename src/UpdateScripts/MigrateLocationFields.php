@@ -28,7 +28,7 @@ class MigrateLocationFields extends UpdateScript
             $skipped->each(fn (string $line) => $this->console()->line("  - {$line}"));
         }
 
-        $this->console()->info('Migrated event location fields to the 7.0 shape.');
+        $this->console()->info('Migrated event location fields for 7.0.');
     }
 
     private function filledString(array $data, string $key): bool
@@ -41,7 +41,7 @@ class MigrateLocationFields extends UpdateScript
         $data = $entry->data()->all();
         $location = Arr::get($data, 'location');
 
-        // Array-shaped location (another package's group) — do not reshape it.
+        // location is already a group from another package — leave it alone.
         // Only move a leftover Events link: link: https://… → online_url: https://…
         if (is_array($location)) {
             if (! $this->filledString($data, 'link') || $this->filledString($data, 'online_url')) {

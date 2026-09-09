@@ -57,7 +57,7 @@ ICS downloads read the following entry fields when present:
 | Online only | `online_url` | `online_url` | — |
 | Hybrid | `location.name` | `online_url` | `location.coordinates` |
 
-`location` must be a group. A string or other non-group value is skipped (no `LOCATION:` from it). Nested coordinates shape:
+`location` must be a group. A string or other non-group value is skipped (no `LOCATION:` from it). Nested coordinates:
 
 ```php
 'location' => [
@@ -121,7 +121,7 @@ Skipped (logged with entry IDs — resolve by hand):
 - `address` and a non-URL string `location` both set
 - `link` and a URL-valued `location` both set
 - `online_url` already set together with a conflicting `link` or URL-valued `location`
-- Array-shaped `location` (e.g. Prime/Simple) — left alone; only a lone `link` may move to `online_url`
+- `location` that is already a group — left alone; only a lone `link` may move to `online_url`
 
 Computed-value mappings are not migrated — update those by hand.
 
