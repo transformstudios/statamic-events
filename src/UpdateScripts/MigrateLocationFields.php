@@ -31,11 +31,6 @@ class MigrateLocationFields extends UpdateScript
         $this->console()->info('Migrated event location fields to the 7.0 shape.');
     }
 
-    private function arrayValue(array $data, string $key): ?array
-    {
-        return is_array($value = Arr::get($data, $key)) ? $value : null;
-    }
-
     private function filledString(array $data, string $key): bool
     {
         return is_string($value = Arr::get($data, $key)) && filled($value);
@@ -58,7 +53,7 @@ class MigrateLocationFields extends UpdateScript
         }
 
         $name = $this->resolveName($data);
-        $coordinates = $this->arrayValue($data, 'coordinates');
+        $coordinates = $this->resolveCoordinates($data);
 
         if (! is_null($name) || ! is_null($coordinates)) {
             $group = array_filter(compact('name', 'coordinates'), fn ($value) => ! is_null($value));
@@ -89,6 +84,11 @@ class MigrateLocationFields extends UpdateScript
         $this->migrateEntry($entry);
 
         return null;
+    }
+
+    private function resolveCoordinates(array $data): ?array
+    {
+        return is_array($value = Arr::get($data, 'coordinates')) ? $value : null;
     }
 
     private function resolveName(array $data): ?string
