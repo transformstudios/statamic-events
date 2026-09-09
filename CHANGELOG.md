@@ -1,5 +1,12 @@
 # Changelog
 
+## v6.1.8 - 2026-09-09
+
+### 🧰 Maintenance
+
+- Bump github-workflows to v1.4.0 [@edalzell](https://github.com/edalzell) (#214)
+- Forward-merge 6.x into main [@edalzell](https://github.com/edalzell) (#208)
+
 ## v6.1.7 - 2026-09-06
 
 ### 🐛 Fixed
