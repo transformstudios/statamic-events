@@ -106,7 +106,24 @@ Breaking changes for location fields:
 - URL sniffing on a string `location` is gone — use `online_url` for join links
 - Protected `eventUrl()` / `icsAddress()` were replaced by `icsUrl()` / `icsLocation()`
 
-An update script (#196) migrates common legacy handles. Back up content before upgrading. Computed-value mappings and foreign (e.g. Prime) `location` shapes need a separate cutover.
+**Back up content before upgrading.** The `MigrateLocationFields` update script rewrites entries in the configured events collections (all sites):
+
+| Old | New |
+|---|---|
+| `address` | `location.name` |
+| non-URL string `location` | `location.name` |
+| URL string `location` | `online_url` |
+| `link` | `online_url` |
+| top-level `coordinates` | `location.coordinates` |
+
+Skipped (logged with entry IDs — resolve by hand):
+
+- `address` and a non-URL string `location` both set
+- `link` and a URL-valued `location` both set
+- `online_url` already set together with a conflicting `link` or URL-valued `location`
+- Array-shaped `location` (e.g. Prime/Simple) — left alone; only a lone `link` may move to `online_url`
+
+Computed-value mappings are not migrated — update those by hand.
 
 ### Single-Day Events
 
