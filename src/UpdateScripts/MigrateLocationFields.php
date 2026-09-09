@@ -51,8 +51,7 @@ class MigrateLocationFields extends UpdateScript
         }
 
         $name = $this->resolveName($data);
-        $coordinates = Arr::get($data, 'coordinates');
-        $coordinates = is_array($coordinates) ? $coordinates : null;
+        $coordinates = is_array($coordinates = Arr::get($data, 'coordinates')) ? $coordinates : null;
         $onlineUrl = $this->resolveOnlineUrl($data);
 
         if (! is_null($name) || ! is_null($coordinates)) {
