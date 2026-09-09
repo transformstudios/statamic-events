@@ -4,7 +4,8 @@ namespace TransformStudios\Events\UpdateScripts;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Statamic\Facades\Entry;
+use Statamic\Entries\Entry;
+use Statamic\Facades\Entry as Entries;
 use Statamic\UpdateScripts\UpdateScript;
 use TransformStudios\Events\Events;
 
@@ -18,8 +19,8 @@ class MigrateLocationFields extends UpdateScript
     public function update()
     {
         $skipped = collect(Events::setting('collections', ['events']))
-            ->flatMap(fn (string $collection) => Entry::query()->where('collection', $collection)->get())
-            ->map(fn ($entry) => $this->processEntry($entry))
+            ->flatMap(fn (string $collection) => Entries::query()->where('collection', $collection)->get())
+            ->map(fn (Entry $entry) => $this->processEntry($entry))
             ->filter();
 
         if ($skipped->isNotEmpty()) {
@@ -35,7 +36,7 @@ class MigrateLocationFields extends UpdateScript
         return is_string($value = Arr::get($data, $key)) && filled($value);
     }
 
-    private function migrateEntry($entry): void
+    private function migrateEntry(Entry $entry): void
     {
         $data = $entry->data()->all();
         $location = Arr::get($data, 'location');
@@ -76,7 +77,7 @@ class MigrateLocationFields extends UpdateScript
         $entry->save();
     }
 
-    private function processEntry($entry): ?string
+    private function processEntry(Entry $entry): ?string
     {
         if ($reason = $this->skipReason($entry->data()->all())) {
             return "{$entry->id()} ({$reason})";
