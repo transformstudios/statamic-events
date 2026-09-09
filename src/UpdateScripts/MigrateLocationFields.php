@@ -55,16 +55,16 @@ class MigrateLocationFields extends UpdateScript
         $coordinates = is_array($coordinates) ? $coordinates : null;
         $onlineUrl = $this->resolveOnlineUrl($data);
 
-        if ($name !== null || $coordinates !== null) {
+        if (! is_null($name) || ! is_null($coordinates)) {
             $entry->set('location', array_filter([
                 'name' => $name,
                 'coordinates' => $coordinates,
-            ], fn ($value) => $value !== null));
+            ], fn ($value) => ! is_null($value)));
         } elseif (is_string($location)) {
             $entry->remove('location');
         }
 
-        if ($onlineUrl !== null) {
+        if (! is_null($onlineUrl)) {
             $entry->set('online_url', $onlineUrl);
         }
 
