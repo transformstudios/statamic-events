@@ -581,3 +581,130 @@ test('online_url is included on all four download routes', function () {
     $this->assertStringContainsString('URL:https://zoom.us/j/multiday', $multiDate);
     expect(substr_count($multiWhole, 'URL:https://zoom.us/j/multiday'))->toBe(2);
 });
+
+test('declared coordinates emit GEO', function () {
+    Carbon::setTestNow(now()->setTimeFromTimeString('10:00'));
+
+    Entry::make()
+        ->collection('events')
+        ->slug('coords-event')
+        ->id('coords-id')
+        ->data([
+            'title' => 'Coords Event',
+            'start_date' => Carbon::now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'address' => '123 Main St',
+            'coordinates' => [
+                'latitude' => 49.28,
+                'longitude' => -123.12,
+            ],
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'coords-id',
+    ]))->assertDownload('coords-event.ics')->streamedContent();
+
+    $this->assertStringContainsString('GEO:49.28;-123.12', $content);
+});
+
+test('coordinates field rejects non-numeric latitude or longitude', function () {
+    $fields = \Statamic\Facades\Fieldset::find('events::event')->fields();
+
+    expect(fn () => $fields->addValues([
+        'coordinates' => [
+            'latitude' => 'north',
+            'longitude' => 50,
+        ],
+    ])->validator()->validate())->toThrow(\Illuminate\Validation\ValidationException::class);
+});
+
+test('coordinates are included on all four download routes', function () {
+    Carbon::setTestNow(now());
+
+    Entry::make()
+        ->collection('events')
+        ->slug('coords-single')
+        ->id('coords-single-id')
+        ->data([
+            'title' => 'Coords Single',
+            'start_date' => now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'coordinates' => [
+                'latitude' => 40,
+                'longitude' => 50,
+            ],
+        ])->save();
+
+    Entry::make()
+        ->collection('events')
+        ->slug('coords-recurring')
+        ->id('coords-recurring-id')
+        ->data([
+            'title' => 'Coords Recurring',
+            'start_date' => now()->toDateString(),
+            'start_time' => '11:00',
+            'end_time' => '12:00',
+            'recurrence' => 'weekly',
+            'coordinates' => [
+                'latitude' => 40,
+                'longitude' => 50,
+            ],
+        ])->save();
+
+    Entry::make()
+        ->collection('events')
+        ->slug('coords-multi-day')
+        ->id('coords-multi-day-id')
+        ->data([
+            'title' => 'Coords Multi Day',
+            'multi_day' => true,
+            'coordinates' => [
+                'latitude' => 40,
+                'longitude' => 50,
+            ],
+            'days' => [
+                [
+                    'date' => now()->toDateString(),
+                    'start_time' => '19:00',
+                    'end_time' => '21:00',
+                ],
+                [
+                    'date' => now()->addDay()->toDateString(),
+                    'start_time' => '11:00',
+                    'end_time' => '15:00',
+                ],
+            ],
+        ])->save();
+
+    $single = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'coords-single-id',
+    ]))->assertDownload('coords-single.ics')->streamedContent();
+
+    $recurringDate = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'coords-recurring-id',
+    ]))->assertDownload('coords-recurring.ics')->streamedContent();
+
+    $recurringWhole = $this->get(route('statamic.events.ics.show', [
+        'event' => 'coords-recurring-id',
+    ]))->assertDownload('coords-recurring.ics')->streamedContent();
+
+    $multiDate = $this->get(route('statamic.events.ics.show', [
+        'date' => now()->toDateString(),
+        'event' => 'coords-multi-day-id',
+    ]))->assertDownload('coords-multi-day.ics')->streamedContent();
+
+    $multiWhole = $this->get(route('statamic.events.ics.show', [
+        'event' => 'coords-multi-day-id',
+    ]))->assertDownload('coords-multi-day.ics')->streamedContent();
+
+    $this->assertStringContainsString('GEO:40;50', $single);
+    $this->assertStringContainsString('GEO:40;50', $recurringDate);
+    $this->assertStringContainsString('GEO:40;50', $recurringWhole);
+    $this->assertStringContainsString('GEO:40;50', $multiDate);
+    expect(substr_count($multiWhole, 'GEO:40;50'))->toBe(2);
+});

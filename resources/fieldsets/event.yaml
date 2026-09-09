@@ -219,3 +219,24 @@ fields:
         - nullable
         - url
       instructions: 'Join link for online or hybrid events (Zoom, livestream, etc.).'
+  -
+    handle: coordinates
+    field:
+      type: group
+      display: Coordinates
+      fullscreen: false
+      border: false
+      instructions: 'Optional map coordinates for ICS GEO. Only meaningful alongside a physical location.'
+      fields:
+        -
+          handle: latitude
+          field:
+            type: float
+            display: Latitude
+            width: 50
+        -
+          handle: longitude
+          field:
+            type: float
+            display: Longitude
+            width: 50
