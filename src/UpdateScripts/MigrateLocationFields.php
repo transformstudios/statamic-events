@@ -16,27 +16,14 @@ class MigrateLocationFields extends UpdateScript
 
     public function update()
     {
-        $skipped = [];
+        $skipped = collect(Events::setting('collections', ['events']))
+            ->flatMap(fn (string $collection) => Entry::query()->where('collection', $collection)->get())
+            ->map(fn ($entry) => $this->processEntry($entry))
+            ->filter();
 
-        collect(Events::setting('collections', ['events']))
-            ->each(function (string $collection) use (&$skipped) {
-                Entry::query()
-                    ->where('collection', $collection)
-                    ->get()
-                    ->each(function ($entry) use (&$skipped) {
-                        if ($reason = $this->skipReason($entry->data()->all())) {
-                            $skipped[] = "{$entry->id()} ({$reason})";
-
-                            return;
-                        }
-
-                        $this->migrateEntry($entry);
-                    });
-            });
-
-        if ($skipped !== []) {
+        if ($skipped->isNotEmpty()) {
             $this->console()->warn('Skipped entries (resolve by hand):');
-            collect($skipped)->each(fn (string $line) => $this->console()->line("  - {$line}"));
+            $skipped->each(fn (string $line) => $this->console()->line("  - {$line}"));
         }
 
         $this->console()->info('Migrated event location fields to the 7.0 shape.');
@@ -87,6 +74,17 @@ class MigrateLocationFields extends UpdateScript
         }
 
         $entry->save();
+    }
+
+    private function processEntry($entry): ?string
+    {
+        if ($reason = $this->skipReason($entry->data()->all())) {
+            return "{$entry->id()} ({$reason})";
+        }
+
+        $this->migrateEntry($entry);
+
+        return null;
     }
 
     private function resolveName(array $data): ?string
