@@ -48,8 +48,8 @@ class MigrateLocationFields extends UpdateScript
 
         // Prime/foreign group: leave location alone; move link → online_url if needed.
         if (is_array($location)) {
-            if (is_string($link = Arr::get($data, 'link')) && filled($link) && ! $this->filledString($data, 'online_url')) {
-                $entry->set('online_url', $link)->remove('link')->save();
+            if ($this->filledString($data, 'link') && ! $this->filledString($data, 'online_url')) {
+                $entry->set('online_url', $data['link'])->remove('link')->save();
             }
 
             return;
