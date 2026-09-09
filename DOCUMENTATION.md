@@ -44,21 +44,32 @@ ICS downloads read the following entry fields when present:
 
 | ICS property | Source |
 |---|---|
-| `LOCATION` | `address`, falling back to `location` — only when the value is a string |
-| `URL` | `online_url`, then deprecated `link`, then deprecated `location` when that string is a URL |
-| `GEO` | `coordinates` (`latitude` / `longitude`) |
+| `LOCATION` | `location.name`, falling back to `online_url` when the name is empty |
+| `URL` | `online_url` |
+| `GEO` | `location.coordinates` (`latitude` / `longitude`) |
 | `DESCRIPTION` | `description` |
 
-A URL-valued `location` (with no separate `address` / `online_url` / `link`) currently emits **both** `LOCATION:` and `URL:`. Prefer `online_url` for join links; `link` and the URL-valued `location` fallback are deprecated and will be removed in 7.0.
+`location` and `online_url` are independent and combinable (hybrid events).
 
-The `coordinates` field must be a keyed array:
+| Event | `LOCATION:` | `URL:` | `GEO:` |
+|---|---|---|---|
+| Physical only | `location.name` | — | `location.coordinates` |
+| Online only | `online_url` | `online_url` | — |
+| Hybrid | `location.name` | `online_url` | `location.coordinates` |
+
+`location` must be a group. A string or other non-group value is skipped (no `LOCATION:` from it). Nested coordinates shape:
 
 ```php
-'coordinates' => [
-    'latitude' => 40,
-    'longitude' => 50,
+'location' => [
+    'name' => '123 Main St',
+    'coordinates' => [
+        'latitude' => 40,
+        'longitude' => 50,
+    ],
 ],
 ```
+
+Partial or non-numeric coordinates are skipped (no `GEO:`) rather than failing the download.
 
 If your field names differ from the defaults above, use a [Computed Value](https://statamic.dev/content-modeling/computed-values#defining-computed-values) to map them.
 
@@ -83,9 +94,19 @@ Using the sample fieldset is the fastest way to get started.
 
 | Field | Description |
 |-------|-------------|
-| `online_url` | Join link for online or hybrid events (Zoom, livestream, etc.). Optional; can be combined with a physical place once `location` is declared. |
+| `location` | Group: `name` (localizable text — venue, description, or address) and optional nested `coordinates` (`latitude` / `longitude`). |
+| `online_url` | Join link for online or hybrid events (Zoom, livestream, etc.). Optional; independent of `location`. |
 
-`link` is deprecated in favour of `online_url` and will be removed in 7.0.
+### Upgrading to 7.0
+
+Breaking changes for location fields:
+
+- `location` is now a **group** (`name` + nested `coordinates`), not a string
+- `address`, `link`, and top-level `coordinates` are no longer read
+- URL sniffing on a string `location` is gone — use `online_url` for join links
+- Protected `eventUrl()` / `icsAddress()` were replaced by `icsUrl()` / `icsLocation()`
+
+An update script (#196) migrates common legacy handles. Back up content before upgrading. Computed-value mappings and foreign (e.g. Prime) `location` shapes need a separate cutover.
 
 ### Single-Day Events
 

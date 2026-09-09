@@ -7,7 +7,6 @@ use Carbon\CarbonInterface;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use RRule\RRuleInterface;
 use Spatie\IcalendarGenerator\Components\Event as ICalendarEvent;
 use Statamic\Entries\Entry;
@@ -133,11 +132,11 @@ abstract class Event
 
     protected function decorate(ICalendarEvent $iCalEvent): ICalendarEvent
     {
-        if ($address = $this->icsAddress()) {
-            $iCalEvent->address($address);
+        if ($location = $this->icsLocation()) {
+            $iCalEvent->address($location);
         }
 
-        if ($this->hasValidCoordinates($coords = $this->event->get('coordinates'))) {
+        if ($this->hasValidCoordinates($coords = Arr::get($this->event->get('location'), 'coordinates'))) {
             $iCalEvent->coordinates((float) $coords['latitude'], (float) $coords['longitude']);
         }
 
@@ -145,39 +144,11 @@ abstract class Event
             $iCalEvent->description($description);
         }
 
-        if (! is_null($url = $this->eventUrl())) {
+        if (! is_null($url = $this->icsUrl())) {
             $iCalEvent->url($url);
         }
 
         return $iCalEvent;
-    }
-
-    protected function eventUrl(): ?string
-    {
-        if (is_string($url = $this->event->get('online_url')) && $url !== '') {
-            return $url;
-        }
-
-        // @deprecated Will be removed in 7.0. Use online_url.
-        if (is_string($link = $this->event->get('link')) && $link !== '') {
-            return $link;
-        }
-
-        // @deprecated Will be removed in 7.0. Use online_url.
-        $location = $this->event->get('location');
-
-        if (! is_string($location) || $location === '') {
-            return null;
-        }
-
-        return Str::isUrl($location) ? $location : null;
-    }
-
-    protected function icsAddress(): ?string
-    {
-        $address = $this->event->address ?? $this->event->get('location');
-
-        return is_string($address) && $address !== '' ? $address : null;
     }
 
     // Entry::get() is untyped; keep mixed so a bad value can't TypeError the public ICS route.
@@ -186,6 +157,24 @@ abstract class Event
         return is_array($coords)
             && is_numeric($coords['latitude'] ?? null)
             && is_numeric($coords['longitude'] ?? null);
+    }
+
+    protected function icsLocation(): ?string
+    {
+        $name = Arr::get($this->event->get('location'), 'name');
+
+        if (is_string($name) && $name !== '') {
+            return $name;
+        }
+
+        return $this->icsUrl();
+    }
+
+    protected function icsUrl(): ?string
+    {
+        $url = $this->event->get('online_url');
+
+        return is_string($url) && $url !== '' ? $url : null;
     }
 
     protected function supplement(CarbonInterface $date): ?Entry

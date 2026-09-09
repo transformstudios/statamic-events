@@ -209,6 +209,44 @@ fields:
       type: section
       display: Location
   -
+    handle: location
+    field:
+      type: group
+      display: Location
+      fullscreen: false
+      border: false
+      localizable: true
+      instructions: 'Physical place for the event — a plain description or an address. Optional; combine with Online URL for hybrid events.'
+      fields:
+        -
+          handle: name
+          field:
+            type: text
+            display: Name
+            localizable: true
+            instructions: 'Venue name, plain description, or street address (ICS LOCATION).'
+        -
+          handle: coordinates
+          field:
+            type: group
+            display: Coordinates
+            fullscreen: false
+            border: false
+            instructions: 'Optional map coordinates for ICS GEO.'
+            fields:
+              -
+                handle: latitude
+                field:
+                  type: float
+                  display: Latitude
+                  width: 50
+              -
+                handle: longitude
+                field:
+                  type: float
+                  display: Longitude
+                  width: 50
+  -
     handle: online_url
     field:
       type: text
