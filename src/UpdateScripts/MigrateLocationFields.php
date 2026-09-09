@@ -2,6 +2,7 @@
 
 namespace TransformStudios\Events\UpdateScripts;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Statamic\Facades\Entry;
 use Statamic\UpdateScripts\UpdateScript;
@@ -29,21 +30,19 @@ class MigrateLocationFields extends UpdateScript
         $this->console()->info('Migrated event location fields to the 7.0 shape.');
     }
 
-    private function filledString(mixed $value): bool
+    private function filledString(array $data, string $key): bool
     {
-        return is_string($value) && $value !== '';
+        return is_string($value = Arr::get($data, $key)) && filled($value);
     }
 
     private function migrateEntry($entry): void
     {
         $data = $entry->data()->all();
-        $location = $data['location'] ?? null;
+        $location = Arr::get($data, 'location');
 
         // Foreign/Prime group: never reshape location; only lift a lone link.
         if (is_array($location)) {
-            $link = $data['link'] ?? null;
-
-            if (is_string($link) && $link !== '' && ! $this->filledString($data['online_url'] ?? null)) {
+            if (is_string($link = Arr::get($data, 'link')) && filled($link) && ! $this->filledString($data, 'online_url')) {
                 $entry->set('online_url', $link)->remove('link')->save();
             }
 
@@ -51,7 +50,8 @@ class MigrateLocationFields extends UpdateScript
         }
 
         $name = $this->resolveName($data);
-        $coordinates = is_array($data['coordinates'] ?? null) ? $data['coordinates'] : null;
+        $coordinates = Arr::get($data, 'coordinates');
+        $coordinates = is_array($coordinates) ? $coordinates : null;
         $onlineUrl = $this->resolveOnlineUrl($data);
 
         if ($name !== null || $coordinates !== null) {
@@ -89,14 +89,12 @@ class MigrateLocationFields extends UpdateScript
 
     private function resolveName(array $data): ?string
     {
-        if ($this->filledString($data['address'] ?? null)) {
+        if ($this->filledString($data, 'address')) {
             return $data['address'];
         }
 
-        $location = $data['location'] ?? null;
-
-        if ($this->filledString($location) && ! Str::isUrl($location)) {
-            return $location;
+        if ($this->filledString($data, 'location') && ! Str::isUrl($data['location'])) {
+            return $data['location'];
         }
 
         return null;
@@ -104,18 +102,16 @@ class MigrateLocationFields extends UpdateScript
 
     private function resolveOnlineUrl(array $data): ?string
     {
-        if ($this->filledString($data['online_url'] ?? null)) {
+        if ($this->filledString($data, 'online_url')) {
             return $data['online_url'];
         }
 
-        if ($this->filledString($data['link'] ?? null)) {
+        if ($this->filledString($data, 'link')) {
             return $data['link'];
         }
 
-        $location = $data['location'] ?? null;
-
-        if ($this->filledString($location) && Str::isUrl($location)) {
-            return $location;
+        if ($this->filledString($data, 'location') && Str::isUrl($data['location'])) {
+            return $data['location'];
         }
 
         return null;
@@ -123,13 +119,12 @@ class MigrateLocationFields extends UpdateScript
 
     private function skipReason(array $data): ?string
     {
-        $location = $data['location'] ?? null;
-        $hasAddress = $this->filledString($data['address'] ?? null);
-        $hasLink = $this->filledString($data['link'] ?? null);
-        $hasOnlineUrl = $this->filledString($data['online_url'] ?? null);
-        $isStringLocation = $this->filledString($location);
-        $isUrlLocation = $isStringLocation && Str::isUrl($location);
-        $isNonUrlStringLocation = $isStringLocation && ! Str::isUrl($location);
+        $hasAddress = $this->filledString($data, 'address');
+        $hasLink = $this->filledString($data, 'link');
+        $hasOnlineUrl = $this->filledString($data, 'online_url');
+        $isStringLocation = $this->filledString($data, 'location');
+        $isUrlLocation = $isStringLocation && Str::isUrl($data['location']);
+        $isNonUrlStringLocation = $isStringLocation && ! Str::isUrl($data['location']);
 
         if ($hasAddress && $isNonUrlStringLocation) {
             return 'address and non-URL location both set';
