@@ -5,14 +5,14 @@ Dates, timezones, and calendars are hard. Events makes recurring, multi-day, and
 ### Key Benefits
 
 - **Render Calendars with Minimal Code** – Generate calendar views and event listings using simple template tags.
-- **Drop-In Event Fieldset** – Start fast with a ready-to-use fieldset that handles recurrence, multi-day events, and timezones.
+- **Drop-In Event Fieldsets** – Start fast with ready-to-use fieldsets for schedule (`events::event`) and location (`events::location`).
 - **Add to Calendar (ICS)** – Let users download events and add them directly to their calendar.
 
 ---
 
 ## How It Works
 
-After installing via Composer, create or use a standard Statamic collection with structured event fields. You can use the provided [sample fieldset](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml) to get started quickly.
+After installing via Composer, create or use a standard Statamic collection with structured event fields. You can use the provided [schedule](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/event.yaml) and [location](https://github.com/transformstudios/statamic-events/blob/main/resources/fieldsets/location.yaml) fieldsets to get started quickly.
 
 Once configured, use simple template tags like:
 

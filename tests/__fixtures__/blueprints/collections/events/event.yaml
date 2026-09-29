@@ -1,16 +1,25 @@
 title: Event
-sections:
-  main:
-    display: Main
-    fields:
+tabs:
+  schedule:
+    display: Schedule
+    sections:
       -
-        import: events::event
+        fields:
+          -
+            import: events::event
+          -
+            handle: categories
+            field:
+              type: terms
+              taxonomies:
+                - categories
+              display: Categories
+              mode: tags
+              width: 50
+  location:
+    display: Location
+    sections:
       -
-        handle: categories
-        field:
-          type: terms
-          taxonomies:
-            - categories
-          display: Categories
-          mode: tags
-          width: 50
+        fields:
+          -
+            import: events::location
