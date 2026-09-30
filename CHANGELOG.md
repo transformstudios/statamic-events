@@ -1,5 +1,15 @@
 # Changelog
 
+## v6.2.1 - 2026-09-30
+
+### 🐛 Fixed
+
+- Read ICS dates in the event timezone [@edalzell](https://github.com/edalzell) (#222)
+
+### 🧰 Maintenance
+
+- Test events whose local time falls on another UTC day [@edalzell](https://github.com/edalzell) (#223)
+
 ## v6.2.0 - 2026-09-09
 
 ### 🚀 New
