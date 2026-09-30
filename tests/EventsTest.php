@@ -280,6 +280,80 @@ test('can determine occurs at for single event', function () {
     expect($event->occursOnDate(now()))->toBeTrue();
 });
 
+test('evening event occurs on its local date when that date is parsed in the app timezone', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->slug('evening-event')
+        ->data([
+            'title' => 'Evening Event',
+            'start_date' => '2026-10-02',
+            'start_time' => '19:00',
+            'end_time' => '21:00',
+            'timezone' => 'America/Los_Angeles',
+        ]);
+
+    $event = EventFactory::createFromEntry($entry);
+
+    expect($event->occursOnDate(CarbonImmutable::parse('2026-10-02')))->toBeTrue()
+        ->and($event->occursOnDate(CarbonImmutable::parse('2026-10-01')))->toBeFalse()
+        ->and($event->occursOnDate(CarbonImmutable::parse('2026-10-03')))->toBeFalse()
+        ->and($event->start()->format('Y-m-d H:i'))->toBe('2026-10-02 19:00')
+        ->and($event->start()->timezone->getName())->toBe('America/Los_Angeles');
+});
+
+test('multi day evening event occurs on its local dates when those dates are parsed in the app timezone', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->slug('multi-day-evening')
+        ->data([
+            'title' => 'Multi-day Evening',
+            'multi_day' => true,
+            'timezone' => 'America/Los_Angeles',
+            'days' => [
+                [
+                    'date' => '2026-10-02',
+                    'start_time' => '19:00',
+                    'end_time' => '21:00',
+                ],
+                [
+                    'date' => '2026-10-03',
+                    'start_time' => '11:00',
+                    'end_time' => '15:00',
+                ],
+            ],
+        ]);
+
+    $event = EventFactory::createFromEntry($entry);
+
+    expect($event->start()->format('Y-m-d H:i'))->toBe('2026-10-02 19:00')
+        ->and($event->start()->timezone->getName())->toBe('America/Los_Angeles')
+        ->and($event->occursOnDate(CarbonImmutable::parse('2026-10-01')))->toBeFalse()
+        ->and($event->occursOnDate(CarbonImmutable::parse('2026-10-02')))->toBeTrue()
+        ->and($event->occursOnDate(CarbonImmutable::parse('2026-10-03')))->toBeTrue()
+        ->and($event->occursOnDate(CarbonImmutable::parse('2026-10-04')))->toBeFalse();
+});
+
+test('recurring evening event includes its last local day', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->slug('recurring-evening')
+        ->data([
+            'title' => 'Recurring Evening',
+            'start_date' => '2026-10-01',
+            'end_date' => '2026-10-02',
+            'start_time' => '19:00',
+            'end_time' => '21:00',
+            'recurrence' => 'daily',
+            'timezone' => 'America/Los_Angeles',
+        ]);
+
+    $event = EventFactory::createFromEntry($entry);
+
+    expect($event->occursOnDate(CarbonImmutable::parse('2026-10-01')))->toBeTrue()
+        ->and($event->occursOnDate(CarbonImmutable::parse('2026-10-02')))->toBeTrue()
+        ->and($event->occursOnDate(CarbonImmutable::parse('2026-10-03')))->toBeFalse();
+});
+
 test('can determine occurs at for multiday event', function () {
     Carbon::setTestNow(now());
 
@@ -335,6 +409,32 @@ test('can exclude dates', function () {
         ->between(now(), now()->addDays(3)->endOfDay());
 
     expect($occurrences)->toHaveCount(3);
+});
+
+test('can exclude an evening occurrence on its local date', function () {
+    Entry::make()
+        ->collection('events')
+        ->slug('recurring-evening')
+        ->data([
+            'title' => 'Recurring Evening',
+            'start_date' => '2026-10-01',
+            'end_date' => '2026-10-03',
+            'start_time' => '19:00',
+            'end_time' => '21:00',
+            'recurrence' => 'daily',
+            'timezone' => 'America/Los_Angeles',
+            'exclude_dates' => [['date' => '2026-10-02']],
+        ])->save();
+
+    $occurrences = Events::fromCollection(handle: 'events')
+        ->between(
+            CarbonImmutable::parse('2026-10-01')->startOfDay(),
+            CarbonImmutable::parse('2026-10-04')->endOfDay(),
+        );
+
+    expect($occurrences)->toHaveCount(2)
+        ->and($occurrences->get(0)->start->format('Y-m-d H:i'))->toBe('2026-10-02 02:00')
+        ->and($occurrences->get(1)->start->format('Y-m-d H:i'))->toBe('2026-10-04 02:00');
 });
 
 test('can handle empty exclude dates', function () {
@@ -444,6 +544,32 @@ test('event with timezone offset appears on the correct UTC date', function () {
 
     expect($events1)->toHaveCount(0);
     expect($events2)->toHaveCount(1);
+});
+
+test('early morning event ahead of UTC stays on its local date', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => '2026-10-02',
+            'timezone' => 'Asia/Tokyo',
+            'start_time' => '01:00',
+            'end_time' => '02:00',
+        ]);
+
+    $entry->save();
+
+    $event = EventFactory::createFromEntry($entry);
+
+    expect($event->occursOnDate(CarbonImmutable::parse('2026-10-02')))->toBeTrue()
+        ->and($event->occursOnDate(CarbonImmutable::parse('2026-10-01')))->toBeFalse()
+        ->and($event->start()->format('Y-m-d H:i'))->toBe('2026-10-02 01:00')
+        ->and($event->start()->timezone->getName())->toBe('Asia/Tokyo');
+
+    $previousUtcDay = CarbonImmutable::parse('2026-10-01');
+    $localDay = CarbonImmutable::parse('2026-10-02');
+
+    expect(Events::fromCollection('events')->between($previousUtcDay->startOfDay(), $previousUtcDay->endOfDay()))->toHaveCount(1);
+    expect(Events::fromCollection('events')->between($localDay->startOfDay(), $localDay->endOfDay()))->toHaveCount(0);
 });
 
 it('uses UTC when no app timezone set', function () {
