@@ -1,5 +1,11 @@
 # Changelog
 
+## v6.2.2 - 2026-09-30
+
+### 🐛 Fixed
+
+- Backport v6.1.7 changes to 6.x [@edalzell](https://github.com/edalzell) (#225)
+
 ## v6.2.1 - 2026-09-30
 
 ### 🐛 Fixed
