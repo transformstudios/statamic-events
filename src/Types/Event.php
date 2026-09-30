@@ -199,10 +199,8 @@ abstract class Event
 
     protected function toCarbonImmutable(string|CarbonInterface $date): CarbonImmutable
     {
-        // A date string has no toImmutable().
         $carbon = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
 
-        // Keep this clock time and label it with the event timezone.
         // setTimezone() would convert the instant and move the calendar day.
         return $carbon->shiftTimezone($this->timezoneName());
     }
