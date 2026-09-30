@@ -70,7 +70,9 @@ abstract class Event
 
     public function occursOnDate(string|CarbonInterface $date): bool
     {
-        $immutableDate = is_string($date) ? CarbonImmutable::parse($date) : $date->toImmutable();
+        // The calendar link sends a date. Read that day in the event's timezone.
+        // Parsed in the app timezone, an evening event falls on the next day and the download 404s.
+        $immutableDate = $this->toCarbonImmutable($date);
 
         return ! empty($this->rule()->getOccurrencesBetween(begin: $immutableDate->startOfDay(), end: $immutableDate->endOfDay()));
     }
@@ -199,7 +201,7 @@ abstract class Event
 
     protected function toCarbonImmutable(string|CarbonInterface $date): CarbonImmutable
     {
-        $carbon = is_string($date) ? CarbonImmutable::parse($date) : $date;
+        $carbon = is_string($date) ? CarbonImmutable::parse($date) : CarbonImmutable::instance($date);
 
         return $carbon->shiftTimezone($this->timezoneName());
     }
