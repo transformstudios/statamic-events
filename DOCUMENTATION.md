@@ -57,7 +57,7 @@ ICS downloads read the following entry fields when present:
 | Online only | `online_url` | `online_url` | — |
 | Hybrid | `location.name` | `online_url` | `location.coordinates` |
 
-`location` must be a group. A string or other non-group value is skipped (no `LOCATION:` from it). Nested coordinates shape:
+`location` must be a group. A string or other non-group value is skipped (no `LOCATION:` from it). Nested coordinates:
 
 ```php
 'location' => [
@@ -106,7 +106,25 @@ Breaking changes for location fields:
 - URL sniffing on a string `location` is gone — use `online_url` for join links
 - Protected `eventUrl()` / `icsAddress()` were replaced by `icsUrl()` / `icsLocation()`
 
-An update script (#196) migrates common legacy handles. Back up content before upgrading. Computed-value mappings and foreign (e.g. Prime) `location` shapes need a separate cutover.
+**Back up content before upgrading.** The `MigrateLocationFields` update script rewrites entries in the configured events collections (all sites):
+
+| Old | New |
+|---|---|
+| `address` | `location.name` |
+| non-URL string `location` | `location.name` |
+| URL string `location` | `online_url` |
+| `link` | `online_url` |
+| top-level `coordinates` | `location.coordinates` |
+
+Skipped (logged with entry IDs — resolve by hand):
+
+- `address` and a non-URL string `location` both set
+- `link` and a URL-valued `location` both set
+- `online_url` already set together with a conflicting `link` or URL-valued `location`
+
+`location` that is already a group is left alone (not logged). A lone `link` on those entries may still move to `online_url`.
+
+Computed-value mappings are not migrated — update those by hand.
 
 ### Single-Day Events
 
