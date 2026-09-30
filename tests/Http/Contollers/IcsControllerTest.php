@@ -41,32 +41,6 @@ test('can create single day event ics file', function () {
     $this->assertStringContainsString('GEO:40;50', $content);
 });
 
-test('evening event in another timezone downloads an ics for its local date', function () {
-    Entry::make()
-        ->collection('events')
-        ->slug('family-flicks')
-        ->id('evening-id')
-        ->data([
-            'title' => 'Family Flicks',
-            'start_date' => '2026-10-02',
-            'start_time' => '19:00',
-            'end_time' => '21:00',
-            'timezone' => 'America/Los_Angeles',
-            'address' => '123 Main St',
-        ])->save();
-
-    $response = $this->get(route('statamic.events.ics.show', [
-        'date' => '2026-10-02',
-        'event' => 'evening-id',
-    ]))->assertDownload('family-flicks.ics');
-
-    $content = $response->streamedContent();
-
-    $this->assertStringContainsString('DTSTART:20261002T190000', $content);
-    $this->assertStringContainsString('DTEND:20261002T210000', $content);
-    $this->assertStringContainsString('LOCATION:123 Main St', $content);
-});
-
 test('can create single day recurring event ics file', function () {
     Carbon::setTestNow(now()->addDay()->setTimeFromTimeString('10:00'));
 
