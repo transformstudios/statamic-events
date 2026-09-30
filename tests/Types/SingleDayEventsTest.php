@@ -195,3 +195,28 @@ it('retrieves occurrences that span days in different timezone than event', func
     [now()->startOfDay(), now()->endOfDay()->addDay(), 1],
     [now()->startOfDay(), now()->endOfDay(), 1],
 ]);
+
+test('evening event is still upcoming after the utc date rolls over', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->data([
+            'start_date' => '2026-10-02',
+            'start_time' => '19:00',
+            'end_time' => '21:00',
+            'timezone' => 'America/Los_Angeles',
+        ]);
+
+    $event = EventFactory::createFromEntry($entry);
+
+    Carbon::setTestNow(CarbonImmutable::parse('2026-10-03 01:00:00'));
+
+    $next = $event->nextOccurrences();
+
+    expect($next)->toHaveCount(1)
+        ->and($next->first()->start->format('Y-m-d H:i'))->toBe('2026-10-02 19:00')
+        ->and($next->first()->start->timezone->getName())->toBe('America/Los_Angeles');
+
+    Carbon::setTestNow(CarbonImmutable::parse('2026-10-03 05:00:00'));
+
+    expect($event->nextOccurrences())->toBeEmpty();
+});

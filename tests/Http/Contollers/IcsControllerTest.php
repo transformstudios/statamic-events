@@ -581,3 +581,26 @@ test('online_url is included on all four download routes', function () {
     $this->assertStringContainsString('URL:https://zoom.us/j/multiday', $multiDate);
     expect(substr_count($multiWhole, 'URL:https://zoom.us/j/multiday'))->toBe(2);
 });
+
+test('recurring ics until includes the last local evening', function () {
+    Entry::make()
+        ->collection('events')
+        ->slug('recurring-evening')
+        ->id('recurring-evening-id')
+        ->data([
+            'title' => 'Recurring Evening',
+            'start_date' => '2026-10-01',
+            'end_date' => '2026-10-02',
+            'start_time' => '19:00',
+            'end_time' => '21:00',
+            'recurrence' => 'daily',
+            'timezone' => 'America/Los_Angeles',
+        ])->save();
+
+    $content = $this->get(route('statamic.events.ics.show', [
+        'event' => 'recurring-evening-id',
+    ]))->assertDownload('recurring-evening.ics')->streamedContent();
+
+    $this->assertStringContainsString('DTSTART:20261001T190000', $content);
+    $this->assertStringContainsString('UNTIL=20261002T235959', $content);
+});
