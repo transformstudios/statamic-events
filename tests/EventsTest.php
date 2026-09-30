@@ -280,6 +280,23 @@ test('can determine occurs at for single event', function () {
     expect($event->occursOnDate(now()))->toBeTrue();
 });
 
+test('evening event occurs on its local date when that date is parsed in the app timezone', function () {
+    $entry = Entry::make()
+        ->collection('events')
+        ->slug('evening-event')
+        ->data([
+            'title' => 'Evening Event',
+            'start_date' => '2026-10-02',
+            'start_time' => '19:00',
+            'end_time' => '21:00',
+            'timezone' => 'America/Los_Angeles',
+        ]);
+
+    $event = EventFactory::createFromEntry($entry);
+
+    expect($event->occursOnDate(CarbonImmutable::parse('2026-10-02')))->toBeTrue();
+});
+
 test('can determine occurs at for multiday event', function () {
     Carbon::setTestNow(now());
 
