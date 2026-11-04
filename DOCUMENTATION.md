@@ -11,7 +11,7 @@ composer require transformstudios/events
 Get up and running in three steps:
 
 1. Create or use a Statamic collection (default: `events`)
-2. Import the provided fieldset: `events::event`
+2. Import the provided fieldsets: `events::event` (schedule) and `events::location` (optional)
 3. Add a template:
 
 ```antlers
@@ -57,7 +57,7 @@ ICS downloads read the following entry fields when present:
 | Online only | `online_url` | `online_url` | — |
 | Hybrid | `location.name` | `online_url` | `location.coordinates` |
 
-`location` must be a group. A string or other non-group value is skipped (no `LOCATION:` from it). Nested coordinates shape:
+`location` must be a group. A string or other non-group value is skipped (no `LOCATION:` from it). Nested coordinates:
 
 ```php
 'location' => [
@@ -75,22 +75,44 @@ If your field names differ from the defaults above, use a [Computed Value](https
 
 ---
 
-## Fieldset
+## Fieldsets
 
-Your collection blueprint must include the required event fields for Events to work correctly.
+Your collection blueprint must include the schedule fields for Events to work. Location fields are optional but required for ICS `LOCATION:` / `URL:` / `GEO:`.
 
-You can:
+| Fieldset | Contents |
+|---|---|
+| `events::event` | Recurrence, dates, times, multi-day days |
+| `events::location` | `location` group (`name` + `coordinates`) and `online_url` |
 
-- Define fields manually
-- Import the provided fieldset: `events::event`
+Import both into one tab, or put them on separate tabs:
 
-Using the sample fieldset is the fastest way to get started.
+```yaml
+tabs:
+  schedule:
+    display: Schedule
+    sections:
+      -
+        fields:
+          -
+            import: events::event
+  location:
+    display: Location
+    sections:
+      -
+        fields:
+          -
+            import: events::location
+```
+
+You can also define the fields manually instead of importing.
 
 ---
 
 ## Fields
 
 ### Location & Online URL
+
+Provided by `events::location`:
 
 | Field | Description |
 |-------|-------------|
@@ -99,14 +121,15 @@ Using the sample fieldset is the fastest way to get started.
 
 ### Upgrading to 7.0
 
-Breaking changes for location fields:
+Breaking changes:
 
 - `location` is now a **group** (`name` + nested `coordinates`), not a string
 - `address`, `link`, and top-level `coordinates` are no longer read
 - URL sniffing on a string `location` is gone — use `online_url` for join links
 - Protected `eventUrl()` / `icsAddress()` were replaced by `icsUrl()` / `icsLocation()`
+- Location fields moved out of `events::event` into **`events::location`**. Import that fieldset (same tab or a Location tab) or add the fields yourself. `type: section` dividers were removed from `events::event`.
 
-An update script (#196) migrates common legacy handles. Back up content before upgrading. Computed-value mappings and foreign (e.g. Prime) `location` shapes need a separate cutover.
+An update script migrates common legacy content handles. Back up content before upgrading. Computed-value mappings and `location` values that are already a group need a separate cutover.
 
 ### Single-Day Events
 
